@@ -1,4 +1,4 @@
-import { onrampedUser, Stock, userWithBalance } from "../interfaces";
+import { onrampedUser, OrderBook, Stock, userWithBalance } from "../interfaces";
 
 export const user_with_balances: userWithBalance = {
   user1: {
@@ -13,7 +13,7 @@ export const user_with_balances: userWithBalance = {
 
 export const rampedUsers: onrampedUser[] = [];
 
-const ORDERBOOK = {
+export const ORDERBOOK: OrderBook = {
   BTC_USDT_10_Oct_2024_9_30: {
     yes: {
       "9.5": {

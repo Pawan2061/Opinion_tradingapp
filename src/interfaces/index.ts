@@ -21,3 +21,24 @@ export interface Stock {
     };
   };
 }
+
+export interface OrderBook {
+  [stockSymbol: string]: {
+    yes: {
+      [price: string]: {
+        total: number;
+        orders: {
+          [userId: string]: number;
+        };
+      };
+    };
+    no: {
+      [price: string]: {
+        total: number;
+        orders: {
+          [userId: string]: number;
+        };
+      };
+    };
+  };
+}
