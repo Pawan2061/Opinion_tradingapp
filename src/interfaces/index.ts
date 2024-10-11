@@ -3,7 +3,10 @@ export interface UserBalance {
   locked: number;
 }
 export interface userWithBalance {
-  [userId: string]: UserBalance;
+  [userId: string]: {
+    balance: number;
+    locked: number;
+  };
 }
 
 export interface onrampedUser {
@@ -26,7 +29,7 @@ export interface OrderBook {
   [stockSymbol: string]: {
     yes: {
       [price: string]: {
-        total: number;
+        quantity: number;
         orders: {
           [userId: string]: number;
         };
@@ -34,7 +37,7 @@ export interface OrderBook {
     };
     no: {
       [price: string]: {
-        total: number;
+        quantity: number;
         orders: {
           [userId: string]: number;
         };

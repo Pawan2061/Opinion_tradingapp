@@ -44,16 +44,15 @@ export const rampUser = async (req: Request, res: Response) => {
         message: "insufficient credentials",
       });
     }
-    const user: onrampedUser = {
-      userId: req.body.userId,
+
+    const newUser: onrampedUser = {
+      userId: req.body.id,
       amount: req.body.amount,
     };
-
-    rampedUsers.push(user);
-    console.log(user);
+    user_with_balances[req.body.userId].balance += newUser.amount;
 
     res.status(200).json({
-      users: rampedUsers,
+      user: newUser,
     });
   } catch (error) {
     console.log(error);
@@ -85,8 +84,13 @@ export const orderYes = (req: Request, res: any) => {
   try {
     console.log(req.body);
 
-    const { stockSymbol, price, total, userId } = req.body;
+    const { stockSymbol, price, quantity, userId } = req.body;
 
+    if (user_with_balances[userId].balance < price * quantity) {
+      return res.status(403).json({
+        message: "user doesnt have sufficient balance",
+      });
+    }
     const stock = ORDERBOOK[stockSymbol];
 
     if (!stock) {
@@ -101,16 +105,18 @@ export const orderYes = (req: Request, res: any) => {
 
     if (!stock.yes[price]) {
       stock.yes[price] = {
-        total: total,
+        quantity: 0,
         orders: {},
       };
     }
 
-    stock.yes[price].total += total;
+    stock.yes[price].quantity += quantity;
     if (stock.yes[price].orders[userId]) {
-      stock.yes[price].orders[userId] += total;
+      stock.yes[price].orders[userId] += quantity;
+      user_with_balances[userId].balance -= price * quantity;
     } else {
-      stock.yes[price].orders[userId] = total;
+      stock.yes[price].orders[userId] = quantity;
+      user_with_balances[userId].balance -= price * quantity;
     }
     console.log(stock);
 
@@ -128,7 +134,12 @@ export const orderYes = (req: Request, res: any) => {
 
 export const orderNo = (req: Request, res: any) => {
   try {
-    const { stockSymbol, price, total, userId } = req.body;
+    const { stockSymbol, price, quantity, userId } = req.body;
+    if (user_with_balances[userId].balance < price * quantity) {
+      return res.status(403).json({
+        message: "user doesnt have sufficient balance",
+      });
+    }
 
     const stock = ORDERBOOK[stockSymbol];
 
@@ -144,16 +155,18 @@ export const orderNo = (req: Request, res: any) => {
 
     if (!stock.no[price]) {
       stock.no[price] = {
-        total: total,
+        quantity: quantity,
         orders: {},
       };
     }
 
-    stock.no[price].total += total;
+    stock.no[price].quantity += quantity;
     if (stock.no[price].orders[userId]) {
-      stock.no[price].orders[userId] += total;
+      stock.no[price].orders[userId] += quantity;
+      user_with_balances[userId].balance -= price * quantity;
     } else {
-      stock.no[price].orders[userId] = total;
+      stock.no[price].orders[userId] = quantity;
+      user_with_balances[userId].balance -= price * quantity;
     }
     console.log(stock);
 
