@@ -1,19 +1,69 @@
 import { Request, Response } from "express";
-import {
-  ORDERBOOK,
-  rampedUsers,
-  STOCK_BALANCES,
-  user_with_balances,
-} from "../data/dummy";
+import { ORDERBOOK, STOCK_BALANCES, user_with_balances } from "../data/dummy";
 
 import {
   ApiResponse,
   ErrorResponse,
   MINTED_STOCKS,
   onrampedUser,
-  OrderBook,
-  OrderResponse,
+  Stock,
 } from "../interfaces";
+
+export const createUser = async (req: Request, res: any) => {
+  try {
+    const userId = req.params.userId;
+    console.log(userId);
+
+    user_with_balances[userId] = {
+      balance: 0,
+      locked: 0,
+    };
+
+    return res.status(200).json({
+      user: user_with_balances,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      error: error,
+    });
+  }
+};
+
+export const createSymbol = (req: Request, res: any) => {
+  try {
+    const stockSymbol = req.params.stockSymbol;
+
+    const { userId, locked, quantity } = req.body;
+
+    const stockType = "no";
+    if (!STOCK_BALANCES[userId]) {
+      STOCK_BALANCES[userId] = {};
+    }
+
+    if (!STOCK_BALANCES[userId][stockSymbol]) {
+      STOCK_BALANCES[userId][stockSymbol] = {};
+    }
+    STOCK_BALANCES[userId][stockSymbol] = {
+      yes: {
+        quantity: 0,
+        locked: 0,
+      },
+      no: {
+        quantity: 10,
+        locked: 1,
+      },
+    };
+
+    return res.status(200).json({
+      stock_balance: STOCK_BALANCES,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      error: error,
+    });
+  }
+};
+
 export const getUserBalance = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;

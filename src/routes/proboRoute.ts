@@ -8,9 +8,12 @@ import {
   orderNo,
   viewOrderbook,
   mintStock,
+  createUser,
+  createSymbol,
 } from "../controllers/proboController";
-import expressAsyncHandler from "express-async-handler";
 export const proboRouter = express.Router();
+proboRouter.post("/user/create/:userId", createUser);
+proboRouter.post("/balance/inr/:stockSymbol", createSymbol);
 
 proboRouter.get("/balance/inr/:id", getUserBalance);
 proboRouter.post("/onramp/inr", rampUser);

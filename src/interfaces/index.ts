@@ -16,7 +16,7 @@ export interface onrampedUser {
 
 export interface Stock {
   [userId: string]: {
-    [stockName: string]: {
+    [stockSymbol: string]: {
       [outcome: string]: {
         quantity: number;
         locked: number;
