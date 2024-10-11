@@ -42,3 +42,10 @@ export interface OrderBook {
     };
   };
 }
+
+export interface OrderResponse {
+  total: number;
+  order: {
+    [userId: string]: number;
+  };
+}

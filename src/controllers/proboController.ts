@@ -5,7 +5,8 @@ import {
   STOCK_BALANCES,
   user_with_balances,
 } from "../data/dummy";
-import { onrampedUser, OrderBook } from "../interfaces";
+
+import { onrampedUser, OrderBook, OrderResponse } from "../interfaces";
 export const getUserBalance = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
@@ -76,12 +77,51 @@ export const getBalanceStock = async (req: Request, res: Response) => {
 export const orderYes = (req: Request, res: Response) => {
   try {
     const { stockSymbol, price, total, userId } = req.body;
-    console.log(req.body);
 
-    console.log("Incoming stockSymbol:", stockSymbol);
-    console.log("ORDERBOOK:", ORDERBOOK);
     const stock = ORDERBOOK[stockSymbol];
+
+    if (!stock) {
+      return res.status(404).json({
+        message: "No stock found for the given stock symbol",
+      });
+    }
+
+    if (!stock?.yes) {
+      stock.yes = {};
+    }
+
+    if (!stock.yes[price]) {
+      stock.yes[price] = {
+        total: total,
+        orders: {},
+      };
+    }
+
+    stock.yes[price].total += total;
+    if (stock.yes[price].orders[userId]) {
+      stock.yes[price].orders[userId] += total;
+    } else {
+      stock.yes[price].orders[userId] = total;
+    }
     console.log(stock);
+
+    return res.status(200).json({
+      orderedStock: stock.yes[price],
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(400).json({
+      error: error,
+    });
+  }
+};
+
+export const orderNo = (req: Request, res: any) => {
+  try {
+    const { stockSymbol, price, total, userId } = req.body;
+
+    const stock = ORDERBOOK[stockSymbol];
 
     if (!stock) {
       return res.status(404).json({
