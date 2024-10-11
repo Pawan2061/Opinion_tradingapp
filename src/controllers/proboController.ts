@@ -6,7 +6,13 @@ import {
   user_with_balances,
 } from "../data/dummy";
 
-import { onrampedUser, OrderBook, OrderResponse } from "../interfaces";
+import {
+  ApiResponse,
+  ErrorResponse,
+  onrampedUser,
+  OrderBook,
+  OrderResponse,
+} from "../interfaces";
 export const getUserBalance = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
@@ -74,7 +80,7 @@ export const getBalanceStock = async (req: Request, res: Response) => {
   }
 };
 
-export const orderYes = (req: Request, res: Response) => {
+export const orderYes = (req: Request, res: any) => {
   try {
     console.log(req.body);
 
@@ -127,7 +133,7 @@ export const orderNo = (req: Request, res: any) => {
 
     if (!stock) {
       return res.status(404).json({
-        message: "No stock found for the given stock symbol",
+        error: "No stock found for the given stock symbol",
       });
     }
 
@@ -156,6 +162,27 @@ export const orderNo = (req: Request, res: any) => {
   } catch (error) {
     console.log(error);
 
+    return res.status(400).json({
+      error: error,
+    });
+  }
+};
+export const viewOrderbook = async (req: Request, res: any) => {
+  try {
+    const stockSymbol = req.params.stockSymbol;
+
+    if (!stockSymbol) {
+      return res.status(404).json({
+        error: "ubcn",
+      });
+    }
+
+    const book = ORDERBOOK[stockSymbol];
+
+    return res.status(200).json({
+      book: book,
+    });
+  } catch (error) {
     return res.status(400).json({
       error: error,
     });

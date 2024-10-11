@@ -42,10 +42,17 @@ export interface OrderBook {
     };
   };
 }
-
 export interface OrderResponse {
-  total: number;
-  order: {
-    [userId: string]: number;
+  orderedStock: {
+    total: number;
+    orders: {
+      [userId: string]: number;
+    };
   };
 }
+
+export interface ErrorResponse {
+  error: any;
+}
+
+export type ApiResponse = OrderResponse | ErrorResponse;
