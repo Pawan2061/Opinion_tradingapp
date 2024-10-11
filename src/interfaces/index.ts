@@ -56,3 +56,10 @@ export interface ErrorResponse {
 }
 
 export type ApiResponse = OrderResponse | ErrorResponse;
+
+export type MINTED_STOCKS = {
+  userId: string;
+  stockSymbol: string;
+  quantity: number;
+  timeStamp: Date;
+};

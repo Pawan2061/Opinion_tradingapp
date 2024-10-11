@@ -1,4 +1,10 @@
-import { onrampedUser, OrderBook, Stock, userWithBalance } from "../interfaces";
+import {
+  MINTED_STOCKS,
+  onrampedUser,
+  OrderBook,
+  Stock,
+  userWithBalance,
+} from "../interfaces";
 
 export const user_with_balances: userWithBalance = {
   user1: {

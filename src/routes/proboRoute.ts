@@ -7,6 +7,7 @@ import {
   rampUser,
   orderNo,
   viewOrderbook,
+  mintStock,
 } from "../controllers/proboController";
 import expressAsyncHandler from "express-async-handler";
 export const proboRouter = express.Router();
@@ -19,3 +20,5 @@ proboRouter.post("/order/yes", orderYes);
 
 proboRouter.post("/order/no", orderNo);
 proboRouter.get("/orderbook/:stockSymbol", viewOrderbook);
+
+proboRouter.post("/trade/mint/:stockSymbol", mintStock);

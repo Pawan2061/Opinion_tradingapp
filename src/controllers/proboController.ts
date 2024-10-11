@@ -9,6 +9,7 @@ import {
 import {
   ApiResponse,
   ErrorResponse,
+  MINTED_STOCKS,
   onrampedUser,
   OrderBook,
   OrderResponse,
@@ -187,4 +188,20 @@ export const viewOrderbook = async (req: Request, res: any) => {
       error: error,
     });
   }
+};
+
+export const mintStock = async (req: Request, res: any) => {
+  try {
+    const { userId, quantity } = req.body;
+
+    const newMint: MINTED_STOCKS = {
+      quantity: quantity,
+      userId: userId,
+      stockSymbol: req.params.id,
+      timeStamp: new Date(),
+    };
+    return res.status(200).json({
+      minted_token: newMint,
+    });
+  } catch (error) {}
 };
