@@ -7,6 +7,7 @@ import {
   rampUser,
   orderNo,
 } from "../controllers/proboController";
+import expressAsyncHandler from "express-async-handler";
 export const proboRouter = express.Router();
 
 proboRouter.get("/balance/inr/:id", getUserBalance);

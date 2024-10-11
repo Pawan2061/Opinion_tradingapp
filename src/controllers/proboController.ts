@@ -76,6 +76,8 @@ export const getBalanceStock = async (req: Request, res: Response) => {
 
 export const orderYes = (req: Request, res: Response) => {
   try {
+    console.log(req.body);
+
     const { stockSymbol, price, total, userId } = req.body;
 
     const stock = ORDERBOOK[stockSymbol];
@@ -129,27 +131,27 @@ export const orderNo = (req: Request, res: any) => {
       });
     }
 
-    if (!stock?.yes) {
-      stock.yes = {};
+    if (!stock?.no) {
+      stock.no = {};
     }
 
-    if (!stock.yes[price]) {
-      stock.yes[price] = {
+    if (!stock.no[price]) {
+      stock.no[price] = {
         total: total,
         orders: {},
       };
     }
 
-    stock.yes[price].total += total;
-    if (stock.yes[price].orders[userId]) {
-      stock.yes[price].orders[userId] += total;
+    stock.no[price].total += total;
+    if (stock.no[price].orders[userId]) {
+      stock.no[price].orders[userId] += total;
     } else {
-      stock.yes[price].orders[userId] = total;
+      stock.no[price].orders[userId] = total;
     }
     console.log(stock);
 
     return res.status(200).json({
-      orderedStock: stock.yes[price],
+      orderedStock: stock.no[price],
     });
   } catch (error) {
     console.log(error);
