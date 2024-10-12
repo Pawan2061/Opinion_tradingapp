@@ -18,6 +18,7 @@ export const createUser = async (req: Request, res: any) => {
       balance: 0,
       locked: 0,
     };
+    console.log(user_with_balances);
 
     return res.status(200).json({
       user: user_with_balances,
@@ -33,7 +34,7 @@ export const createSymbol = (req: Request, res: any) => {
   try {
     const stockSymbol = req.params.stockSymbol;
 
-    const { userId, locked, quantity } = req.body;
+    const { userId } = req.body;
 
     const stockType = "no";
     if (!STOCK_BALANCES[userId]) {
@@ -87,8 +88,6 @@ export const getUserBalance = async (req: Request, res: Response) => {
 };
 export const rampUser = async (req: Request, res: Response) => {
   try {
-    console.log(req.body);
-
     if (!req.body.userId || !req.body.amount) {
       res.status(404).json({
         message: "insufficient credentials",
@@ -160,13 +159,58 @@ export const orderYes = (req: Request, res: any) => {
       };
     }
 
+    const user_with_stock = STOCK_BALANCES[userId];
+
+    if (!user_with_stock) {
+    }
+
+    // const user_newstock = STOCK_BALANCES[userId];
+    // if (!user_newstock) {
+    //   return res.json({
+    //     message: "such user doesnt exist",
+    //   });
+    // }
+
+    // if (!user_newstock[stockSymbol]) {
+    //   return res.json({
+    //     message: "no such stock available",
+    //   });
+    // }
+
+    // if (
+    //   !user_newstock[stockSymbol]["yes"] ||
+    //   user_newstock[stockSymbol]["yes"].quantity < quantity
+    // ) {
+    //   return res.json({
+    //     message: "couldnt place the order due to less balance",
+    //   });
+    // }
+    // if (!STOCK_BALANCES[userId]) {
+    //   STOCK_BALANCES[userId] = {};
+    // }
+
+    // if (!STOCK_BALANCES[userId][stockSymbol]) {
+    //   STOCK_BALANCES[userId][stockSymbol] = {
+    //     yes: { quantity: 0, locked: 0 },
+    //     no: { quantity: 0, locked: 0 },
+    //   };
+    // }
+
+    // STOCK_BALANCES[userId][stockSymbol]["yes"] = {
+    //   locked: 0,
+    //   quantity: quantity + quantity,
+    // };
+
     stock.yes[price].quantity += quantity;
+
     if (stock.yes[price].orders[userId]) {
       stock.yes[price].orders[userId] += quantity;
+      user_with_balances[userId].locked! += price * quantity;
       user_with_balances[userId].balance -= price * quantity;
     } else {
       stock.yes[price].orders[userId] = quantity;
       user_with_balances[userId].balance -= price * quantity;
+      user_with_balances[price].locked! += quantity * price;
     }
     console.log(stock);
 
@@ -267,4 +311,34 @@ export const mintStock = async (req: Request, res: any) => {
       minted_token: newMint,
     });
   } catch (error) {}
+};
+
+export const sellYes = (req: Request, res: any) => {
+  try {
+    const { stockSymbol, price, userId, quantity } = req.body;
+
+    if (!stockSymbol || !price || !userId || !quantity) {
+      return res.json({
+        message: "insufficient credentials",
+      });
+    }
+
+    const user_stock = STOCK_BALANCES[userId];
+
+    if (!user_stock) {
+      return res.json({
+        message: "such stock doesnt exist on user stocks",
+      });
+    }
+
+    if (!user_stock[stockSymbol]) {
+      return res.json({
+        message: "No stock available for the following user",
+      });
+    }
+  } catch (error) {
+    return res.json({
+      message: error,
+    });
+  }
 };

@@ -10,6 +10,7 @@ import {
   mintStock,
   createUser,
   createSymbol,
+  sellYes,
 } from "../controllers/proboController";
 export const proboRouter = express.Router();
 proboRouter.post("/user/create/:userId", createUser);
@@ -19,7 +20,8 @@ proboRouter.get("/balance/inr/:id", getUserBalance);
 proboRouter.post("/onramp/inr", rampUser);
 proboRouter.get("/balance/stock/:userId", getBalanceStock);
 
-proboRouter.post("/order/yes", orderYes);
+proboRouter.post("/order/buy/yes", orderYes);
+proboRouter.post("/order/sell/yes", sellYes);
 
 proboRouter.post("/order/no", orderNo);
 proboRouter.get("/orderbook/:stockSymbol", viewOrderbook);
