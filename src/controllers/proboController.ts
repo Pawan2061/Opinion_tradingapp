@@ -20,8 +20,8 @@ export const createUser = async (req: Request, res: any) => {
     };
     console.log(user_with_balances);
 
-    return res.status(200).json({
-      user: user_with_balances,
+    return res.status(201).json({
+      message: `User ${userId} created `,
     });
   } catch (error) {
     return res.status(400).json({
@@ -35,30 +35,25 @@ export const createSymbol = (req: Request, res: any) => {
     const stockSymbol = req.params.stockSymbol;
 
     const { userId } = req.body;
+    const val = "yes";
 
-    const stockType = "no";
-    if (!STOCK_BALANCES[userId]) {
-      STOCK_BALANCES[userId] = {};
+    if (!stockSymbol || !userId) {
+      return res.status(404).json({
+        message: "Insufficient data",
+      });
     }
-
-    if (!STOCK_BALANCES[userId][stockSymbol]) {
-      STOCK_BALANCES[userId][stockSymbol] = {};
-    }
-    STOCK_BALANCES[userId][stockSymbol] = {
-      yes: {
-        quantity: 0,
-        locked: 0,
-      },
-      no: {
-        quantity: 10,
-        locked: 1,
-      },
+    ORDERBOOK[stockSymbol] = {
+      yes: {},
+      no: {},
     };
+    console.log(ORDERBOOK);
 
-    return res.status(200).json({
-      stock_balance: STOCK_BALANCES,
+    return res.status(201).json({
+      message: `Symbol ${stockSymbol} created`,
     });
   } catch (error) {
+    console.log(error);
+
     return res.status(400).json({
       error: error,
     });
@@ -125,20 +120,22 @@ export const getUserBalance = async (req: Request, res: Response) => {
 };
 export const rampUser = async (req: Request, res: Response) => {
   try {
-    if (!req.body.userId || !req.body.amount) {
+    const { userId, amount } = req.body;
+    if (!userId || !amount) {
       res.status(404).json({
         message: "insufficient credentials",
       });
     }
-
-    const newUser: onrampedUser = {
-      userId: req.body.id,
-      amount: req.body.amount,
-    };
-    user_with_balances[req.body.userId].balance += newUser.amount;
+    if (!user_with_balances[userId]) {
+      const newUser = (user_with_balances[userId] = {
+        balance: amount,
+        locked: 0,
+      });
+    }
+    user_with_balances[userId].balance += amount;
 
     res.status(200).json({
-      user: newUser,
+      message: `Onramped ${userId} with amount ${amount}`,
     });
   } catch (error) {
     console.log(error);
@@ -149,13 +146,13 @@ export const rampUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getBalanceStock = async (req: Request, res: Response) => {
+export const getBalanceStock = async (req: Request, res: any) => {
   try {
     const userId = req.params.userId;
 
     const stockbalance = STOCK_BALANCES[userId];
     console.log(stockbalance);
-    res.status(200).json({
+    return res.status(200).json({
       stock: stockbalance,
     });
   } catch (error) {
@@ -166,11 +163,16 @@ export const getBalanceStock = async (req: Request, res: Response) => {
   }
 };
 
-export const orderYes = (req: Request, res: any) => {
+export const buyYes = (req: Request, res: any) => {
   try {
     console.log(req.body);
 
-    const { stockSymbol, price, quantity, userId } = req.body;
+    const { stockSymbol, price, quantity, userId, stockType } = req.body;
+    if (!stockSymbol || !price || !quantity || !userId || !stockType) {
+      return res.status(404).json({
+        message: "insufficient creds",
+      });
+    }
 
     if (user_with_balances[userId].balance < price * quantity) {
       return res.status(403).json({
@@ -180,26 +182,58 @@ export const orderYes = (req: Request, res: any) => {
     const stock = ORDERBOOK[stockSymbol];
 
     if (!stock) {
-      return res.status(404).json({
-        message: "No stock found for the given stock symbol",
+      // const newBook = (ORDERBOOK[stockSymbol].no = {
+      //   price: {
+      //     quantity: quantity,
+      //     orders: {
+      //       userId: quantity,
+      //     },
+      //   },
+      // });
+
+      return res.status(400).json({
+        message: "no stock found",
       });
     }
 
     if (!stock?.yes) {
       stock.yes = {};
+      stock.no[1000 - price] = {
+        quantity: quantity,
+
+        orders: {
+          userId: userId,
+        },
+      };
+      ORDERBOOK[stockSymbol].no[price] = {
+        quantity: quantity,
+        orders: {
+          userId: userId,
+        },
+      };
+      console.log(ORDERBOOK);
     }
 
     if (!stock.yes[price]) {
       stock.yes[price] = {
-        quantity: 0,
-        orders: {},
+        quantity: quantity,
+        orders: {
+          userId: userId,
+        },
       };
+      ORDERBOOK[stockSymbol].yes[price] = {
+        quantity: quantity,
+        orders: {
+          userId: userId,
+        },
+      };
+      console.log(ORDERBOOK);
     }
 
-    const user_with_stock = STOCK_BALANCES[userId];
+    // const user_with_stock = STOCK_BALANCES[userId];
 
-    if (!user_with_stock) {
-    }
+    // if (!user_with_stock) {
+    // }
 
     // const user_newstock = STOCK_BALANCES[userId];
     // if (!user_newstock) {
@@ -263,7 +297,7 @@ export const orderYes = (req: Request, res: any) => {
   }
 };
 
-export const orderNo = (req: Request, res: any) => {
+export const buyNo = (req: Request, res: any) => {
   try {
     const { stockSymbol, price, quantity, userId } = req.body;
     if (user_with_balances[userId].balance < price * quantity) {
@@ -313,6 +347,11 @@ export const orderNo = (req: Request, res: any) => {
   }
 };
 
+export const sellNo = async (req: Request, res: any) => {
+  try {
+  } catch (error) {}
+};
+
 export const viewOrderbook = async (req: Request, res: any) => {
   try {
     const stockSymbol = req.params.stockSymbol;
@@ -326,7 +365,7 @@ export const viewOrderbook = async (req: Request, res: any) => {
     const book = ORDERBOOK[stockSymbol];
 
     return res.status(200).json({
-      book: book,
+      book,
     });
   } catch (error) {
     return res.status(400).json({
@@ -337,16 +376,24 @@ export const viewOrderbook = async (req: Request, res: any) => {
 
 export const mintStock = async (req: Request, res: any) => {
   try {
-    const { userId, quantity } = req.body;
+    const { userId, quantity, price } = req.body;
 
     const newMint: MINTED_STOCKS = {
       quantity: quantity,
       userId: userId,
       stockSymbol: req.params.id,
-      timeStamp: new Date(),
+      price: price,
     };
+
+    if (user_with_balances[userId].balance <= quantity * price) {
+      return res.status(400).json({
+        message: "Cant buy due to insufficient balance",
+      });
+    }
+    user_with_balances[userId].balance -= quantity * price;
+
     return res.status(200).json({
-      minted_token: newMint,
+      message: `Minted ${newMint.quantity} 'yes' and 'no' tokens for user ${newMint.userId}, remaining balance${user_with_balances[userId].balance}`,
     });
   } catch (error) {}
 };
@@ -361,6 +408,12 @@ export const sellYes = (req: Request, res: any) => {
       });
     }
 
+    // if (user_with_balances[userId].balance <= price * quantity) {
+    //   return res.status(400).json({
+    //     message: "insufficient balance for this user",
+    //   });
+    // }
+
     const user_stock = STOCK_BALANCES[userId];
 
     if (!user_stock) {
@@ -371,9 +424,25 @@ export const sellYes = (req: Request, res: any) => {
 
     if (!user_stock[stockSymbol]) {
       return res.json({
-        message: "No stock available for the following user",
+        message: "NPo stock available for the following user",
       });
     }
+
+    if (user_stock[stockSymbol]["yes"].quantity < quantity) {
+      return res.status(400).json({
+        message: "you dont have enough stocks",
+      });
+    }
+    STOCK_BALANCES[userId][stockSymbol]["yes"].locked += quantity;
+
+    STOCK_BALANCES[userId][stockSymbol]["yes"].quantity -= quantity;
+
+    ORDERBOOK[stockSymbol].yes[price].quantity += quantity;
+    ORDERBOOK[stockSymbol].yes[price].orders[userId] += quantity;
+
+    return res.status(200).json({
+      message: `user ${userId} sold ${quantity} yes for ${price * quantity}`,
+    });
   } catch (error) {
     return res.json({
       message: error,

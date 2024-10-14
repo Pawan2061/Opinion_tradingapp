@@ -64,5 +64,5 @@ export type MINTED_STOCKS = {
   userId: string;
   stockSymbol: string;
   quantity: number;
-  timeStamp: Date;
+  price: number;
 };

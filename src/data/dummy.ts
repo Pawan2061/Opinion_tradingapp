@@ -15,6 +15,10 @@ export const user_with_balances: userWithBalance = {
     balance: 200,
     locked: 0,
   },
+  user5: {
+    balance: 25000,
+    locked: 0,
+  },
 };
 
 export const rampedUsers: onrampedUser[] = [];
