@@ -209,12 +209,30 @@ export const buyYes = (req: Request, res: any) => {
     }
 
     if (!ORDERBOOK[stockSymbol].yes[price]) {
-      ORDERBOOK[stockSymbol].no[10 - price] = {
-        quantity: quantity,
-        orders: {
-          [userId]: quantity,
-        },
-      };
+      const newPrice = 10 - price;
+      if (!ORDERBOOK[stockSymbol].no[newPrice]) {
+        ORDERBOOK[stockSymbol].no[newPrice] = {
+          quantity: 0,
+          orders: {},
+        };
+      }
+
+      if (ORDERBOOK[stockSymbol].no[newPrice].orders[userId]) {
+        ORDERBOOK[stockSymbol].no[newPrice].orders[userId] += quantity;
+      } else {
+        ORDERBOOK[stockSymbol].no[newPrice].orders[userId] = quantity;
+      }
+      ORDERBOOK[stockSymbol].no[newPrice].quantity += quantity;
+      user_with_balances[userId].balance -= price * quantity;
+      user_with_balances[userId].locked += price * quantity;
+
+      // ORDERBOOK[stockSymbol].no[newPrice] = {
+      //   quantity: 0,
+      //   orders: {
+      //     [userId]: quantity,
+      //   },
+      // };
+      // ORDERBOOK[stockSymbol].no[10 - price].quantity += quantity;
       return res.status(200).json({
         message: "Order placed in no side",
         orderedStock: ORDERBOOK[stockSymbol].no[10 - price],
