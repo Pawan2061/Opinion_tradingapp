@@ -44,26 +44,6 @@ export const ORDERBOOK: OrderBook = {
     },
     no: {},
   },
-  BTC_USDT_10_Oct_2024_9_0: {
-    yes: {
-      "9.5": {
-        quantity: 12,
-        orders: {
-          user1: 2,
-          user2: 10,
-        },
-      },
-      "8.5": {
-        quantity: 12,
-        orders: {
-          user1: 3,
-          user2: 3,
-          user3: 6,
-        },
-      },
-    },
-    no: {},
-  },
 };
 
 export const STOCK_BALANCES: Stock = {

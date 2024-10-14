@@ -179,18 +179,8 @@ export const buyYes = (req: Request, res: any) => {
         message: "user doesnt have sufficient balance",
       });
     }
-    // const stock = ORDERBOOK[stockSymbol];
 
     if (!ORDERBOOK[stockSymbol]) {
-      // const newBook = (ORDERBOOK[stockSymbol].no = {
-      //   price: {
-      //     quantity: quantity,
-      //     orders: {
-      //       userId: quantity,
-      //     },
-      //   },
-      // });
-
       return res.status(400).json({
         message: "no stock found",
       });
@@ -226,13 +216,6 @@ export const buyYes = (req: Request, res: any) => {
       user_with_balances[userId].balance -= price * quantity;
       user_with_balances[userId].locked += price * quantity;
 
-      // ORDERBOOK[stockSymbol].no[newPrice] = {
-      //   quantity: 0,
-      //   orders: {
-      //     [userId]: quantity,
-      //   },
-      // };
-      // ORDERBOOK[stockSymbol].no[10 - price].quantity += quantity;
       return res.status(200).json({
         message: "Order placed in no side",
         orderedStock: ORDERBOOK[stockSymbol].no[10 - price],
@@ -240,48 +223,6 @@ export const buyYes = (req: Request, res: any) => {
 
       console.log(ORDERBOOK);
     }
-
-    // const user_with_stock = STOCK_BALANCES[userId];
-
-    // if (!user_with_stock) {
-    // }
-
-    // const user_newstock = STOCK_BALANCES[userId];
-    // if (!user_newstock) {
-    //   return res.json({
-    //     message: "such user doesnt exist",
-    //   });
-    // }
-
-    // if (!user_newstock[stockSymbol]) {
-    //   return res.json({
-    //     message: "no such stock available",
-    //   });
-    // }
-
-    // if (
-    //   !user_newstock[stockSymbol]["yes"] ||
-    //   user_newstock[stockSymbol]["yes"].quantity < quantity
-    // ) {
-    //   return res.json({
-    //     message: "couldnt place the order due to less balance",
-    //   });
-    // }
-    // if (!STOCK_BALANCES[userId]) {
-    //   STOCK_BALANCES[userId] = {};
-    // }
-
-    // if (!STOCK_BALANCES[userId][stockSymbol]) {
-    //   STOCK_BALANCES[userId][stockSymbol] = {
-    //     yes: { quantity: 0, locked: 0 },
-    //     no: { quantity: 0, locked: 0 },
-    //   };
-    // }
-
-    // STOCK_BALANCES[userId][stockSymbol]["yes"] = {
-    //   locked: 0,
-    //   quantity: quantity + quantity,
-    // };
 
     if (ORDERBOOK[stockSymbol].yes[price].orders[userId]) {
       ORDERBOOK[stockSymbol].yes[price].quantity! += quantity;
@@ -309,44 +250,72 @@ export const buyYes = (req: Request, res: any) => {
 
 export const buyNo = (req: Request, res: any) => {
   try {
-    const { stockSymbol, price, quantity, userId } = req.body;
+    const { stockSymbol, price, quantity, userId, stockType } = req.body;
+
+    // Check if required parameters are provided
+    if (!stockSymbol || !price || !quantity || !userId || !stockType) {
+      return res.status(404).json({
+        message: "insufficient creds",
+      });
+    }
+
+    // Check if user has sufficient balance
     if (user_with_balances[userId].balance < price * quantity) {
       return res.status(403).json({
-        message: "user doesnt have sufficient balance",
+        message: "user doesn't have sufficient balance",
       });
     }
 
-    const stock = ORDERBOOK[stockSymbol];
-
-    if (!stock) {
-      return res.status(404).json({
-        error: "No stock found for the given stock symbol",
+    // Check if the stock symbol exists in the ORDERBOOK
+    if (!ORDERBOOK[stockSymbol]) {
+      return res.status(400).json({
+        message: "no stock found",
       });
     }
 
-    if (!stock?.no) {
-      stock.no = {};
+    if (!ORDERBOOK[stockSymbol]?.no) {
+      ORDERBOOK[stockSymbol].no = {};
     }
 
-    if (!stock.no[price]) {
-      stock.no[price] = {
-        quantity: quantity,
-        orders: {},
-      };
-    }
+    if (!ORDERBOOK[stockSymbol].no[price]) {
+      const newPrice = 10 - price;
 
-    stock.no[price].quantity += quantity;
-    if (stock.no[price].orders[userId]) {
-      stock.no[price].orders[userId] += quantity;
+      if (!ORDERBOOK[stockSymbol].yes[newPrice]) {
+        ORDERBOOK[stockSymbol].yes[newPrice] = {
+          quantity: 0,
+          orders: {},
+        };
+      }
+
+      if (ORDERBOOK[stockSymbol].yes[newPrice].orders[userId]) {
+        ORDERBOOK[stockSymbol].yes[newPrice].orders[userId] += quantity;
+      } else {
+        ORDERBOOK[stockSymbol].yes[newPrice].orders[userId] = quantity;
+      }
+
+      ORDERBOOK[stockSymbol].yes[newPrice].quantity += quantity;
       user_with_balances[userId].balance -= price * quantity;
+      user_with_balances[userId].locked += price * quantity;
+
+      return res.status(200).json({
+        message: "Order placed in yes side",
+        orderedStock: ORDERBOOK[stockSymbol].yes[10 - price],
+      });
+    }
+
+    if (ORDERBOOK[stockSymbol].no[price].orders[userId]) {
+      ORDERBOOK[stockSymbol].no[price].quantity += quantity;
+      ORDERBOOK[stockSymbol].no[price].orders[userId] += quantity;
+      user_with_balances[userId].balance -= price * quantity;
+      user_with_balances[userId].locked += price * quantity;
     } else {
-      stock.no[price].orders[userId] = quantity;
+      ORDERBOOK[stockSymbol].no[price].orders[userId] = quantity;
       user_with_balances[userId].balance -= price * quantity;
+      user_with_balances[userId].locked += price * quantity;
     }
-    console.log(stock);
 
     return res.status(200).json({
-      orderedStock: stock.no[price],
+      orderedStock: ORDERBOOK[stockSymbol].no[price],
     });
   } catch (error) {
     console.log(error);

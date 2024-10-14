@@ -33,7 +33,7 @@ proboRouter.post("/order/sell", sell);
 proboRouter.post("/order/buy/yes", buyYes);
 proboRouter.post("/order/sell/yes", sellYes);
 
-// proboRouter.post("/order/buy/no", buyNo);
+proboRouter.post("/order/buy/no", buyNo);
 proboRouter.post("/order/sell/no", sellNo);
 proboRouter.get("/orderbook/:stockSymbol", viewOrderbook);
 
