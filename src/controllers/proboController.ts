@@ -179,9 +179,9 @@ export const buyYes = (req: Request, res: any) => {
         message: "user doesnt have sufficient balance",
       });
     }
-    const stock = ORDERBOOK[stockSymbol];
+    // const stock = ORDERBOOK[stockSymbol];
 
-    if (!stock) {
+    if (!ORDERBOOK[stockSymbol]) {
       // const newBook = (ORDERBOOK[stockSymbol].no = {
       //   price: {
       //     quantity: quantity,
@@ -196,37 +196,30 @@ export const buyYes = (req: Request, res: any) => {
       });
     }
 
-    if (!stock?.yes) {
-      stock.yes = {};
-      stock.no[1000 - price] = {
-        quantity: quantity,
+    if (!ORDERBOOK[stockSymbol]?.yes) {
+      ORDERBOOK[stockSymbol].yes = {};
 
-        orders: {
-          userId: userId,
-        },
-      };
-      ORDERBOOK[stockSymbol].no[price] = {
+      ORDERBOOK[stockSymbol].no[10 - price] = {
         quantity: quantity,
         orders: {
-          userId: userId,
+          [userId]: quantity,
         },
       };
       console.log(ORDERBOOK);
     }
 
-    if (!stock.yes[price]) {
-      stock.yes[price] = {
+    if (!ORDERBOOK[stockSymbol].yes[price]) {
+      ORDERBOOK[stockSymbol].no[10 - price] = {
         quantity: quantity,
         orders: {
-          userId: userId,
+          [userId]: quantity,
         },
       };
-      ORDERBOOK[stockSymbol].yes[price] = {
-        quantity: quantity,
-        orders: {
-          userId: userId,
-        },
-      };
+      return res.status(200).json({
+        message: "Order placed in no side",
+        orderedStock: ORDERBOOK[stockSymbol].no[10 - price],
+      });
+
       console.log(ORDERBOOK);
     }
 
@@ -272,21 +265,20 @@ export const buyYes = (req: Request, res: any) => {
     //   quantity: quantity + quantity,
     // };
 
-    stock.yes[price].quantity += quantity;
+    if (ORDERBOOK[stockSymbol].yes[price].orders[userId]) {
+      ORDERBOOK[stockSymbol].yes[price].quantity! += quantity;
 
-    if (stock.yes[price].orders[userId]) {
-      stock.yes[price].orders[userId] += quantity;
-      user_with_balances[userId].locked! += price * quantity;
+      ORDERBOOK[stockSymbol].yes[price].orders[userId] += quantity;
+      user_with_balances[userId].locked += price * quantity;
       user_with_balances[userId].balance -= price * quantity;
     } else {
-      stock.yes[price].orders[userId] = quantity;
+      ORDERBOOK[stockSymbol].yes[price].orders[userId] = quantity;
       user_with_balances[userId].balance -= price * quantity;
-      user_with_balances[price].locked! += quantity * price;
+      user_with_balances[userId].locked += quantity * price;
     }
-    console.log(stock);
 
     return res.status(200).json({
-      orderedStock: stock.yes[price],
+      orderedStock: ORDERBOOK[stockSymbol].yes[price],
     });
   } catch (error) {
     console.log(error);
