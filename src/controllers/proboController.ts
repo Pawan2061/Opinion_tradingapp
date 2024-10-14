@@ -65,6 +65,43 @@ export const createSymbol = (req: Request, res: any) => {
   }
 };
 
+export const getBalances = async (req: Response, res: any) => {
+  try {
+    const userBalances = user_with_balances;
+
+    if (!userBalances) {
+      return res.status(404).json({
+        message: "no balances found",
+      });
+    }
+    return res.status(200).json({
+      INR_BALANCES: userBalances,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      error: error,
+    });
+  }
+};
+
+export const getStocks = async (req: Request, res: any) => {
+  try {
+    const stock_balance = STOCK_BALANCES;
+    if (!stock_balance) {
+      return res.status(404).json({
+        message: "no stock balances found",
+      });
+    }
+    return res.status(200).json({
+      stocks: stock_balance,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      error: error,
+    });
+  }
+};
+
 export const getUserBalance = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
@@ -275,6 +312,7 @@ export const orderNo = (req: Request, res: any) => {
     });
   }
 };
+
 export const viewOrderbook = async (req: Request, res: any) => {
   try {
     const stockSymbol = req.params.stockSymbol;
@@ -336,6 +374,24 @@ export const sellYes = (req: Request, res: any) => {
         message: "No stock available for the following user",
       });
     }
+  } catch (error) {
+    return res.json({
+      message: error,
+    });
+  }
+};
+
+export const getOrderbook = async (req: Request, res: any) => {
+  try {
+    const orderbooks = ORDERBOOK;
+    if (!orderbooks) {
+      return res.status(404).json({
+        message: "No orderbook found",
+      });
+    }
+    return res.status(200).json({
+      orderbooks: orderbooks,
+    });
   } catch (error) {
     return res.json({
       message: error,

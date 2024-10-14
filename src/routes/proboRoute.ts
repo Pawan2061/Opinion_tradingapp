@@ -11,10 +11,16 @@ import {
   createUser,
   createSymbol,
   sellYes,
+  getOrderbook,
+  getBalances,
+  getStocks,
 } from "../controllers/proboController";
 export const proboRouter = express.Router();
 proboRouter.post("/user/create/:userId", createUser);
 proboRouter.post("/balance/inr/:stockSymbol", createSymbol);
+proboRouter.get("/orderbook", getOrderbook);
+proboRouter.get("/balances/inr", getBalances);
+proboRouter.get("/balances/stock", getStocks);
 
 proboRouter.get("/balance/inr/:id", getUserBalance);
 proboRouter.post("/onramp/inr", rampUser);
