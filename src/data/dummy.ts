@@ -42,7 +42,16 @@ export const ORDERBOOK: OrderBook = {
         },
       },
     },
-    no: {},
+    no: {
+      "3": {
+        quantity: 12,
+        orders: {
+          user1: 3,
+          user2: 3,
+          user3: 6,
+        },
+      },
+    },
   },
 };
 
