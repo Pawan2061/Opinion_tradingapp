@@ -15,6 +15,7 @@ import {
   buyYes,
   buyNo,
   sellNo,
+  resetMemory,
 } from "../controllers/proboController";
 import { buy, sell } from "../controllers/trade";
 export const proboRouter = express.Router();
@@ -38,3 +39,5 @@ proboRouter.post("/order/sell/no", sellNo);
 proboRouter.get("/orderbook/:stockSymbol", viewOrderbook);
 
 proboRouter.post("/trade/mint/:stockSymbol", mintStock);
+
+proboRouter.post("/reset", resetMemory);

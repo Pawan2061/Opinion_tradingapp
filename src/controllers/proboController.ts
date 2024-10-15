@@ -530,7 +530,8 @@ export const sellYes = (req: Request, res: any) => {
     ORDERBOOK[stockSymbol].yes[price].orders[userId] += quantity;
 
     return res.status(200).json({
-      message: `user ${userId} sold ${quantity} yes for ${price * quantity}`,
+      // message: `user ${userId} sold ${quantity} yes for ${price * quantity}`,
+      ORDERBOOK,
     });
   } catch (error) {
     return res.json({
@@ -549,6 +550,29 @@ export const getOrderbook = async (req: Request, res: any) => {
     }
     return res.status(200).json({
       orderbooks: orderbooks,
+    });
+  } catch (error) {
+    return res.json({
+      message: error,
+    });
+  }
+};
+
+export const resetMemory = async (req: Request, res: any) => {
+  try {
+    // Object.assign(STOCK_BALANCES, {});
+    // Object.assign(ORDERBOOK, {});
+    // Object.assign(user_with_balances, {});
+    Object.keys(STOCK_BALANCES).forEach((key) => delete STOCK_BALANCES[key]);
+    Object.keys(user_with_balances).forEach(
+      (key) => delete user_with_balances[key]
+    );
+    Object.keys(ORDERBOOK).forEach((key) => delete ORDERBOOK[key]);
+
+    return res.status(200).json({
+      STOCK_BALANCES,
+      user_with_balances,
+      ORDERBOOK,
     });
   } catch (error) {
     return res.json({
