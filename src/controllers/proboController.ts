@@ -411,6 +411,7 @@ export const buyNo = (req: Request, res: any) => {
         totalAmount -= subtraction;
       }
       ORDERBOOK[stockSymbol].no[price].quantity -= quantity - totalAmount;
+
       if (ORDERBOOK[stockSymbol].no[price].quantity == 0) {
         delete ORDERBOOK[stockSymbol].no[price];
       }
@@ -420,8 +421,11 @@ export const buyNo = (req: Request, res: any) => {
       // user_with_balances[userId].locked += price * quantity;
     } else {
       // ORDERBOOK[stockSymbol].no[price].orders[userId] = quantity;
-      user_with_balances[userId].balance -= price * quantity;
-      user_with_balances[userId].locked += price * quantity;
+      // user_with_balances[userId].balance -= price * quantity;
+      // user_with_balances[userId].locked += price * quantity;
+      return res.status(404).json({
+        message: "no orders found for this symbol",
+      });
     }
 
     return res.status(200).json({
@@ -434,11 +438,6 @@ export const buyNo = (req: Request, res: any) => {
       error: error,
     });
   }
-};
-
-export const sellNo = async (req: Request, res: any) => {
-  try {
-  } catch (error) {}
 };
 
 export const viewOrderbook = async (req: Request, res: any) => {
@@ -487,55 +486,167 @@ export const mintStock = async (req: Request, res: any) => {
   } catch (error) {}
 };
 
+// export const sellYes = (req: Request, res: any) => {
+//   try {
+//     const { stockSymbol, price, userId, quantity } = req.body;
+
+//     if (!stockSymbol || !price || !userId || !quantity) {
+//       return res.json({
+//         message: "insufficient credentials",
+//       });
+//     }
+
+//     // if (user_with_balances[userId].balance <= price * quantity) {
+//     //   return res.status(400).json({
+//     //     message: "insufficient balance for this user",
+//     //   });
+//     // }
+
+//     if (!STOCK_BALANCES[userId]) {
+//       return res.json({
+//         message: "such stock doesnt exist on user stocks",
+//       });
+//     }
+
+//     // if (!STOCK_BALANCES[userId]) {
+//     //   return res.json({
+//     //     message: "No stock available for the following user",
+//     //   });
+//     // }
+
+//     if (STOCK_BALANCES[userId]["yes"].quantity < quantity) {
+//       return res.status(400).json({
+//         message: "you dont have enough stocks",
+//       });
+//     }
+//     STOCK_BALANCES[userId][stockSymbol]["yes"].locked += quantity;
+
+//     STOCK_BALANCES[userId][stockSymbol]["yes"].quantity -= quantity;
+
+//     ORDERBOOK[stockSymbol].yes[price].quantity += quantity;
+//     ORDERBOOK[stockSymbol].yes[price].orders[userId] += quantity;
+
+//     return res.status(200).json({
+//       stockbalance: STOCK_BALANCES,
+//     });
+//   } catch (error) {
+//     return res.json({
+//       message: error,
+//     });
+//   }
+// };
 export const sellYes = (req: Request, res: any) => {
   try {
     const { stockSymbol, price, userId, quantity } = req.body;
 
     if (!stockSymbol || !price || !userId || !quantity) {
-      return res.json({
-        message: "insufficient credentials",
-      });
-    }
-
-    // if (user_with_balances[userId].balance <= price * quantity) {
-    //   return res.status(400).json({
-    //     message: "insufficient balance for this user",
-    //   });
-    // }
-
-    const user_stock = STOCK_BALANCES[userId];
-
-    if (!user_stock) {
-      return res.json({
-        message: "such stock doesnt exist on user stocks",
-      });
-    }
-
-    if (!user_stock[stockSymbol]) {
-      return res.json({
-        message: "NPo stock available for the following user",
-      });
-    }
-
-    if (user_stock[stockSymbol]["yes"].quantity < quantity) {
       return res.status(400).json({
-        message: "you dont have enough stocks",
+        message: "Insufficient credentials",
       });
     }
-    STOCK_BALANCES[userId][stockSymbol]["yes"].locked += quantity;
 
+    // Check if the user has stock balances
+    if (
+      !STOCK_BALANCES[userId] ||
+      !STOCK_BALANCES[userId][stockSymbol] ||
+      !STOCK_BALANCES[userId][stockSymbol]["yes"]
+    ) {
+      return res.status(400).json({
+        message: "No such stock available for this user",
+      });
+    }
+
+    // Check if the user has enough quantity of stocks
+    if (STOCK_BALANCES[userId][stockSymbol]["yes"].quantity < quantity) {
+      return res.status(400).json({
+        message: "You don't have enough stocks",
+      });
+    }
+
+    // Lock and deduct the stock quantity
+    STOCK_BALANCES[userId][stockSymbol]["yes"].locked += quantity;
     STOCK_BALANCES[userId][stockSymbol]["yes"].quantity -= quantity;
 
+    // Ensure ORDERBOOK has the necessary structure
+    if (!ORDERBOOK[stockSymbol]) {
+      ORDERBOOK[stockSymbol] = { yes: {}, no: {} };
+    }
+    if (!ORDERBOOK[stockSymbol].yes[price]) {
+      ORDERBOOK[stockSymbol].yes[price] = { quantity: 0, orders: {} };
+    }
+    if (!ORDERBOOK[stockSymbol].yes[price].orders[userId]) {
+      ORDERBOOK[stockSymbol].yes[price].orders[userId] = 0;
+    }
+
+    // Update the order book
     ORDERBOOK[stockSymbol].yes[price].quantity += quantity;
     ORDERBOOK[stockSymbol].yes[price].orders[userId] += quantity;
 
     return res.status(200).json({
-      // message: `user ${userId} sold ${quantity} yes for ${price * quantity}`,
-      ORDERBOOK,
+      stockbalance: STOCK_BALANCES,
     });
   } catch (error) {
-    return res.json({
-      message: error,
+    return res.status(500).json({
+      message: "An error occurred while processing the request",
+      error: error,
+    });
+  }
+};
+export const sellNo = (req: Request, res: any) => {
+  try {
+    const { stockSymbol, price, userId, quantity } = req.body;
+
+    // Check for missing fields
+    if (!stockSymbol || !price || !userId || !quantity) {
+      return res.status(400).json({
+        message: "Insufficient credentials",
+      });
+    }
+
+    // Check if the user has stock balances for "no" stocks
+    if (
+      !STOCK_BALANCES[userId] ||
+      !STOCK_BALANCES[userId][stockSymbol] ||
+      !STOCK_BALANCES[userId][stockSymbol]["no"]
+    ) {
+      return res.status(400).json({
+        message: "No such 'no' stock available for this user",
+      });
+    }
+
+    // Check if the user has enough "no" stocks to sell
+    if (STOCK_BALANCES[userId][stockSymbol]["no"].quantity < quantity) {
+      return res.status(400).json({
+        message: "You don't have enough 'no' stocks",
+      });
+    }
+
+    // Lock and deduct the "no" stock quantity for the user
+    STOCK_BALANCES[userId][stockSymbol]["no"].locked += quantity;
+    STOCK_BALANCES[userId][stockSymbol]["no"].quantity -= quantity;
+
+    // Ensure the order book structure exists for "no" stocks
+    if (!ORDERBOOK[stockSymbol]) {
+      ORDERBOOK[stockSymbol] = { yes: {}, no: {} };
+    }
+    if (!ORDERBOOK[stockSymbol].no[price]) {
+      ORDERBOOK[stockSymbol].no[price] = { quantity: 0, orders: {} };
+    }
+    if (!ORDERBOOK[stockSymbol].no[price].orders[userId]) {
+      ORDERBOOK[stockSymbol].no[price].orders[userId] = 0;
+    }
+
+    // Update the order book for "no" stocks
+    ORDERBOOK[stockSymbol].no[price].quantity += quantity;
+    ORDERBOOK[stockSymbol].no[price].orders[userId] += quantity;
+
+    return res.status(200).json({
+      stockbalance: STOCK_BALANCES,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An error occurred while processing the request",
+      error: error,
     });
   }
 };
@@ -560,9 +671,6 @@ export const getOrderbook = async (req: Request, res: any) => {
 
 export const resetMemory = async (req: Request, res: any) => {
   try {
-    // Object.assign(STOCK_BALANCES, {});
-    // Object.assign(ORDERBOOK, {});
-    // Object.assign(user_with_balances, {});
     Object.keys(STOCK_BALANCES).forEach((key) => delete STOCK_BALANCES[key]);
     Object.keys(user_with_balances).forEach(
       (key) => delete user_with_balances[key]
