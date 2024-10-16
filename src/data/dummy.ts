@@ -98,7 +98,7 @@ export const STOCK_BALANCES: Stock = {
         quantity: 10,
         locked: 8,
       },
-      ye: {
+      yes: {
         quantity: 3,
         locked: 4,
       },

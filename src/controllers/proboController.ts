@@ -219,26 +219,30 @@ export const buyYes = (req: Request, res: any) => {
       });
     }
 
-    // If the price exists on the "yes" side, process the order
     if (ORDERBOOK[stockSymbol].yes[price].orders) {
       let totalAmount = quantity;
 
       for (let user in ORDERBOOK[stockSymbol].yes[price].orders) {
         if (totalAmount <= 0) break;
+        console.log(ORDERBOOK[stockSymbol].yes[price].orders[user].type);
+
         let currentValue =
           ORDERBOOK[stockSymbol].yes[price].orders[user].quantity;
         let subtraction = Math.min(totalAmount, currentValue);
         user_with_balances[user].balance += price * subtraction;
 
-        ORDERBOOK[stockSymbol].yes[price].orders[user].quantity -=
-          currentValue - subtraction;
+        ORDERBOOK[stockSymbol].yes[price].orders[user].quantity -= subtraction;
         totalAmount -= subtraction;
-        if (!STOCK_BALANCES[userId] || !STOCK_BALANCES[userId][stockSymbol]) {
-          console.log("im here");
-
-          STOCK_BALANCES[userId][stockSymbol]["yes"].quantity = quantity;
+        if (!STOCK_BALANCES[userId]) {
+          STOCK_BALANCES[userId] = {};
         }
-        STOCK_BALANCES[userId][stockSymbol]["yes"].quantity += quantity;
+
+        if (!STOCK_BALANCES[userId][stockSymbol]) {
+          STOCK_BALANCES[userId][stockSymbol] = {
+            yes: { locked: 0, quantity: 0 },
+          };
+        }
+        STOCK_BALANCES[userId][stockSymbol]["yes"].quantity += subtraction;
       }
 
       ORDERBOOK[stockSymbol].yes[price].quantity -= quantity - totalAmount;
@@ -334,27 +338,17 @@ export const buyNo = (req: Request, res: any) => {
 
         ORDERBOOK[stockSymbol].no[price].orders[user].quantity -= subtraction;
         totalAmount -= subtraction;
-
-        // if (ORDERBOOK[stockSymbol].no[price].orders[user].quantity === 0) {
-        //   delete ORDERBOOK[stockSymbol].no[price].orders[user];
-        // }
-        // if (!STOCK_BALANCES[userId] || !STOCK_BALANCES[userId][stockSymbol]) {
-        //   console.log("im here");
-
-        //   STOCK_BALANCES[userId][stockSymbol]["no"].quantity = quantity;
-        // }
-        // STOCK_BALANCES[userId][stockSymbol]["no"].quantity += quantity;
         if (!STOCK_BALANCES[userId]) {
           STOCK_BALANCES[userId] = {};
         }
 
         if (!STOCK_BALANCES[userId][stockSymbol]) {
           STOCK_BALANCES[userId][stockSymbol] = {
-            no: { locked: 0, quantity: quantity },
+            no: { locked: 0, quantity: 0 },
           };
         }
 
-        STOCK_BALANCES[userId][stockSymbol]["no"].quantity += quantity;
+        STOCK_BALANCES[userId][stockSymbol]["no"].quantity += subtraction;
       }
 
       ORDERBOOK[stockSymbol].no[price].quantity -= quantity - totalAmount;
