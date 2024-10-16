@@ -50,7 +50,7 @@ export const ORDERBOOK: OrderBook = {
             quantity: 3,
             type: "normal ",
           },
-          user3: {
+          user5: {
             quantity: 6,
             type: "normal ",
           },
@@ -67,9 +67,9 @@ export const ORDERBOOK: OrderBook = {
           },
           user2: {
             quantity: 3,
-            type: "normal ",
+            type: "inverse",
           },
-          user3: {
+          user5: {
             quantity: 6,
             type: "normal ",
           },
@@ -95,10 +95,10 @@ export const STOCK_BALANCES: Stock = {
   user2: {
     BTC_USDT_10_Oct_2024_9_30: {
       no: {
-        quantity: 3,
-        locked: 4,
+        quantity: 10,
+        locked: 8,
       },
-      yes: {
+      ye: {
         quantity: 3,
         locked: 4,
       },

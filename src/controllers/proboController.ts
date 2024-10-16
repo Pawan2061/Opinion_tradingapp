@@ -163,103 +163,6 @@ export const getBalanceStock = async (req: Request, res: any) => {
   }
 };
 
-// export const buyYes = (req: Request, res: any) => {
-//   try {
-//     console.log(req.body);
-
-//     const { stockSymbol, price, quantity, userId, stockType } = req.body;
-//     if (!stockSymbol || !price || !quantity || !userId || !stockType) {
-//       return res.status(404).json({
-//         message: "insufficient creds",
-//       });
-//     }
-
-//     if (user_with_balances[userId].balance < price * quantity) {
-//       return res.status(403).json({
-//         message: "user doesnt have sufficient balance",
-//       });
-//     }
-
-//     if (!ORDERBOOK[stockSymbol]) {
-//       return res.status(400).json({
-//         message: "no stock found",
-//       });
-//     }
-
-//     if (!ORDERBOOK[stockSymbol]?.yes) {
-//       ORDERBOOK[stockSymbol].yes = {};
-
-//       ORDERBOOK[stockSymbol].no[10 - price] = {
-//         quantity: quantity,
-//         orders: {
-//           [userId]: quantity,
-//         },
-//       };
-//       console.log(ORDERBOOK);
-//     }
-
-//     if (!ORDERBOOK[stockSymbol].yes[price]) {
-//       const newPrice = 10 - price;
-//       if (!ORDERBOOK[stockSymbol].no[newPrice]) {
-//         ORDERBOOK[stockSymbol].no[newPrice] = {
-//           quantity: 0,
-//           orders: {},
-//         };
-//       }
-
-//       if (ORDERBOOK[stockSymbol].no[newPrice].orders[userId]) {
-//         ORDERBOOK[stockSymbol].no[newPrice].orders[userId] += quantity;
-//       } else {
-//         ORDERBOOK[stockSymbol].no[newPrice].orders[userId] = quantity;
-//       }
-//       ORDERBOOK[stockSymbol].no[newPrice].quantity += quantity;
-//       user_with_balances[userId].balance -= price * quantity;
-//       user_with_balances[userId].locked += price * quantity;
-
-//       return res.status(200).json({
-//         message: "Order placed in no side",
-//         orderedStock: ORDERBOOK,
-//       });
-//     }
-
-//     if (ORDERBOOK[stockSymbol].yes[price].orders) {
-//       let totalAmount = quantity;
-
-//       for (let user in ORDERBOOK[stockSymbol].yes[price].orders) {
-//         if (totalAmount <= 0) break;
-//         let currentValue = ORDERBOOK[stockSymbol].yes[price].orders[user];
-//         let subtraction = Math.min(totalAmount, currentValue);
-//         ORDERBOOK[stockSymbol].no[price].orders[user] =
-//           currentValue - subtraction;
-//         totalAmount -= subtraction;
-//       }
-//       ORDERBOOK[stockSymbol].yes[price].quantity -= quantity - totalAmount;
-//       if (ORDERBOOK[stockSymbol].yes[price].quantity == 0) {
-//         delete ORDERBOOK[stockSymbol].yes[price];
-//       }
-//       // ORDERBOOK[stockSymbol].yes[price].quantity! += quantity;
-
-//       // ORDERBOOK[stockSymbol].yes[price].orders[userId] += quantity;
-//       // user_with_balances[userId].locked += price * quantity;
-//       user_with_balances[userId].balance -= price * quantity;
-//     } else {
-//       // ORDERBOOK[stockSymbol].yes[price].orders[userId] = quantity;
-//       user_with_balances[userId].balance -= price * quantity;
-//       user_with_balances[userId].locked += quantity * price;
-//     }
-
-//     return res.status(200).json({
-//       orderedStock: ORDERBOOK[stockSymbol].yes[price],
-//     });
-//   } catch (error) {
-//     console.log(error);
-
-//     return res.status(400).json({
-//       error: error,
-//     });
-//   }
-// };
-
 export const buyYes = (req: Request, res: any) => {
   try {
     const { stockSymbol, price, quantity, userId, stockType } = req.body;
@@ -299,7 +202,7 @@ export const buyYes = (req: Request, res: any) => {
 
       if (ORDERBOOK[stockSymbol].no[newPrice].orders[userId]) {
         ORDERBOOK[stockSymbol].no[newPrice].orders[userId].quantity += quantity;
-        ORDERBOOK[stockSymbol].no[newPrice].orders[userId].type += "inverse";
+        ORDERBOOK[stockSymbol].no[newPrice].orders[userId].type = "inverse";
       } else {
         ORDERBOOK[stockSymbol].no[newPrice].orders[userId] = {
           quantity: quantity,
@@ -326,9 +229,16 @@ export const buyYes = (req: Request, res: any) => {
           ORDERBOOK[stockSymbol].yes[price].orders[user].quantity;
         let subtraction = Math.min(totalAmount, currentValue);
         user_with_balances[user].balance += price * subtraction;
-        ORDERBOOK[stockSymbol].yes[price].orders[user].quantity =
+
+        ORDERBOOK[stockSymbol].yes[price].orders[user].quantity -=
           currentValue - subtraction;
         totalAmount -= subtraction;
+        if (!STOCK_BALANCES[userId] || !STOCK_BALANCES[userId][stockSymbol]) {
+          console.log("im here");
+
+          STOCK_BALANCES[userId][stockSymbol]["yes"].quantity = quantity;
+        }
+        STOCK_BALANCES[userId][stockSymbol]["yes"].quantity += quantity;
       }
 
       ORDERBOOK[stockSymbol].yes[price].quantity -= quantity - totalAmount;
@@ -358,37 +268,31 @@ export const buyNo = (req: Request, res: any) => {
   try {
     const { stockSymbol, price, quantity, userId, stockType } = req.body;
 
-    // Validate required input data
     if (!stockSymbol || !price || !quantity || !userId || !stockType) {
       return res.status(404).json({
         message: "insufficient credentials",
       });
     }
 
-    // Ensure user has enough balance
     if (user_with_balances[userId].balance < price * quantity) {
       return res.status(403).json({
         message: "user doesn't have sufficient balance",
       });
     }
 
-    // Check if stock exists in the ORDERBOOK
     if (!ORDERBOOK[stockSymbol]) {
       return res.status(400).json({
         message: "no stock found",
       });
     }
 
-    // Initialize 'no' side if not present
     if (!ORDERBOOK[stockSymbol]?.no) {
       ORDERBOOK[stockSymbol].no = {};
     }
 
-    // Handle case where price is not yet in the 'no' side of the orderbook
     if (!ORDERBOOK[stockSymbol].no[price]) {
-      const newPrice = 10 - price; // Adjust the price as per logic
+      const newPrice = 10 - price;
 
-      // Initialize 'yes' side at the corresponding price if necessary
       if (!ORDERBOOK[stockSymbol].yes[newPrice]) {
         ORDERBOOK[stockSymbol].yes[newPrice] = {
           quantity: 0,
@@ -396,7 +300,6 @@ export const buyNo = (req: Request, res: any) => {
         };
       }
 
-      // Update or create the user's order on the 'yes' side
       if (ORDERBOOK[stockSymbol].yes[newPrice].orders[userId]) {
         ORDERBOOK[stockSymbol].yes[newPrice].orders[userId].quantity +=
           quantity;
@@ -408,7 +311,6 @@ export const buyNo = (req: Request, res: any) => {
         };
       }
 
-      // Update total quantity and adjust user balance
       ORDERBOOK[stockSymbol].yes[newPrice].quantity += quantity;
       user_with_balances[userId].balance -= price * quantity;
       user_with_balances[userId].locked += price * quantity;
@@ -418,11 +320,9 @@ export const buyNo = (req: Request, res: any) => {
       });
     }
 
-    // Handle existing orders at the current price level on the 'no' side
     if (ORDERBOOK[stockSymbol].no[price].orders) {
       let totalAmount = quantity;
 
-      // Match the order against existing orders
       for (let user in ORDERBOOK[stockSymbol].no[price].orders) {
         if (totalAmount <= 0) break;
 
@@ -430,41 +330,41 @@ export const buyNo = (req: Request, res: any) => {
           ORDERBOOK[stockSymbol].no[price].orders[user].quantity;
         let subtraction = Math.min(totalAmount, currentValue);
 
-        // Update the matched user's balance and adjust their order
         user_with_balances[user].balance += price * subtraction;
+
         ORDERBOOK[stockSymbol].no[price].orders[user].quantity -= subtraction;
         totalAmount -= subtraction;
 
-        // Remove the order if the quantity is zero
-        if (ORDERBOOK[stockSymbol].no[price].orders[user].quantity === 0) {
-          delete ORDERBOOK[stockSymbol].no[price].orders[user];
+        // if (ORDERBOOK[stockSymbol].no[price].orders[user].quantity === 0) {
+        //   delete ORDERBOOK[stockSymbol].no[price].orders[user];
+        // }
+        // if (!STOCK_BALANCES[userId] || !STOCK_BALANCES[userId][stockSymbol]) {
+        //   console.log("im here");
+
+        //   STOCK_BALANCES[userId][stockSymbol]["no"].quantity = quantity;
+        // }
+        // STOCK_BALANCES[userId][stockSymbol]["no"].quantity += quantity;
+        if (!STOCK_BALANCES[userId]) {
+          STOCK_BALANCES[userId] = {};
         }
+
+        if (!STOCK_BALANCES[userId][stockSymbol]) {
+          STOCK_BALANCES[userId][stockSymbol] = {
+            no: { locked: 0, quantity: quantity },
+          };
+        }
+
+        STOCK_BALANCES[userId][stockSymbol]["no"].quantity += quantity;
       }
 
-      // Adjust the remaining quantity in the orderbook
       ORDERBOOK[stockSymbol].no[price].quantity -= quantity - totalAmount;
 
-      // Remove the price level if no orders remain
       if (ORDERBOOK[stockSymbol].no[price].quantity == 0) {
         delete ORDERBOOK[stockSymbol].no[price];
       }
 
-      // Deduct user's balance for the total purchase
       user_with_balances[userId].balance -= price * quantity;
-      // STOCK_BALANCES[userId][stockSymbol]["no"].quantity += quantity;
-      // user_with_balances[userId].locked += price * quantity;
     } else {
-      // Handle new orders for this price if no existing ones are found
-      // ORDERBOOK[stockSymbol].no[price] = {
-      //   quantity: quantity,
-      //   orders: {
-      //     [userId]: {
-      //       quantity: quantity,
-      //       type: "normal",
-      //     },
-      //   },
-      // };
-
       user_with_balances[userId].balance -= price * quantity;
       user_with_balances[userId].locked += price * quantity;
     }
