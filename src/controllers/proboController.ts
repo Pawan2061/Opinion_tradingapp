@@ -203,11 +203,13 @@ export const buyYes = (req: Request, res: any) => {
       if (ORDERBOOK[stockSymbol].no[newPrice].orders[userId]) {
         ORDERBOOK[stockSymbol].no[newPrice].orders[userId].quantity += quantity;
         ORDERBOOK[stockSymbol].no[newPrice].orders[userId].type = "inverse";
+        STOCK_BALANCES[userId][stockSymbol]["no"].locked += quantity;
       } else {
         ORDERBOOK[stockSymbol].no[newPrice].orders[userId] = {
           quantity: quantity,
           type: "inverse",
         };
+        STOCK_BALANCES[userId][stockSymbol]["no"].locked += quantity;
       }
 
       ORDERBOOK[stockSymbol].no[newPrice].quantity += quantity;
@@ -308,11 +310,13 @@ export const buyNo = (req: Request, res: any) => {
         ORDERBOOK[stockSymbol].yes[newPrice].orders[userId].quantity +=
           quantity;
         ORDERBOOK[stockSymbol].yes[newPrice].orders[userId].type = "inverse";
+        STOCK_BALANCES[userId][stockSymbol]["yes"].locked += quantity;
       } else {
         ORDERBOOK[stockSymbol].yes[newPrice].orders[userId] = {
           quantity: quantity,
           type: "inverse",
         };
+        STOCK_BALANCES[userId][stockSymbol]["yes"].locked += quantity;
       }
 
       ORDERBOOK[stockSymbol].yes[newPrice].quantity += quantity;
@@ -351,7 +355,7 @@ export const buyNo = (req: Request, res: any) => {
         STOCK_BALANCES[userId][stockSymbol]["no"].quantity += subtraction;
       }
 
-      ORDERBOOK[stockSymbol].no[price].quantity -= quantity - totalAmount;
+      ORDERBOOK[stockSymbol].no[price]!.quantity -= quantity - totalAmount;
 
       if (ORDERBOOK[stockSymbol].no[price].quantity == 0) {
         delete ORDERBOOK[stockSymbol].no[price];
