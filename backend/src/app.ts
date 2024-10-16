@@ -1,10 +1,13 @@
 import express from "express";
 import { proboRouter } from "./routes/proboRoute";
-import { ORDERBOOK, STOCK_BALANCES, user_with_balances } from "./data/dummy";
+import { WebSocket } from "ws";
 
 const app = express();
 app.use(express.json());
-
+export const ws = new WebSocket("ws://localhost:8080");
+ws.on("open", () => {
+  console.log("socketio");
+});
 app.use("/api/v1", proboRouter);
 
 app.listen(3000, () => {
