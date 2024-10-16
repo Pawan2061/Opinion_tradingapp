@@ -29,16 +29,31 @@ export const ORDERBOOK: OrderBook = {
       "9.5": {
         quantity: 12,
         orders: {
-          user1: 2,
-          user2: 10,
+          user1: {
+            quantity: 2,
+            type: "normal ",
+          },
+          user2: {
+            quantity: 10,
+            type: "normal ",
+          },
         },
       },
       "8.5": {
         quantity: 12,
         orders: {
-          user1: 3,
-          user2: 3,
-          user3: 6,
+          user1: {
+            quantity: 3,
+            type: "normal ",
+          },
+          user2: {
+            quantity: 3,
+            type: "normal ",
+          },
+          user3: {
+            quantity: 6,
+            type: "normal ",
+          },
         },
       },
     },
@@ -46,9 +61,18 @@ export const ORDERBOOK: OrderBook = {
       "3": {
         quantity: 12,
         orders: {
-          user1: 3,
-          user2: 3,
-          user3: 6,
+          user1: {
+            quantity: 3,
+            type: "normal ",
+          },
+          user2: {
+            quantity: 3,
+            type: "normal ",
+          },
+          user3: {
+            quantity: 6,
+            type: "normal ",
+          },
         },
       },
     },
@@ -59,14 +83,22 @@ export const STOCK_BALANCES: Stock = {
   user1: {
     BTC_USDT_10_Oct_2024_9_30: {
       yes: {
-        quantity: 1,
-        locked: 0,
+        quantity: 10,
+        locked: 8,
+      },
+      no: {
+        quantity: 10,
+        locked: 8,
       },
     },
   },
   user2: {
     BTC_USDT_10_Oct_2024_9_30: {
       no: {
+        quantity: 3,
+        locked: 4,
+      },
+      yes: {
         quantity: 3,
         locked: 4,
       },

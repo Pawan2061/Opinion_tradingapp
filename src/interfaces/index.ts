@@ -25,26 +25,26 @@ export interface Stock {
   };
 }
 
-export interface OrderBook {
-  [stockSymbol: string]: {
-    yes: {
-      [price: number]: {
-        quantity: number;
-        orders: {
-          [userId: string]: number;
-        };
-      };
-    };
-    no: {
-      [price: number]: {
-        quantity: number;
-        orders: {
-          [userId: string]: number;
-        };
-      };
-    };
-  };
-}
+// export interface OrderBook {
+//   [stockSymbol: string]: {
+//     yes: {
+//       [price: number]: {
+//         quantity: number;
+//         orders: {
+//           [userId: string]: number;
+//         };
+//       };
+//     };
+//     no: {
+//       [price: number]: {
+//         quantity: number;
+//         orders: {
+//           [userId: string]: number;
+//         };
+//       };
+//     };
+//   };
+// }
 export interface OrderResponse {
   orderedStock: {
     total: number;
@@ -66,3 +66,28 @@ export type MINTED_STOCKS = {
   quantity: number;
   price: number;
 };
+
+export interface orderType {
+  type: "normal " | "inverse";
+  quantity: number;
+}
+export interface OrderBook {
+  [stockSymbol: string]: {
+    yes: {
+      [price: number]: {
+        quantity: number;
+        orders: {
+          [userId: string]: orderType;
+        };
+      };
+    };
+    no: {
+      [price: number]: {
+        quantity: number;
+        orders: {
+          [userId: string]: orderType;
+        };
+      };
+    };
+  };
+}
