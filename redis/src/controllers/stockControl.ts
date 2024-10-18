@@ -16,8 +16,18 @@ export const createSymbol = async (payload: any) => {
     };
     console.log("very close");
 
-    ws.send(JSON.stringify(ORDERBOOK));
-    await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(ORDERBOOK));
+    } else {
+      console.error("WebSocket is not open");
+    }
+
+    const ans = await redisClient.lPush(
+      responseQueue,
+      JSON.stringify(ORDERBOOK)
+    );
+
+    return JSON.stringify(ORDERBOOK);
   } catch (error) {
     return { error: error };
   }

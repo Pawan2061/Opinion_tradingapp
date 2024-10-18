@@ -14,6 +14,7 @@ import {
   onRampUser,
 } from "../controllers/userController";
 import { queueRequest } from "../interface/request";
+import { pubsubManager, PubSubManager } from "../pubsub";
 
 export const processRequests = async (request: any) => {
   console.log("im outside");
@@ -29,7 +30,10 @@ export const processRequests = async (request: any) => {
   }
 
   if (request.method === "createSymbol") {
-    await createSymbol(request.payload);
+    const data = await createSymbol(request.payload);
+    console.log(data, "kristy");
+
+    await pubsubManager.sendOutput(request.payload.id, data);
   }
 
   if (request.method === "onRamp") {

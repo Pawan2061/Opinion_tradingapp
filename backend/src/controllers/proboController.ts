@@ -1,13 +1,18 @@
 import { json, Request, Response } from "express";
+import { v4 as uuid } from "uuid";
 import { ORDERBOOK, STOCK_BALANCES, user_with_balances } from "../data/dummy";
+import { pubsubManager } from "../../../redis/src/pubsub";
 const requestQueue = "request";
 const responseQueue = "response";
 
 import { redisClient } from "../app";
+import { handleOutput } from "../utils/help";
 
 export const createUser = async (req: Request, res: any) => {
   try {
+    const id = uuid();
     const input = {
+      id: id,
       method: "createUser",
       payload: req.params.userId,
     };
@@ -53,10 +58,12 @@ export const createSymbol = async (req: Request, res: any) => {
         message: "Insufficient data",
       });
     }
+    const id = uuid();
 
     const input = {
       method: "createSymbol",
       payload: {
+        id: id,
         stockSymbol: stockSymbol,
         userId: userId,
       },
@@ -72,7 +79,16 @@ export const createSymbol = async (req: Request, res: any) => {
       });
     }
 
-    return res.status(200).send(JSON.parse(data.element));
+    try {
+      const response = await redisClient.subscribe(id, (output) => {
+        const data = pubsubManager.handleOutput(output);
+        console.log(data);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
+    return res.status(200).send(JSON.parse(data!.element));
 
     // ORDERBOOK[stockSymbol] = {
     //   yes: {},
@@ -80,9 +96,9 @@ export const createSymbol = async (req: Request, res: any) => {
     // };
     // console.log(ORDERBOOK);
 
-    return res.status(201).json({
-      ORDERBOOK,
-    });
+    // return res.status(201).json({
+    //   ORDERBOOK,
+    // });
   } catch (error) {
     console.log(error);
 

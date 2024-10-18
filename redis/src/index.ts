@@ -11,6 +11,8 @@ export const ws = new WebSocket("ws://localhost:8080");
 
 export const redisClient = createClient({});
 
+export const pubClient = createClient({});
+
 async function redisConnect() {
   try {
     await redisClient.connect();

@@ -1,6 +1,5 @@
 import { json, request, Request, Response } from "express";
 
-import { createClient } from "redis";
 import { user_with_balances } from "../data";
 import { redisClient } from "..";
 import { responseQueue } from ".";
