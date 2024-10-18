@@ -3,7 +3,7 @@ import { ORDERBOOK, STOCK_BALANCES, user_with_balances } from "../data/dummy";
 const requestQueue = "request";
 const responseQueue = "response";
 
-import { redisClient, ws } from "../app";
+import { redisClient } from "../app";
 
 export const createUser = async (req: Request, res: any) => {
   try {

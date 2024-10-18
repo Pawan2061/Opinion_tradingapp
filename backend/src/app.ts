@@ -6,7 +6,6 @@ import { createClient } from "redis";
 export const redisClient = createClient();
 const app = express();
 app.use(express.json());
-export const ws = new WebSocket("ws://localhost:8080");
 
 // ws.on("open", () => {
 //   console.log("socketio");

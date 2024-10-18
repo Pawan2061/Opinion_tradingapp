@@ -1,6 +1,6 @@
 import { response, Response } from "express";
 import { responseQueue } from ".";
-import { redisClient } from "..";
+import { redisClient, ws } from "..";
 import { ORDERBOOK, STOCK_BALANCES, user_with_balances } from "../data";
 
 export const createSymbol = async (payload: any) => {
@@ -14,6 +14,9 @@ export const createSymbol = async (payload: any) => {
       yes: {},
       no: {},
     };
+    console.log("very close");
+
+    ws.send(JSON.stringify(ORDERBOOK));
     await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
   } catch (error) {
     return { error: error };
@@ -161,6 +164,7 @@ export const buyYes = async (payload: any) => {
         // return res.status(200).json({
         //   orderedStock: ORDERBOOK,
         // });
+        ws.send(JSON.stringify(ORDERBOOK));
         await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
       } else {
         ORDERBOOK[payload.stockSymbol].no[newPrice].orders[payload.userId] = {
@@ -181,6 +185,7 @@ export const buyYes = async (payload: any) => {
         //   orderedStock: ORDERBOOK,
         // });
         console.log(ORDERBOOK);
+        ws.send(JSON.stringify(ORDERBOOK));
         await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
       }
     }
@@ -238,12 +243,13 @@ export const buyYes = async (payload: any) => {
         payload.price * payload.quantity;
     }
 
+    ws.send(JSON.stringify(ORDERBOOK));
+
     await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
   } catch (error) {
     return { error: error };
   }
 };
-
 export const buyNo = async (payload: any) => {
   try {
     if (

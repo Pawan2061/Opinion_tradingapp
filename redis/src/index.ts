@@ -7,6 +7,7 @@ import { queueRequest } from "./interface/request";
 const app = express();
 
 const requestQueue = "request";
+export const ws = new WebSocket("ws://localhost:8080");
 
 export const redisClient = createClient({});
 
