@@ -1,6 +1,7 @@
-import { Request, Response } from "express";
+import { json, Request, Response } from "express";
 import { ORDERBOOK, STOCK_BALANCES, user_with_balances } from "../data/dummy";
 const requestQueue = "request";
+const responseQueue = "response";
 
 import { redisClient, ws } from "../app";
 
@@ -13,13 +14,7 @@ export const createUser = async (req: Request, res: any) => {
 
     await redisClient.lPush(requestQueue, JSON.stringify(input));
 
-    console.log("upside");
-
-    const data = await redisClient.brPop("receive-user", 0);
-    console.log("downside");
-
-    console.log(data, "here");
-    console.log(data);
+    const data = await redisClient.brPop(responseQueue, 0);
 
     if (!data) {
       return res.status(409).json({
@@ -47,7 +42,7 @@ export const createUser = async (req: Request, res: any) => {
   }
 };
 
-export const createSymbol = (req: Request, res: any) => {
+export const createSymbol = async (req: Request, res: any) => {
   try {
     const stockSymbol = req.params.stockSymbol;
 
@@ -59,11 +54,31 @@ export const createSymbol = (req: Request, res: any) => {
       });
     }
 
-    ORDERBOOK[stockSymbol] = {
-      yes: {},
-      no: {},
+    const input = {
+      method: "createSymbol",
+      payload: {
+        stockSymbol: stockSymbol,
+        userId: userId,
+      },
     };
-    console.log(ORDERBOOK);
+
+    await redisClient.lPush(requestQueue, JSON.stringify(input));
+
+    const data = await redisClient.brPop(responseQueue, 0);
+
+    if (!data) {
+      return res.status(409).json({
+        message: "couldnt process further",
+      });
+    }
+
+    return res.status(200).send(JSON.parse(data.element));
+
+    // ORDERBOOK[stockSymbol] = {
+    //   yes: {},
+    //   no: {},
+    // };
+    // console.log(ORDERBOOK);
 
     return res.status(201).json({
       ORDERBOOK,
@@ -79,16 +94,31 @@ export const createSymbol = (req: Request, res: any) => {
 
 export const getBalances = async (req: Response, res: any) => {
   try {
-    const userBalances = user_with_balances;
+    const input = {
+      method: "getBalance",
+      payload: {},
+    };
 
-    if (!userBalances) {
-      return res.status(404).json({
-        message: "no balances found",
-      });
+    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    const data = await redisClient.brPop(responseQueue, 0);
+    if (!data) {
+      return res
+        .status(409)
+        .json({ message: "cant proceed with this request" });
     }
-    return res.status(200).json({
-      INR_BALANCES: userBalances,
-    });
+
+    return res.status(200).send(JSON.parse(data.element));
+
+    // const userBalances = user_with_balances;
+
+    // if (!userBalances) {
+    //   return res.status(404).json({
+    //     message: "no balances found",
+    //   });
+    // }
+    // return res.status(200).json({
+    //   INR_BALANCES: userBalances,
+    // });
   } catch (error) {
     return res.status(400).json({
       error: error,
@@ -98,15 +128,32 @@ export const getBalances = async (req: Response, res: any) => {
 
 export const getStocks = async (req: Request, res: any) => {
   try {
-    const stock_balance = STOCK_BALANCES;
-    if (!stock_balance) {
-      return res.status(404).json({
-        message: "no stock balances found",
+    const input = {
+      method: "getStocks",
+      payload: {},
+    };
+
+    await redisClient.lPush(requestQueue, JSON.stringify(input));
+
+    const data = await redisClient.brPop(responseQueue, 0);
+
+    if (!data) {
+      return res.status(409).json({
+        message: "cant proceed with this request",
       });
     }
-    return res.status(200).json({
-      stocks: stock_balance,
-    });
+
+    return res.status(200).send(JSON.parse(data.element));
+
+    // const stock_balance = STOCK_BALANCES;
+    // if (!stock_balance) {
+    //   return res.status(404).json({
+    //     message: "no stock balances found",
+    //   });
+    // }
+    // return res.status(200).json({
+    //   stocks: stock_balance,
+    // });
   } catch (error) {
     return res.status(400).json({
       error: error,
@@ -114,42 +161,71 @@ export const getStocks = async (req: Request, res: any) => {
   }
 };
 
-export const getUserBalance = async (req: Request, res: Response) => {
+export const getUserBalance = async (req: Request, res: any) => {
   try {
     const id = req.params.id;
-    console.log(id);
 
-    const user = user_with_balances[id];
+    const input = {
+      method: "getUserBalance",
+      payload: id,
+    };
 
-    if (user) {
-      res.status(200).json({
-        id,
-        balance: user.balance,
-        locked: user.locked,
-      });
-    } else {
-      res.status(404).json({ message: "User not found" });
-    }
+    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    const data = await redisClient.brPop(responseQueue, 0);
+    // const user = user_with_balances[id];
+
+    // if (user) {
+    //   res.status(200).json({
+    //     id,
+    //     balance: user.balance,
+    //     locked: user.locked,
+    //   });
+    // } else {
+    //   res.status(404).json({ message: "User not found" });
+    // }
+    return res.status(200).send(data?.element);
+
+    // return res.status(200).send(JSON.parse());
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred" });
   }
 };
-export const rampUser = async (req: Request, res: Response) => {
+export const rampUser = async (req: Request, res: any) => {
   try {
     const { userId, amount } = req.body;
-    if (!userId || !amount) {
-      res.status(404).json({
-        message: "insufficient credentials",
+
+    const input = {
+      method: "onRamp",
+      payload: {
+        userId: userId,
+        amount: amount,
+      },
+    };
+
+    await redisClient.lPush(requestQueue, JSON.stringify(input));
+
+    const data = await redisClient.brPop(responseQueue, 0);
+    if (!data) {
+      return res.status(409).json({
+        message: " couldnt process this request",
       });
     }
-    if (!user_with_balances[userId]) {
-      const newUser = (user_with_balances[userId] = {
-        balance: amount,
-        locked: 0,
-      });
-    }
-    user_with_balances[userId].balance += amount;
+
+    return res.status(200).send(JSON.parse(data.element));
+
+    // if (!userId || !amount) {
+    //   res.status(404).json({
+    //     message: "insufficient credentials",
+    //   });
+    // }
+    // if (!user_with_balances[userId]) {
+    //   const newUser = (user_with_balances[userId] = {
+    //     balance: amount,
+    //     locked: 0,
+    //   });
+    // }
+    // user_with_balances[userId].balance += amount;
 
     res.status(200).json({
       message: `Onramped ${userId} with amount ${amount}`,
@@ -166,12 +242,27 @@ export const rampUser = async (req: Request, res: Response) => {
 export const getBalanceStock = async (req: Request, res: any) => {
   try {
     const userId = req.params.userId;
+    const input = {
+      method: "getBalanceStock",
+      payload: userId,
+    };
 
-    const stockbalance = STOCK_BALANCES[userId];
-    console.log(stockbalance);
-    return res.status(200).json({
-      stock: stockbalance,
-    });
+    await redisClient.lPush(requestQueue, JSON.stringify(input));
+
+    const data = await redisClient.brPop(responseQueue, 0);
+
+    if (!data) {
+      return res.status(409).json({
+        message: "couldnt proceed further",
+      });
+    }
+
+    return res.status(200).send(JSON.parse(data.element));
+
+    // const stockbalance = STOCK_BALANCES[userId];
+    // return res.status(200).json({
+    //   stock: stockbalance,
+    // });
   } catch (error) {
     console.log(error);
     res.status(400).json({
@@ -180,118 +271,128 @@ export const getBalanceStock = async (req: Request, res: any) => {
   }
 };
 
-export const buyYes = (req: Request, res: any) => {
+export const buyYes = async (req: Request, res: any) => {
   try {
     const { stockSymbol, price, quantity, userId, stockType } = req.body;
 
-    if (!stockSymbol || !price || !quantity || !userId || !stockType) {
-      return res.status(404).json({
-        message: "insufficient creds",
-      });
-    }
+    const input = {
+      method: "buyYes",
+      payload: {
+        stockSymbol,
+        price,
+        quantity,
+        userId,
+        stockType,
+      },
+    };
 
-    if (user_with_balances[userId]!.balance < price * quantity) {
-      return res.status(403).json({
-        message: "user doesn't have sufficient balance",
-      });
-    }
+    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    console.log("before parsing");
 
-    if (!ORDERBOOK[stockSymbol]) {
-      return res.status(400).json({
-        message: "no stock found",
-      });
-    }
+    const data = await redisClient.brPop(responseQueue, 0);
 
-    if (!ORDERBOOK[stockSymbol]?.yes) {
-      ORDERBOOK[stockSymbol].yes = {};
-    }
+    // if (!stockSymbol || !price || !quantity || !userId || !stockType) {
+    //   return res.status(404).json({
+    //     message: "insufficient creds",
+    //   });
+    // }
 
-    // Handle logic for a new price on the "yes" side
-    if (!ORDERBOOK[stockSymbol].yes[price]) {
-      const newPrice = 10 - price;
+    // if (user_with_balances[userId]!.balance < price * quantity) {
+    //   return res.status(403).json({
+    //     message: "user doesn't have sufficient balance",
+    //   });
+    // }
 
-      if (!ORDERBOOK[stockSymbol].no[newPrice]) {
-        ORDERBOOK[stockSymbol].no[newPrice] = {
-          quantity: 0,
-          orders: {},
-        };
-      }
+    // if (!ORDERBOOK[stockSymbol]) {
+    //   return res.status(400).json({
+    //     message: "no stock found",
+    //   });
+    // }
 
-      if (ORDERBOOK[stockSymbol].no[newPrice].orders[userId]) {
-        ORDERBOOK[stockSymbol].no[newPrice].orders[userId].quantity += quantity;
-        ORDERBOOK[stockSymbol].no[newPrice].orders[userId].type = "inverse";
-        ORDERBOOK[stockSymbol].yes[newPrice].quantity += quantity;
-        user_with_balances[userId].locked += price * quantity;
+    // if (!ORDERBOOK[stockSymbol]?.yes) {
+    //   ORDERBOOK[stockSymbol].yes = {};
+    // }
 
-        user_with_balances[userId].balance -= price * quantity;
-        return res.status(200).json({
-          orderedStock: ORDERBOOK,
-        });
-      } else {
-        ORDERBOOK[stockSymbol].no[newPrice].orders[userId] = {
-          quantity: quantity,
-          type: "inverse",
-        };
-        ORDERBOOK[stockSymbol].no[newPrice].quantity += quantity;
-        user_with_balances[userId].locked += price * quantity;
+    // // Handle logic for a new price on the "yes" side
+    // if (!ORDERBOOK[stockSymbol].yes[price]) {
+    //   const newPrice = 10 - price;
 
-        // STOCK_BALANCES[userId][stockSymbol]["no"].locked += quantity;
+    //   if (!ORDERBOOK[stockSymbol].no[newPrice]) {
+    //     ORDERBOOK[stockSymbol].no[newPrice] = {
+    //       quantity: 0,
+    //       orders: {},
+    //     };
+    //   }
 
-        user_with_balances[userId].balance -= price * quantity;
-        ws.send(JSON.stringify(ORDERBOOK));
-        return res.status(200).json({
-          orderedStock: ORDERBOOK,
-        });
-      }
+    //   if (ORDERBOOK[stockSymbol].no[newPrice].orders[userId]) {
+    //     ORDERBOOK[stockSymbol].no[newPrice].orders[userId].quantity += quantity;
+    //     ORDERBOOK[stockSymbol].no[newPrice].orders[userId].type = "inverse";
+    //     ORDERBOOK[stockSymbol].yes[newPrice].quantity += quantity;
+    //     user_with_balances[userId].locked += price * quantity;
 
-      ORDERBOOK[stockSymbol].no[newPrice].quantity += quantity;
-      user_with_balances[userId].balance -= newPrice * quantity;
-      user_with_balances[userId].locked += newPrice * quantity;
+    //     user_with_balances[userId].balance -= price * quantity;
+    //     return res.status(200).json({
+    //       orderedStock: ORDERBOOK,
+    //     });
+    //   } else {
+    //     ORDERBOOK[stockSymbol].no[newPrice].orders[userId] = {
+    //       quantity: quantity,
+    //       type: "inverse",
+    //     };
+    //     ORDERBOOK[stockSymbol].no[newPrice].quantity += quantity;
+    //     user_with_balances[userId].locked += price * quantity;
 
-      return res.status(200).json({
-        orderedStock: ORDERBOOK,
-      });
-    }
+    //     // STOCK_BALANCES[userId][stockSymbol]["no"].locked += quantity;
 
-    if (ORDERBOOK[stockSymbol].yes[price].orders) {
-      let totalAmount = quantity;
+    //     user_with_balances[userId].balance -= price * quantity;
+    //     ws.send(JSON.stringify(ORDERBOOK));
+    //     return res.status(200).json({
+    //       orderedStock: ORDERBOOK,
+    //     });
+    //   }
+    // }
 
-      for (let user in ORDERBOOK[stockSymbol].yes[price].orders) {
-        if (totalAmount <= 0) break;
-        console.log(ORDERBOOK[stockSymbol].yes[price].orders[user].type);
+    // if (ORDERBOOK[stockSymbol].yes[price].orders) {
+    //   let totalAmount = quantity;
 
-        let currentValue =
-          ORDERBOOK[stockSymbol].yes[price].orders[user].quantity;
-        let subtraction = Math.min(totalAmount, currentValue);
-        user_with_balances[user].balance += price * subtraction;
+    //   for (let user in ORDERBOOK[stockSymbol].yes[price].orders) {
+    //     if (totalAmount <= 0) break;
+    //     console.log(ORDERBOOK[stockSymbol].yes[price].orders[user].type);
 
-        ORDERBOOK[stockSymbol].yes[price].orders[user].quantity -= subtraction;
-        totalAmount -= subtraction;
-        if (!STOCK_BALANCES[userId]) {
-          STOCK_BALANCES[userId] = {};
-        }
+    //     let currentValue =
+    //       ORDERBOOK[stockSymbol].yes[price].orders[user].quantity;
+    //     let subtraction = Math.min(totalAmount, currentValue);
+    //     user_with_balances[user].balance += price * subtraction;
 
-        if (!STOCK_BALANCES[userId][stockSymbol]) {
-          STOCK_BALANCES[userId][stockSymbol] = {
-            yes: { locked: 0, quantity: 0 },
-          };
-        }
-        STOCK_BALANCES[userId][stockSymbol]["yes"].quantity += subtraction;
-      }
+    //     ORDERBOOK[stockSymbol].yes[price].orders[user].quantity -= subtraction;
+    //     totalAmount -= subtraction;
+    //     if (!STOCK_BALANCES[userId]) {
+    //       STOCK_BALANCES[userId] = {};
+    //     }
 
-      ORDERBOOK[stockSymbol].yes[price].quantity -= quantity - totalAmount;
-      if (ORDERBOOK[stockSymbol].yes[price].quantity == 0) {
-        delete ORDERBOOK[stockSymbol].yes[price];
-      }
+    //     if (!STOCK_BALANCES[userId][stockSymbol]) {
+    //       STOCK_BALANCES[userId][stockSymbol] = {
+    //         yes: { locked: 0, quantity: 0 },
+    //       };
+    //     }
+    //     STOCK_BALANCES[userId][stockSymbol]["yes"].quantity += subtraction;
+    //   }
 
-      user_with_balances[userId].balance -= price * quantity;
-    } else {
-      user_with_balances[userId].balance -= price * quantity;
-      user_with_balances[userId].locked += price * quantity;
-    }
+    //   ORDERBOOK[stockSymbol].yes[price].quantity -= quantity - totalAmount;
+    //   if (ORDERBOOK[stockSymbol].yes[price].quantity == 0) {
+    //     delete ORDERBOOK[stockSymbol].yes[price];
+    //   }
+
+    //   user_with_balances[userId].balance -= price * quantity;
+    // } else {
+    //   user_with_balances[userId].balance -= price * quantity;
+    //   user_with_balances[userId].locked += price * quantity;
+    // }
+
+    console.log("almost parsed");
 
     return res.status(200).json({
-      orderedStock: ORDERBOOK,
+      orderedStock: JSON.parse(data!.element),
     });
   } catch (error) {
     console.log(error);
@@ -302,121 +403,144 @@ export const buyYes = (req: Request, res: any) => {
   }
 };
 
-export const buyNo = (req: Request, res: any) => {
+export const buyNo = async (req: Request, res: any) => {
   try {
     const { stockSymbol, price, quantity, userId, stockType } = req.body;
 
-    if (!stockSymbol || !price || !quantity || !userId || !stockType) {
-      return res.status(404).json({
-        message: "insufficient credentials",
+    const input = {
+      method: "buyNo",
+      payload: {
+        stockSymbol: stockSymbol,
+        price: price,
+        quantity: quantity,
+        userId: userId,
+        stockType: stockType,
+      },
+    };
+
+    await redisClient.lPush(requestQueue, JSON.stringify(input));
+
+    const data = await redisClient.brPop(responseQueue, 0);
+
+    if (!data) {
+      return res.status(409).json({
+        message: "cant process this",
       });
     }
 
-    if (user_with_balances[userId].balance < price * quantity) {
-      return res.status(403).json({
-        message: "user doesn't have sufficient balance",
-      });
-    }
+    return res.status(200).send(JSON.parse(data.element));
 
-    if (!ORDERBOOK[stockSymbol]) {
-      return res.status(400).json({
-        message: "no stock found",
-      });
-    }
+    // if (!stockSymbol || !price || !quantity || !userId || !stockType) {
+    //   return res.status(404).json({
+    //     message: "insufficient credentials",
+    //   });
+    // }
 
-    if (!ORDERBOOK[stockSymbol]?.no) {
-      ORDERBOOK[stockSymbol].no = {};
-    }
+    // if (user_with_balances[userId].balance < price * quantity) {
+    //   return res.status(403).json({
+    //     message: "user doesn't have sufficient balance",
+    //   });
+    // }
 
-    if (!ORDERBOOK[stockSymbol].no[price]) {
-      const newPrice = 10 - price;
+    // if (!ORDERBOOK[stockSymbol]) {
+    //   return res.status(400).json({
+    //     message: "no stock found",
+    //   });
+    // }
 
-      if (!ORDERBOOK[stockSymbol].yes[newPrice]) {
-        ORDERBOOK[stockSymbol].yes[newPrice] = {
-          quantity: 0,
-          orders: {},
-        };
-      }
+    // if (!ORDERBOOK[stockSymbol]?.no) {
+    //   ORDERBOOK[stockSymbol].no = {};
+    // }
 
-      if (ORDERBOOK[stockSymbol].yes[newPrice].orders[userId]) {
-        ORDERBOOK[stockSymbol].yes[newPrice].orders[userId].quantity +=
-          quantity;
-        ORDERBOOK[stockSymbol].yes[newPrice].quantity += quantity;
+    // if (!ORDERBOOK[stockSymbol].no[price]) {
+    //   const newPrice = 10 - price;
 
-        ORDERBOOK[stockSymbol].yes[newPrice].orders[userId].type = "inverse";
-        // STOCK_BALANCES[userId][stockSymbol]["yes"].locked += quantity;
-        user_with_balances[userId].locked += price * quantity;
+    //   if (!ORDERBOOK[stockSymbol].yes[newPrice]) {
+    //     ORDERBOOK[stockSymbol].yes[newPrice] = {
+    //       quantity: 0,
+    //       orders: {},
+    //     };
+    //   }
 
-        user_with_balances[userId].balance -= price * quantity;
-        return res.status(200).json({
-          orderedStock: ORDERBOOK,
-        });
-      } else {
-        ORDERBOOK[stockSymbol].yes[newPrice].orders[userId] = {
-          quantity: quantity,
-          type: "inverse",
-        };
-        ORDERBOOK[stockSymbol].yes[newPrice].quantity += quantity;
+    //   if (ORDERBOOK[stockSymbol].yes[newPrice].orders[userId]) {
+    //     ORDERBOOK[stockSymbol].yes[newPrice].orders[userId].quantity +=
+    //       quantity;
+    //     ORDERBOOK[stockSymbol].yes[newPrice].quantity += quantity;
 
-        user_with_balances[userId].balance -= price * quantity;
-        user_with_balances[userId].locked += price * quantity;
-        return res.status(200).json({
-          orderedStock: ORDERBOOK,
-        });
+    //     ORDERBOOK[stockSymbol].yes[newPrice].orders[userId].type = "inverse";
+    //     // STOCK_BALANCES[userId][stockSymbol]["yes"].locked += quantity;
+    //     user_with_balances[userId].locked += price * quantity;
 
-        // STOCK_BALANCES[userId][stockSymbol]!["yes"].locked += quantity;
-      }
+    //     user_with_balances[userId].balance -= price * quantity;
+    //     return res.status(200).json({
+    //       orderedStock: ORDERBOOK,
+    //     });
+    //   } else {
+    //     ORDERBOOK[stockSymbol].yes[newPrice].orders[userId] = {
+    //       quantity: quantity,
+    //       type: "inverse",
+    //     };
+    //     ORDERBOOK[stockSymbol].yes[newPrice].quantity += quantity;
 
-      ORDERBOOK[stockSymbol].yes[newPrice].quantity += quantity;
-      user_with_balances[userId].balance -= newPrice * quantity;
-      user_with_balances[userId].locked += newPrice * quantity;
+    //     user_with_balances[userId].balance -= price * quantity;
+    //     user_with_balances[userId].locked += price * quantity;
+    //     return res.status(200).json({
+    //       orderedStock: ORDERBOOK,
+    //     });
 
-      return res.status(200).json({
-        orderedStock: ORDERBOOK,
-      });
-    }
+    //     // STOCK_BALANCES[userId][stockSymbol]!["yes"].locked += quantity;
+    //   }
 
-    if (ORDERBOOK[stockSymbol].no[price].orders) {
-      let totalAmount = quantity;
+    //   ORDERBOOK[stockSymbol].yes[newPrice].quantity += quantity;
+    //   user_with_balances[userId].balance -= newPrice * quantity;
+    //   user_with_balances[userId].locked += newPrice * quantity;
 
-      for (let user in ORDERBOOK[stockSymbol].no[price].orders) {
-        if (totalAmount <= 0) break;
+    //   return res.status(200).json({
+    //     orderedStock: ORDERBOOK,
+    //   });
+    // }
 
-        let currentValue =
-          ORDERBOOK[stockSymbol].no[price].orders[user].quantity;
-        let subtraction = Math.min(totalAmount, currentValue);
+    // if (ORDERBOOK[stockSymbol].no[price].orders) {
+    //   let totalAmount = quantity;
 
-        user_with_balances[user].balance += price * subtraction;
+    //   for (let user in ORDERBOOK[stockSymbol].no[price].orders) {
+    //     if (totalAmount <= 0) break;
 
-        ORDERBOOK[stockSymbol].no[price].orders[user].quantity -= subtraction;
-        totalAmount -= subtraction;
-        if (!STOCK_BALANCES[userId]) {
-          STOCK_BALANCES[userId] = {};
-        }
+    //     let currentValue =
+    //       ORDERBOOK[stockSymbol].no[price].orders[user].quantity;
+    //     let subtraction = Math.min(totalAmount, currentValue);
 
-        if (!STOCK_BALANCES[userId][stockSymbol]) {
-          STOCK_BALANCES[userId][stockSymbol] = {
-            no: { locked: 0, quantity: 0 },
-          };
-        }
-        STOCK_BALANCES[userId][stockSymbol]["no"].quantity += subtraction;
-      }
+    //     user_with_balances[user].balance += price * subtraction;
 
-      ORDERBOOK[stockSymbol].no[price]!.quantity -= quantity - totalAmount;
+    //     ORDERBOOK[stockSymbol].no[price].orders[user].quantity -= subtraction;
+    //     totalAmount -= subtraction;
+    //     if (!STOCK_BALANCES[userId]) {
+    //       STOCK_BALANCES[userId] = {};
+    //     }
 
-      if (ORDERBOOK[stockSymbol].no[price].quantity == 0) {
-        delete ORDERBOOK[stockSymbol].no[price];
-      }
+    //     if (!STOCK_BALANCES[userId][stockSymbol]) {
+    //       STOCK_BALANCES[userId][stockSymbol] = {
+    //         no: { locked: 0, quantity: 0 },
+    //       };
+    //     }
+    //     STOCK_BALANCES[userId][stockSymbol]["no"].quantity += subtraction;
+    //   }
 
-      user_with_balances[userId].balance -= price * quantity;
-    } else {
-      user_with_balances[userId].balance -= price * quantity;
-      user_with_balances[userId].locked += price * quantity;
-    }
+    //   ORDERBOOK[stockSymbol].no[price]!.quantity -= quantity - totalAmount;
 
-    return res.status(200).json({
-      orderedStock: ORDERBOOK,
-    });
+    //   if (ORDERBOOK[stockSymbol].no[price].quantity == 0) {
+    //     delete ORDERBOOK[stockSymbol].no[price];
+    //   }
+
+    //   user_with_balances[userId].balance -= price * quantity;
+    // } else {
+    //   user_with_balances[userId].balance -= price * quantity;
+    //   user_with_balances[userId].locked += price * quantity;
+    // }
+
+    // return res.status(200).json({
+    //   orderedStock: ORDERBOOK,
+    // });
   } catch (error) {
     console.log(error);
 
@@ -429,18 +553,35 @@ export const buyNo = (req: Request, res: any) => {
 export const viewOrderbook = async (req: Request, res: any) => {
   try {
     const stockSymbol = req.params.stockSymbol;
+    const input = {
+      method: "viewOrderbook",
+      payload: stockSymbol,
+    };
 
-    if (!stockSymbol) {
-      return res.status(404).json({
-        error: "ubcn",
+    await redisClient.lPush(requestQueue, JSON.stringify(input));
+
+    const data = await redisClient.brPop(responseQueue, 0);
+
+    if (!data) {
+      return res.status(409).json({
+        message: "couldnot process further",
       });
     }
+    console.log(data, "here");
 
-    const book = ORDERBOOK[stockSymbol];
+    return res.status(200).send(JSON.parse(data.element));
 
-    return res.status(200).json({
-      book,
-    });
+    // if (!stockSymbol) {
+    //   return res.status(404).json({
+    //     error: "no stocks of such kinds",
+    //   });
+    // }
+
+    // const book = ORDERBOOK[stockSymbol];
+
+    // return res.status(200).json({
+    //   book,
+    // });
   } catch (error) {
     return res.status(400).json({
       error: error,
@@ -673,15 +814,35 @@ export const sellNo = (req: Request, res: any) => {
 
 export const getOrderbook = async (req: Request, res: any) => {
   try {
-    const orderbooks = ORDERBOOK;
-    if (!orderbooks) {
-      return res.status(404).json({
-        message: "No orderbook found",
+    const input = {
+      method: "getOrderbooks",
+      payload: {},
+    };
+
+    await redisClient.lPush(requestQueue, JSON.stringify(input));
+
+    const data = await redisClient.brPop(responseQueue, 0);
+    console.log(data?.element);
+
+    if (!data) {
+      return res.status(409).json({
+        message: "couldnot process further",
       });
     }
+
     return res.status(200).json({
-      orderbooks: orderbooks,
+      orderbook: JSON.parse(data.element),
     });
+
+    // const orderbooks = ORDERBOOK;
+    // if (!orderbooks) {
+    //   return res.status(404).json({
+    //     message: "No orderbook found",
+    //   });
+    // }
+    // return res.status(200).json({
+    //   orderbooks: orderbooks,
+    // });
   } catch (error) {
     return res.json({
       message: error,
