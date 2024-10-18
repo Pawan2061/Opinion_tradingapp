@@ -1,24 +1,45 @@
 import { Request, Response } from "express";
 import { ORDERBOOK, STOCK_BALANCES, user_with_balances } from "../data/dummy";
+const requestQueue = "request";
 
 import { redisClient, ws } from "../app";
 
 export const createUser = async (req: Request, res: any) => {
   try {
-    const userId = req.params.userId;
-    console.log(userId);
-
-    user_with_balances[userId] = {
-      balance: 0,
-      locked: 0,
+    const input = {
+      method: "createUser",
+      payload: req.params.userId,
     };
-    console.log(user_with_balances);
-    const key = Math.random().toString();
-    await redisClient.lPush("22", "hello guys");
 
-    return res.status(201).json({
-      user_with_balances,
-    });
+    await redisClient.lPush(requestQueue, JSON.stringify(input));
+
+    console.log("upside");
+
+    const data = await redisClient.brPop("receive-user", 0);
+    console.log("downside");
+
+    console.log(data, "here");
+    console.log(data);
+
+    if (!data) {
+      return res.status(409).json({
+        message: "couldnt process further",
+      });
+    }
+
+    return res.status(200).send(JSON.parse(data.element));
+
+    // return res.status(200).json({
+    //   data: response,
+    // });
+    // user_with_balances[userId] = {
+    //   balance: 0,
+    //   locked: 0,
+    // };
+
+    // return res.status(201).json({
+    //   user_with_balances,
+    // });
   } catch (error) {
     return res.status(400).json({
       error: error,
@@ -37,6 +58,7 @@ export const createSymbol = (req: Request, res: any) => {
         message: "Insufficient data",
       });
     }
+
     ORDERBOOK[stockSymbol] = {
       yes: {},
       no: {},
