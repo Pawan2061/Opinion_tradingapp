@@ -22,7 +22,7 @@ export const createSymbol = async (payload: any) => {
     console.log("very close");
 
     // ws.send(JSON.stringify(ORDERBOOK));
-    await displayBook(JSON.stringify(ORDERBOOK));
+    await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
 
     return {
       success: true,
@@ -63,23 +63,21 @@ export const viewOrderbook = async (payload: string) => {
     console.log(payload, "here");
 
     if (!payload) {
-      //   return res.status(404).json({
-      //     error: "no stocks of such kinds",
-      //   });
-      console.log("no such stocksymbol found");
-      throw Error;
+      return {
+        success: true,
+        message: "insuficient creds:",
+        data: {},
+      };
     }
 
     const book = ORDERBOOK[payload];
 
-    return JSON.stringify(book);
-    // console.log(book, "sidd");
-
-    // await redisClient.lPush(responseQueue, JSON.stringify(book));
-
-    // return res.status(200).json({
-    //   book,
-    // });
+    await displayBook(JSON.stringify(ORDERBOOK[payload]));
+    return {
+      success: true,
+      message: "ORDERBOOK",
+      data: ORDERBOOK[payload],
+    };
   } catch (error) {
     return { error: error };
   }
@@ -200,11 +198,8 @@ export const buyYes = async (payload: any) => {
         // return res.status(200).json({
         //   orderedStock: ORDERBOOK,
         // });
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify(ORDERBOOK));
-        } else {
-          console.error("WebSocket is not open");
-        } // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+
+        await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
         return {
           success: true,
           message: "ORDERBOOK",
@@ -234,6 +229,8 @@ export const buyYes = async (payload: any) => {
         } else {
           console.error("WebSocket is not open");
         } // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+        await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
+
         return {
           success: true,
           message: "ORDERBOOK",
@@ -294,13 +291,8 @@ export const buyYes = async (payload: any) => {
       user_with_balances[payload.userId].locked +=
         payload.price * payload.quantity;
     }
+    await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
 
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(ORDERBOOK));
-    } else {
-      console.error("WebSocket is not open");
-    }
-    // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
     return {
       success: true,
       message: "ORDERBOOK",
@@ -335,7 +327,6 @@ export const buyNo = async (payload: any) => {
         message: "insufficient balance",
         data: {},
       };
-      console.log("user doesnt have sufficient balanace");
     }
 
     if (!ORDERBOOK[payload.stockSymbol]) {
@@ -376,11 +367,7 @@ export const buyNo = async (payload: any) => {
         user_with_balances[payload.userId].balance -=
           payload.price * payload.quantity;
 
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify(ORDERBOOK));
-        } else {
-          console.error("WebSocket is not open");
-        }
+        await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
         return {
           success: true,
           message: "ORDERBOOK",
@@ -401,29 +388,14 @@ export const buyNo = async (payload: any) => {
           payload.price * payload.quantity;
 
         console.log(ORDERBOOK);
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify(ORDERBOOK));
-        } else {
-          console.error("WebSocket is not open");
-        }
-        // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+        await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
+
         return {
           success: true,
           message: "ORDERBOOK",
           data: ORDERBOOK[payload.stockSymbol],
         };
-
-        // STOCK_BALANCES[userId][stockSymbol]!["yes"].locked += quantity;
       }
-
-      // ORDERBOOK[payload.stockSymbol].yes[newPrice].quantity += payload.quantity;
-      // user_with_balances[payload.userId].balance -= newPrice * payload.quantity;
-      // user_with_balances[payload.userId].locked += newPrice * payload.quantity;
-
-      // // return res.status(200).json({
-      // //   orderedStock: ORDERBOOK,
-      // // });
-      // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
     }
 
     if (ORDERBOOK[payload.stockSymbol].no[payload.price].orders) {
@@ -473,21 +445,13 @@ export const buyNo = async (payload: any) => {
         payload.price * payload.quantity;
     }
 
-    // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(ORDERBOOK));
-    } else {
-      console.error("WebSocket is not open");
-    }
+    await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
+
     return {
       success: true,
       message: "ORDERBOOK",
       data: ORDERBOOK[payload.stockSymbol],
     };
-
-    // return res.status(200).json({
-    //   orderedStock: ORDERBOOK,
-    // });
   } catch (error) {
     return {
       error: error,
@@ -505,10 +469,11 @@ export const sellYes = async (payload: any) => {
       !payload.userId ||
       !payload.quantity
     ) {
-      // return res.status(400).json({
-      //   message: "Insufficient credentials",
-      // });
-      console.log("insufficient credentials");
+      return {
+        success: false,
+        message: "insufficient creds",
+        data: {},
+      };
     }
 
     if (
@@ -516,20 +481,22 @@ export const sellYes = async (payload: any) => {
       !STOCK_BALANCES[payload.userId][payload.stockSymbol] ||
       !STOCK_BALANCES[payload.userId][payload.stockSymbol]["yes"]
     ) {
-      // return res.status(400).json({
-      //   message: "No such stock available for this user",
-      // });
-      console.log("no such stock available");
+      return {
+        success: false,
+        message: "no stocks available",
+        data: {},
+      };
     }
 
     if (
       STOCK_BALANCES[payload.userId][payload.stockSymbol]["yes"].quantity <
       payload.quantity
     ) {
-      // return res.status(400).json({
-      //   message: "You don't have enough stocks",
-      // });
-      console.log("dont have enough stocks");
+      return {
+        success: false,
+        message: "user dont have enough stocks",
+        data: {},
+      };
     }
 
     STOCK_BALANCES[payload.userId][payload.stockSymbol]["yes"].locked +=
@@ -561,15 +528,166 @@ export const sellYes = async (payload: any) => {
     ORDERBOOK[payload.stockSymbol].yes[payload.price].orders[
       payload.userId
     ].quantity += payload.quantity;
+    await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
 
     return {
       success: true,
       message: "sold this stock",
-      stocks: STOCK_BALANCES,
+      data: STOCK_BALANCES,
     };
   } catch (error) {
-    console.log("nednei");
+    return {
+      error: error,
+    };
+  }
+};
 
-    console.log(error);
+export const sellNo = async (payload: any) => {
+  try {
+    if (
+      !payload.stockSymbol ||
+      !payload.price ||
+      !payload.userId ||
+      !payload.quantity
+    ) {
+      return {
+        success: false,
+        message: "insufficient credentials",
+        data: {},
+      };
+    }
+
+    if (
+      !STOCK_BALANCES[payload.userId] ||
+      !STOCK_BALANCES[payload.userId][payload.stockSymbol] ||
+      !STOCK_BALANCES[payload.userId][payload.stockSymbol]["no"]
+    ) {
+      return {
+        success: false,
+        message: "no such stock available",
+        data: {},
+      };
+    }
+
+    if (
+      STOCK_BALANCES[payload.userId][payload.stockSymbol]["no"].quantity <
+      payload.quantity
+    ) {
+      return {
+        success: true,
+        message: "you dont have enough no stocks",
+        data: STOCK_BALANCES,
+      };
+    }
+
+    STOCK_BALANCES[payload.userId][payload.stockSymbol]["no"].locked +=
+      payload.quantity;
+    STOCK_BALANCES[payload.userId][payload.stockSymbol]["no"].quantity -=
+      payload.quantity;
+
+    if (!ORDERBOOK[payload.stockSymbol]) {
+      ORDERBOOK[payload.stockSymbol] = { yes: {}, no: {} };
+    }
+    if (!ORDERBOOK[payload.stockSymbol].no[payload.price]) {
+      ORDERBOOK[payload.stockSymbol].no[payload.price] = {
+        quantity: 0,
+        orders: {},
+      };
+    }
+    if (
+      !ORDERBOOK[payload.stockSymbol].no[payload.price].orders[payload.userId]
+    ) {
+      ORDERBOOK[payload.stockSymbol].no[payload.price].orders[payload.userId] =
+        {
+          quantity: 0,
+          type: "normal ",
+        };
+    }
+
+    ORDERBOOK[payload.tockSymbol].no[payload.price].quantity +=
+      payload.quantity;
+    ORDERBOOK[payload.stockSymbol].no[payload.price].orders[
+      payload.userId
+    ].quantity += payload.quantity;
+    ORDERBOOK[payload.stockSymbol].no[payload.price].orders[
+      payload.userId
+    ].type = "normal ";
+
+    await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
+
+    return {
+      success: true,
+      message: "sold this stock",
+      data: STOCK_BALANCES,
+    };
+  } catch (error) {
+    return {
+      error: error,
+    };
+  }
+};
+
+export const mintStock = async (payload: any) => {
+  try {
+    if (
+      user_with_balances[payload.userId].balance <=
+      payload.quantity * payload.price
+    ) {
+      return {
+        success: false,
+        message: "insufficent balance",
+        data: {},
+      };
+    }
+    // STOCK_BALANCES[userId][symbol]["yes"] = {
+    //   quantity: quantity,
+    //   locked: 0,
+    // };
+    // STOCK_BALANCES[userId][symbol]["no"] = {
+    //   quantity: quantity,
+    //   locked: 0,
+    // };xs
+
+    if (!ORDERBOOK[payload.symbol]) {
+      ORDERBOOK[payload.symbol] = {
+        yes: {},
+        no: {},
+      };
+    }
+
+    if (!ORDERBOOK[payload.symbol].yes[5] || !ORDERBOOK[payload.symbol].no[5]) {
+      ORDERBOOK[payload.symbol].yes[5] = { quantity: 0, orders: {} };
+      ORDERBOOK[payload.symbol].no[5] = { quantity: 0, orders: {} };
+    }
+    ORDERBOOK[payload.symbol].yes[5].quantity += payload.quantity;
+    ORDERBOOK[payload.symbol].no[5].quantity += payload.quantity;
+
+    ORDERBOOK[payload.symbol].yes[5].orders = {
+      [payload.userId]: {
+        quantity: payload.quantity,
+        type: "normal ",
+      },
+    };
+    ORDERBOOK[payload.symbol].no[5].orders = {
+      [payload.userId]: {
+        quantity: payload.quantity,
+        type: "normal ",
+      },
+    };
+
+    console.log("ndudhiei");
+
+    user_with_balances[payload.userId].balance -=
+      payload.quantity * payload.price;
+    await displayBook(JSON.stringify(ORDERBOOK[payload.symbol]));
+    return {
+      success: true,
+      message: "minted this stock",
+      data: ORDERBOOK[payload.symbol],
+    };
+  } catch (error) {
+    return {
+      error: error,
+    };
   }
 };

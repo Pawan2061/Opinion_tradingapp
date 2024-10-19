@@ -91,3 +91,9 @@ export interface OrderBook {
     };
   };
 }
+
+export interface Apiresponse<T = any> {
+  success: boolean;
+  message: string;
+  data: T;
+}

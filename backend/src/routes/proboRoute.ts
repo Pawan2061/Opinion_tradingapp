@@ -27,15 +27,14 @@ proboRouter.get("/balance/inr/:id", getUserBalance);
 proboRouter.get("/orderbook", getOrderbook);
 proboRouter.get("/balances/stock", getStocks);
 proboRouter.get("/balance/stock/:userId", getBalanceStock);
-
 proboRouter.get("/orderbook/:stockSymbol", viewOrderbook);
 proboRouter.post("/order/buy/yes", buyYes);
 proboRouter.post("/order/buy/no", buyNo);
 proboRouter.post("/order/sell/yes", sellYes);
+proboRouter.post("/order/sell/no", sellNo);
 
 // proboRouter.post("/order/buy", buy);
 // proboRouter.post("/order/sell", sell);
-proboRouter.post("/order/sell/no", sellNo);
 proboRouter.post("/trade/mint/:stockSymbol", mintStock);
 
 proboRouter.post("/reset", resetMemory);
