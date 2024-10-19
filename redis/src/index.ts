@@ -8,7 +8,6 @@ const app = express();
 
 const requestQueue = "request";
 export const ws = new WebSocket("ws://localhost:8080");
-
 export const redisClient = createClient({});
 
 export const pubClient = createClient({});
@@ -35,7 +34,7 @@ async function executeProcess() {
   console.log("nedeoo");
   console.log(resp);
 
-  await processRequests(JSON.parse(resp?.element || ""));
+  await processRequests(JSON.parse(resp!.element));
 
   // const data = await createUser(resp?.element || "");
   executeProcess();

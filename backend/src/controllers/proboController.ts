@@ -19,15 +19,22 @@ export const createUser = async (req: Request, res: any) => {
 
     await redisClient.lPush(requestQueue, JSON.stringify(input));
 
-    const data = await redisClient.brPop(responseQueue, 0);
-
-    if (!data) {
-      return res.status(409).json({
-        message: "couldnt process further",
-      });
+    try {
+      const data = await handlePubSub(id);
+      return res.status(200).send(JSON.stringify(data));
+    } catch (error) {
+      return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
 
-    return res.status(200).send(JSON.parse(data.element));
+    // const data = await redisClient.brPop(responseQueue, 0);
+
+    // if (!data) {
+    //   return res.status(409).json({
+    //     message: "couldnt process further",
+    //   });
+    // }
+
+    // return res.status(200).send(JSON.parse(data.element));
 
     // return res.status(200).json({
     //   data: response,
@@ -61,16 +68,16 @@ export const createSymbol = async (req: Request, res: any) => {
     const id = uuid();
 
     const input = {
+      id: id,
+
       method: "createSymbol",
       payload: {
-        id: id,
         stockSymbol: stockSymbol,
         userId: userId,
       },
     };
 
     await redisClient.lPush(requestQueue, JSON.stringify(input));
-    console.log("pushed data", input);
 
     // const data = await redisClient.brPop(responseQueue, 0);
 
@@ -81,9 +88,6 @@ export const createSymbol = async (req: Request, res: any) => {
     // }
 
     try {
-      console.log("subscribing id");
-      console.log(id, "is is there");
-
       const data = await handlePubSub(id);
 
       return res.status(200).send(JSON.stringify(data));
@@ -123,20 +127,29 @@ export const createSymbol = async (req: Request, res: any) => {
 
 export const getBalances = async (req: Response, res: any) => {
   try {
+    const id = uuid();
     const input = {
+      id: id,
       method: "getBalance",
       payload: {},
     };
 
     await redisClient.lPush(requestQueue, JSON.stringify(input));
-    const data = await redisClient.brPop(responseQueue, 0);
-    if (!data) {
-      return res
-        .status(409)
-        .json({ message: "cant proceed with this request" });
-    }
 
-    return res.status(200).send(JSON.parse(data.element));
+    try {
+      const data = await handlePubSub(id);
+      return res.status(200).send(JSON.stringify(data));
+    } catch (error) {
+      return res.status(500).json({ error: "Failed to subscribe to channel" });
+    }
+    // const data = await redisClient.brPop(responseQueue, 0);
+    // if (!data) {
+    //   return res
+    //     .status(409)
+    //     .json({ message: "cant proceed with this request" });
+    // }
+
+    // return res.status(200).send(JSON.parse(data.element));
 
     // const userBalances = user_with_balances;
 
@@ -157,22 +170,32 @@ export const getBalances = async (req: Response, res: any) => {
 
 export const getStocks = async (req: Request, res: any) => {
   try {
+    const id = uuid();
     const input = {
+      id: id,
       method: "getStocks",
       payload: {},
     };
 
     await redisClient.lPush(requestQueue, JSON.stringify(input));
 
-    const data = await redisClient.brPop(responseQueue, 0);
+    try {
+      const data = await handlePubSub(id);
 
-    if (!data) {
-      return res.status(409).json({
-        message: "cant proceed with this request",
-      });
+      return res.status(200).send(JSON.stringify(data));
+    } catch (error) {
+      return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
 
-    return res.status(200).send(JSON.parse(data.element));
+    // const data = await redisClient.brPop(responseQueue, 0);
+
+    // if (!data) {
+    //   return res.status(409).json({
+    //     message: "cant proceed with this request",
+    //   });
+    // }
+
+    // return res.status(200).send(JSON.parse(data.element));
 
     // const stock_balance = STOCK_BALANCES;
     // if (!stock_balance) {
@@ -192,15 +215,24 @@ export const getStocks = async (req: Request, res: any) => {
 
 export const getUserBalance = async (req: Request, res: any) => {
   try {
-    const id = req.params.id;
+    const userId = req.params.id;
+    const id = uuid();
 
     const input = {
+      id: id,
       method: "getUserBalance",
-      payload: id,
+      payload: userId,
     };
 
     await redisClient.lPush(requestQueue, JSON.stringify(input));
-    const data = await redisClient.brPop(responseQueue, 0);
+
+    try {
+      const data = await handlePubSub(id);
+      return res.status(200).send(JSON.stringify(data));
+    } catch (error) {
+      return res.status(500).json({ error: "Failed to subscribe to channel" });
+    }
+    // const data = await redisClient.brPop(responseQueue, 0);
     // const user = user_with_balances[id];
 
     // if (user) {
@@ -212,7 +244,7 @@ export const getUserBalance = async (req: Request, res: any) => {
     // } else {
     //   res.status(404).json({ message: "User not found" });
     // }
-    return res.status(200).send(data?.element);
+    // return res.status(200).send(data?.element);
 
     // return res.status(200).send(JSON.parse());
   } catch (error) {
@@ -223,9 +255,11 @@ export const getUserBalance = async (req: Request, res: any) => {
 export const rampUser = async (req: Request, res: any) => {
   try {
     const { userId, amount } = req.body;
+    const id = uuid();
 
     const input = {
       method: "onRamp",
+      id: id,
       payload: {
         userId: userId,
         amount: amount,
@@ -234,14 +268,22 @@ export const rampUser = async (req: Request, res: any) => {
 
     await redisClient.lPush(requestQueue, JSON.stringify(input));
 
-    const data = await redisClient.brPop(responseQueue, 0);
-    if (!data) {
-      return res.status(409).json({
-        message: " couldnt process this request",
-      });
+    try {
+      const data = await handlePubSub(id);
+      return res.status(200).send(JSON.stringify(data));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
 
-    return res.status(200).send(JSON.parse(data.element));
+    // const data = await redisClient.brPop(responseQueue, 0);
+    // if (!data) {
+    //   return res.status(409).json({
+    //     message: " couldnt process this request",
+    //   });
+    // }
+
+    // return res.status(200).send(JSON.parse(data.element));
 
     // if (!userId || !amount) {
     //   res.status(404).json({
@@ -270,23 +312,32 @@ export const rampUser = async (req: Request, res: any) => {
 
 export const getBalanceStock = async (req: Request, res: any) => {
   try {
+    const id = uuid();
     const userId = req.params.userId;
     const input = {
+      id: id,
       method: "getBalanceStock",
       payload: userId,
     };
 
     await redisClient.lPush(requestQueue, JSON.stringify(input));
 
-    const data = await redisClient.brPop(responseQueue, 0);
-
-    if (!data) {
-      return res.status(409).json({
-        message: "couldnt proceed further",
-      });
+    try {
+      const data = await handlePubSub(id);
+      return res.status(200).send(JSON.stringify(data));
+    } catch (error) {
+      return res.status(400).send(error);
     }
 
-    return res.status(200).send(JSON.parse(data.element));
+    // const data = await redisClient.brPop(responseQueue, 0);
+
+    // if (!data) {
+    //   return res.status(409).json({
+    //     message: "couldnt proceed further",
+    //   });
+    // }
+
+    // return res.status(200).send(JSON.parse(data.element));
 
     // const stockbalance = STOCK_BALANCES[userId];
     // return res.status(200).json({
@@ -303,8 +354,10 @@ export const getBalanceStock = async (req: Request, res: any) => {
 export const buyYes = async (req: Request, res: any) => {
   try {
     const { stockSymbol, price, quantity, userId, stockType } = req.body;
+    const id = uuid();
 
     const input = {
+      id: id,
       method: "buyYes",
       payload: {
         stockSymbol,
@@ -318,7 +371,16 @@ export const buyYes = async (req: Request, res: any) => {
     await redisClient.lPush(requestQueue, JSON.stringify(input));
     console.log("before parsing");
 
-    const data = await redisClient.brPop(responseQueue, 0);
+    try {
+      const data = await handlePubSub(id);
+      return res.status(200).send(JSON.stringify(data));
+    } catch (error) {
+      return res.status(403).json({
+        error: error,
+      });
+    }
+
+    // const data = await redisClient.brPop(responseQueue, 0);
 
     // if (!stockSymbol || !price || !quantity || !userId || !stockType) {
     //   return res.status(404).json({
@@ -417,12 +479,6 @@ export const buyYes = async (req: Request, res: any) => {
     //   user_with_balances[userId].balance -= price * quantity;
     //   user_with_balances[userId].locked += price * quantity;
     // }
-
-    console.log("almost parsed");
-
-    return res.status(200).json({
-      orderedStock: JSON.parse(data!.element),
-    });
   } catch (error) {
     console.log(error);
 
@@ -435,8 +491,10 @@ export const buyYes = async (req: Request, res: any) => {
 export const buyNo = async (req: Request, res: any) => {
   try {
     const { stockSymbol, price, quantity, userId, stockType } = req.body;
+    const id = uuid();
 
     const input = {
+      id: id,
       method: "buyNo",
       payload: {
         stockSymbol: stockSymbol,
@@ -449,15 +507,25 @@ export const buyNo = async (req: Request, res: any) => {
 
     await redisClient.lPush(requestQueue, JSON.stringify(input));
 
-    const data = await redisClient.brPop(responseQueue, 0);
+    try {
+      const data = await handlePubSub(id);
 
-    if (!data) {
-      return res.status(409).json({
-        message: "cant process this",
+      return res.status(200).send(JSON.stringify(data));
+    } catch (error) {
+      return res.status(403).json({
+        error: error,
       });
     }
 
-    return res.status(200).send(JSON.parse(data.element));
+    // const data = await redisClient.brPop(responseQueue, 0);
+
+    // if (!data) {
+    //   return res.status(409).json({
+    //     message: "cant process this",
+    //   });
+    // }
+
+    // return res.status(200).send(JSON.parse(data.element));
 
     // if (!stockSymbol || !price || !quantity || !userId || !stockType) {
     //   return res.status(404).json({
@@ -582,23 +650,32 @@ export const buyNo = async (req: Request, res: any) => {
 export const viewOrderbook = async (req: Request, res: any) => {
   try {
     const stockSymbol = req.params.stockSymbol;
+    const id = uuid();
     const input = {
+      id: id,
       method: "viewOrderbook",
       payload: stockSymbol,
     };
 
     await redisClient.lPush(requestQueue, JSON.stringify(input));
 
-    const data = await redisClient.brPop(responseQueue, 0);
-
-    if (!data) {
-      return res.status(409).json({
-        message: "couldnot process further",
-      });
+    try {
+      const data = await handlePubSub(id);
+      return res.status(200).send(JSON.stringify(data));
+    } catch (error) {
+      return res.status(400).send(error);
     }
-    console.log(data, "here");
 
-    return res.status(200).send(JSON.parse(data.element));
+    // const data = await redisClient.brPop(responseQueue, 0);
+
+    // if (!data) {
+    //   return res.status(409).json({
+    //     message: "couldnot process further",
+    //   });
+    // }
+    // console.log(data, "here");
+
+    // return res.status(200).send(JSON.parse(data.element));
 
     // if (!stockSymbol) {
     //   return res.status(404).json({
@@ -843,25 +920,36 @@ export const sellNo = (req: Request, res: any) => {
 
 export const getOrderbook = async (req: Request, res: any) => {
   try {
+    const id = uuid();
     const input = {
+      id: id,
       method: "getOrderbooks",
       payload: {},
     };
 
     await redisClient.lPush(requestQueue, JSON.stringify(input));
 
-    const data = await redisClient.brPop(responseQueue, 0);
-    console.log(data?.element);
+    try {
+      const data = await handlePubSub(id);
+      console.log(data, "dipen here");
 
-    if (!data) {
-      return res.status(409).json({
-        message: "couldnot process further",
-      });
+      return res.status(200).send(JSON.stringify(data));
+    } catch (error) {
+      return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
 
-    return res.status(200).json({
-      orderbook: JSON.parse(data.element),
-    });
+    // const data = await redisClient.brPop(responseQueue, 0);
+    // console.log(data?.element);
+
+    // if (!data) {
+    //   return res.status(409).json({
+    //     message: "couldnot process further",
+    //   });
+    // }
+
+    // return res.status(200).json({
+    //   orderbook: JSON.parse(data.element),
+    // });
 
     // const orderbooks = ORDERBOOK;
     // if (!orderbooks) {

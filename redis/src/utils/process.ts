@@ -24,47 +24,61 @@ export const processRequests = async (request: any) => {
   console.log(request.method);
 
   if (request.method === "createUser") {
-    console.log("im inside");
+    console.log();
 
-    await createUser(request.payload);
+    const data = await createUser(request.payload);
+    console.log(request.id, "dipenbro");
+
+    await pubsubManager.sendOutput(request.id, data);
   }
 
   if (request.method === "createSymbol") {
     const data = await createSymbol(request.payload);
 
-    await pubsubManager.sendOutput(request.payload.id, data);
+    await pubsubManager.sendOutput(request.id, data);
   }
 
   if (request.method === "onRamp") {
-    await onRampUser(request.payload);
+    const data = await onRampUser(request.payload);
+    await pubsubManager.sendOutput(request.id, data);
   }
 
   if (request.method === "getBalance") {
-    await getBalances(request.payload);
+    const data = await getBalances(request.payload);
+    await pubsubManager.sendOutput(request.id, data);
   }
   if (request.method === "getUserBalance") {
-    await getUserBalance(request.payload);
+    const data = await getUserBalance(request.payload);
+    await pubsubManager.sendOutput(request.id, data);
   }
   if (request.method === "getOrderbooks") {
-    await getOrderbooks(request.payload);
+    const data = await getOrderbooks(request.payload);
+    console.log(request.id, "sargam here");
+
+    await pubsubManager.sendOutput(request.id, data);
   }
   if (request.method === "viewOrderbook") {
-    await viewOrderbook(request.payload);
+    const data = await viewOrderbook(request.payload);
+    await pubsubManager.sendOutput(request.id, data);
   }
   if (request.method === "getStocks") {
-    await getStocks(request.payload);
+    const data = await getStocks(request.payload);
+    await pubsubManager.sendOutput(request.id, data);
   }
   if (request.method === "getBalanceStock") {
-    await getBalanceStock(request.payload);
+    const data = await getBalanceStock(request.payload);
+    await pubsubManager.sendOutput(request.id, data);
   }
   if (request.method === "buyYes") {
     console.log(request.payload, " the payload is here");
 
-    await buyYes(request.payload);
+    const data = await buyYes(request.payload);
+    await pubsubManager.sendOutput(request.id, data);
   }
   if (request.method === "buyNo") {
     console.log(request.payload, " the payload is here");
 
-    await buyNo(request.payload);
+    const data = await buyNo(request.payload);
+    await pubsubManager.sendOutput(request.id, data);
   }
 };

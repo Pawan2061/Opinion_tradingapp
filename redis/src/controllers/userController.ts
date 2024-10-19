@@ -11,7 +11,8 @@ export const createUser = async (userId: string) => {
       locked: 0,
     };
 
-    await redisClient.lPush(responseQueue, JSON.stringify(user_with_balances));
+    // await redisClient.lPush(responseQueue, JSON.stringify(user_with_balances));
+    return JSON.stringify(user_with_balances[userId]);
   } catch (error) {
     console.log(error);
     return {
@@ -39,7 +40,8 @@ export const onRampUser = async (payload: any) => {
     }
     user_with_balances[payload.userId].balance += payload.amount;
 
-    await redisClient.lPush(responseQueue, JSON.stringify(user_with_balances));
+    // await redisClient.lPush(responseQueue, JSON.stringify(user_with_balances));
+    return JSON.stringify(user_with_balances[payload.userId]);
   } catch (error) {
     return {
       error: error,
@@ -57,7 +59,9 @@ export const getBalances = async (payload: string) => {
       console.log("error");
     }
 
-    await redisClient.lPush(responseQueue, JSON.stringify(userBalances));
+    return JSON.stringify(userBalances);
+
+    // await redisClient.lPush(responseQueue, JSON.stringify(userBalances));
   } catch (error) {
     return {
       error: error,
@@ -77,7 +81,9 @@ export const getUserBalance = async (payload: string) => {
       //   balance: user.balance,
       //   locked: user.locked,
       // });
-      await redisClient.lPush(responseQueue, JSON.stringify(user));
+      // await redisClient.lPush(responseQueue, JSON.stringify(user));
+
+      return JSON.stringify(user);
     } else {
       // res.status(404).json({ message: "User not found" });
       console.log("corresponding user info not found");

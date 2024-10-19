@@ -34,6 +34,9 @@ export class PubSubManager {
   public async sendOutput(id: string, data: any) {
     await this.ensureRedisConnection();
     console.log("start");
+    console.log(id, "dipen here");
+
+    console.log(data);
 
     await this.pubClient.publish(id, JSON.stringify(data));
     console.log(data, "my data and my", id);

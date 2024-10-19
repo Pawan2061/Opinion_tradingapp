@@ -42,7 +42,9 @@ export const getOrderbooks = async (payload: string) => {
       //   });
       console.log("not found ");
     }
-    await redisClient.lPush(responseQueue, JSON.stringify(orderbooks));
+
+    return JSON.stringify(orderbooks);
+    // await redisClient.lPush(responseQueue, JSON.stringify(orderbooks));
   } catch (error) {
     return { error: error };
   }
@@ -61,9 +63,11 @@ export const viewOrderbook = async (payload: string) => {
     }
 
     const book = ORDERBOOK[payload];
-    console.log(book, "sidd");
 
-    await redisClient.lPush(responseQueue, JSON.stringify(book));
+    return JSON.stringify(book);
+    // console.log(book, "sidd");
+
+    // await redisClient.lPush(responseQueue, JSON.stringify(book));
 
     // return res.status(200).json({
     //   book,
@@ -79,7 +83,8 @@ export const getStocks = async (payload: string) => {
     if (!stock_balance) {
       throw new Error("STOCKS NOT AVAILABLE ");
     }
-    await redisClient.lPush(responseQueue, JSON.stringify(stock_balance));
+    return JSON.stringify(stock_balance);
+    // await redisClient.lPush(responseQueue, JSON.stringify(stock_balance));
   } catch (error) {
     return { error: error };
   }
@@ -102,7 +107,9 @@ export const getBalanceStock = async (payload: string) => {
 
     console.log("i hrer");
 
-    await redisClient.lPush(responseQueue, JSON.stringify(stockbalance));
+    return JSON.stringify(stockbalance);
+
+    // await redisClient.lPush(responseQueue, JSON.stringify(stockbalance));
   } catch (error) {
     return { error: error };
   }
@@ -139,7 +146,11 @@ export const buyYes = async (payload: any) => {
       //   return res.status(400).json({
       //     message: "no stock found",
       //   });
-      console.log("no stock found");
+      // console.log("no stock found");
+      ORDERBOOK[payload.stockSymbol] = {
+        yes: {},
+        no: {},
+      };
     }
 
     if (!ORDERBOOK[payload.stockSymbol]?.yes) {
@@ -174,8 +185,12 @@ export const buyYes = async (payload: any) => {
         // return res.status(200).json({
         //   orderedStock: ORDERBOOK,
         // });
-        ws.send(JSON.stringify(ORDERBOOK));
-        await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify(ORDERBOOK));
+        } else {
+          console.error("WebSocket is not open");
+        } // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+        return JSON.stringify(ORDERBOOK);
       } else {
         ORDERBOOK[payload.stockSymbol].no[newPrice].orders[payload.userId] = {
           quantity: payload.quantity,
@@ -195,8 +210,12 @@ export const buyYes = async (payload: any) => {
         //   orderedStock: ORDERBOOK,
         // });
         console.log(ORDERBOOK);
-        ws.send(JSON.stringify(ORDERBOOK));
-        await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify(ORDERBOOK));
+        } else {
+          console.error("WebSocket is not open");
+        } // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+        return JSON.stringify(ORDERBOOK);
       }
     }
 
@@ -253,9 +272,13 @@ export const buyYes = async (payload: any) => {
         payload.price * payload.quantity;
     }
 
-    ws.send(JSON.stringify(ORDERBOOK));
-
-    await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(ORDERBOOK));
+    } else {
+      console.error("WebSocket is not open");
+    }
+    // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+    return JSON.stringify(ORDERBOOK);
   } catch (error) {
     return { error: error };
   }
@@ -289,14 +312,17 @@ export const buyNo = async (payload: any) => {
       // return res.status(400).json({
       //   message: "no stock found",
       // });
-      console.log("no stock found");
+      ORDERBOOK[payload.stocksymbol] = {
+        yes: {},
+        no: {},
+      };
     }
 
     if (!ORDERBOOK[payload.stockSymbol]?.no) {
       ORDERBOOK[payload.stockSymbol].no = {};
     }
 
-    if (!ORDERBOOK[payload.stockSymbol].no[payload.paprice]) {
+    if (!ORDERBOOK[payload.stockSymbol].no[payload.price]) {
       const newPrice = 10 - payload.price;
 
       if (!ORDERBOOK[payload.stockSymbol].yes[newPrice]) {
@@ -307,8 +333,8 @@ export const buyNo = async (payload: any) => {
       }
 
       if (ORDERBOOK[payload.stockSymbol].yes[newPrice].orders[payload.userId]) {
-        ORDERBOOK[payload.tockSymbol].yes[newPrice].orders[
-          payload.serId
+        ORDERBOOK[payload.stockSymbol].yes[newPrice].orders[
+          payload.userId
         ].quantity += payload.quantity;
         ORDERBOOK[payload.stockSymbol].yes[newPrice].quantity +=
           payload.quantity;
@@ -325,7 +351,13 @@ export const buyNo = async (payload: any) => {
         // return res.status(200).json({
         //   orderedStock: ORDERBOOK,
         // });
-        await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify(ORDERBOOK));
+        } else {
+          console.error("WebSocket is not open");
+        }
+        return JSON.stringify(ORDERBOOK);
+        // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
       } else {
         ORDERBOOK[payload.stockSymbol].yes[newPrice].orders[payload.userId] = {
           quantity: payload.quantity,
@@ -341,19 +373,26 @@ export const buyNo = async (payload: any) => {
         // return res.status(200).json({
         //   orderedStock: ORDERBOOK,
         // });
-        await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+        console.log(ORDERBOOK);
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify(ORDERBOOK));
+        } else {
+          console.error("WebSocket is not open");
+        }
+        // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+        return JSON.stringify(ORDERBOOK);
 
         // STOCK_BALANCES[userId][stockSymbol]!["yes"].locked += quantity;
       }
 
-      ORDERBOOK[payload.stockSymbol].yes[newPrice].quantity += payload.quantity;
-      user_with_balances[payload.userId].balance -= newPrice * payload.quantity;
-      user_with_balances[payload.userId].locked += newPrice * payload.quantity;
+      // ORDERBOOK[payload.stockSymbol].yes[newPrice].quantity += payload.quantity;
+      // user_with_balances[payload.userId].balance -= newPrice * payload.quantity;
+      // user_with_balances[payload.userId].locked += newPrice * payload.quantity;
 
-      // return res.status(200).json({
-      //   orderedStock: ORDERBOOK,
-      // });
-      await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+      // // return res.status(200).json({
+      // //   orderedStock: ORDERBOOK,
+      // // });
+      // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
     }
 
     if (ORDERBOOK[payload.stockSymbol].no[payload.price].orders) {
@@ -403,7 +442,13 @@ export const buyNo = async (payload: any) => {
         payload.price * payload.quantity;
     }
 
-    await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+    // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(ORDERBOOK));
+    } else {
+      console.error("WebSocket is not open");
+    }
+    return JSON.stringify(ORDERBOOK);
 
     // return res.status(200).json({
     //   orderedStock: ORDERBOOK,
