@@ -5,6 +5,7 @@ import {
   getBalanceStock,
   getOrderbooks,
   getStocks,
+  sellYes,
   viewOrderbook,
 } from "../controllers/stockControl";
 import {
@@ -13,7 +14,6 @@ import {
   getUserBalance,
   onRampUser,
 } from "../controllers/userController";
-import { queueRequest } from "../interface/request";
 import { pubsubManager, PubSubManager } from "../pubsub";
 
 export const processRequests = async (request: any) => {
@@ -26,50 +26,69 @@ export const processRequests = async (request: any) => {
 
   switch (request.method) {
     case "createUser":
+      console.log("done");
+
       data = await createUser(request.payload);
       break;
 
     case "createSymbol":
+      console.log("done");
+
       data = await createSymbol(request.payload);
       break;
 
     case "onRamp":
+      console.log("done");
       data = await onRampUser(request.payload);
       break;
 
     case "getBalance":
+      console.log("done");
+
       data = await getBalances(request.payload);
       break;
 
     case "getUserBalance":
+      console.log("done");
+
       data = await getUserBalance(request.payload);
       break;
 
     case "getOrderbooks":
       data = await getOrderbooks(request.payload);
-      console.log(request.id, "sargam here");
       break;
 
     case "viewOrderbook":
+      console.log("done");
+
       data = await viewOrderbook(request.payload);
       break;
 
     case "getStocks":
+      console.log("done");
+
       data = await getStocks(request.payload);
       break;
 
     case "getBalanceStock":
+      console.log("done");
+
       data = await getBalanceStock(request.payload);
       break;
 
     case "buyYes":
-      console.log(request.payload, " the payload is here");
+      console.log("done");
+
       data = await buyYes(request.payload);
       break;
 
     case "buyNo":
-      console.log(request.payload, " the payload is here");
+      console.log("success");
+
       data = await buyNo(request.payload);
+      break;
+    case "sellyes":
+      data = await sellYes(request.payload);
       break;
 
     default:

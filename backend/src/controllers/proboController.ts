@@ -231,7 +231,15 @@ export const rampUser = async (req: Request, res: any) => {
 
     try {
       const data = await handlePubSub(id);
-      return res.status(200).send(data);
+
+      const finalData = JSON.parse(data);
+      if (finalData.success) {
+        return res.status(200).send(finalData);
+      }
+      // return res.status(200).send(data);
+      return res
+        .status(500)
+        .json({ error: finalData.message || "An error occurred" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: "Failed to subscribe to channel" });
@@ -767,50 +775,74 @@ export const mintStock = async (req: Request, res: any) => {
 //     });
 //   }
 // };
-export const sellYes = (req: Request, res: any) => {
+export const sellYes = async (req: Request, res: any) => {
   try {
     const { stockSymbol, price, userId, quantity } = req.body;
+    const id = uuid();
 
-    if (!stockSymbol || !price || !userId || !quantity) {
-      return res.status(400).json({
-        message: "Insufficient credentials",
+    const input = {
+      id: id,
+      method: "sellyes",
+      payload: {
+        stockSymbol: stockSymbol,
+        price: price,
+        userId: userId,
+        quantity: quantity,
+      },
+    };
+
+    await redisClient.lPush(requestQueue, JSON.stringify(input));
+
+    try {
+      const data = await handlePubSub(id);
+
+      return res.status(200).send(data);
+    } catch (error) {
+      return res.status(403).json({
+        error: error,
       });
     }
 
-    if (
-      !STOCK_BALANCES[userId] ||
-      !STOCK_BALANCES[userId][stockSymbol] ||
-      !STOCK_BALANCES[userId][stockSymbol]["yes"]
-    ) {
-      return res.status(400).json({
-        message: "No such stock available for this user",
-      });
-    }
+    // if (!stockSymbol || !price || !userId || !quantity) {
+    //   return res.status(400).json({
+    //     message: "Insufficient credentials",
+    //   });
+    // }
 
-    if (STOCK_BALANCES[userId][stockSymbol]["yes"].quantity < quantity) {
-      return res.status(400).json({
-        message: "You don't have enough stocks",
-      });
-    }
+    // if (
+    //   !STOCK_BALANCES[userId] ||
+    //   !STOCK_BALANCES[userId][stockSymbol] ||
+    //   !STOCK_BALANCES[userId][stockSymbol]["yes"]
+    // ) {
+    //   return res.status(400).json({
+    //     message: "No such stock available for this user",
+    //   });
+    // }
 
-    STOCK_BALANCES[userId][stockSymbol]["yes"].locked += quantity;
-    STOCK_BALANCES[userId][stockSymbol]["yes"].quantity -= quantity;
+    // if (STOCK_BALANCES[userId][stockSymbol]["yes"].quantity < quantity) {
+    //   return res.status(400).json({
+    //     message: "You don't have enough stocks",
+    //   });
+    // }
 
-    if (!ORDERBOOK[stockSymbol]) {
-      ORDERBOOK[stockSymbol] = { yes: {}, no: {} };
-    }
-    if (!ORDERBOOK[stockSymbol].yes[price]) {
-      ORDERBOOK[stockSymbol].yes[price] = { quantity: 0, orders: {} };
-    }
-    if (!ORDERBOOK[stockSymbol].yes[price].orders[userId]) {
-      ORDERBOOK[stockSymbol].yes[price].orders[userId] = {
-        quantity: 0,
-        type: "normal ",
-      };
-    }
+    // STOCK_BALANCES[userId][stockSymbol]["yes"].locked += quantity;
+    // STOCK_BALANCES[userId][stockSymbol]["yes"].quantity -= quantity;
 
-    ORDERBOOK[stockSymbol].yes[price].quantity += quantity;
-    ORDERBOOK[stockSymbol].yes[price].orders[userId].quantity += quantity;
+    // if (!ORDERBOOK[stockSymbol]) {
+    //   ORDERBOOK[stockSymbol] = { yes: {}, no: {} };
+    // }
+    // if (!ORDERBOOK[stockSymbol].yes[price]) {
+    //   ORDERBOOK[stockSymbol].yes[price] = { quantity: 0, orders: {} };
+    // }
+    // if (!ORDERBOOK[stockSymbol].yes[price].orders[userId]) {
+    //   ORDERBOOK[stockSymbol].yes[price].orders[userId] = {
+    //     quantity: 0,
+    //     type: "normal ",
+    //   };
+    // }
+
+    // ORDERBOOK[stockSymbol].yes[price].quantity += quantity;
+    // ORDERBOOK[stockSymbol].yes[price].orders[userId].quantity += quantity;
 
     return res.status(200).json({
       stockbalance: STOCK_BALANCES,

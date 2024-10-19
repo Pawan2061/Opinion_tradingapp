@@ -9,9 +9,11 @@ export const createSymbol = async (payload: any) => {
   try {
     if (ORDERBOOK.hasOwnProperty(payload.stockSymbol)) {
       console.log("already there");
-      return JSON.stringify({
-        message: "already availanble",
-      });
+      return {
+        success: false,
+        message: "this symbol is already available",
+        data: ORDERBOOK[payload.stockSymbol],
+      };
     }
     ORDERBOOK[payload.stockSymbol] = {
       yes: {},
@@ -22,7 +24,11 @@ export const createSymbol = async (payload: any) => {
     // ws.send(JSON.stringify(ORDERBOOK));
     await displayBook(JSON.stringify(ORDERBOOK));
 
-    return JSON.stringify(ORDERBOOK);
+    return {
+      success: true,
+      message: `${payload.stockSymbol} is created`,
+      data: ORDERBOOK[payload.stockSymbol],
+    };
   } catch (error) {
     return { error: error };
   }
@@ -32,15 +38,20 @@ export const getOrderbooks = async (payload: string) => {
   try {
     const orderbooks = ORDERBOOK;
     if (!orderbooks) {
-      //   return res.status(404).json({
-      //     message: "No orderbook found",
-      //   });2
-      console.log("not found ");
+      return {
+        success: false,
+        message: "this orderbook is not  available",
+        data: {},
+      };
     }
 
     await displayBook(JSON.stringify(orderbooks));
 
-    return JSON.stringify(orderbooks);
+    return {
+      success: true,
+      message: "ORDERBOOKS:",
+      data: ORDERBOOK,
+    };
     // await redisClient.lPush(responseQueue, JSON.stringify(orderbooks));
   } catch (error) {
     return { error: error };
@@ -78,9 +89,17 @@ export const getStocks = async (payload: string) => {
   try {
     const stock_balance = STOCK_BALANCES;
     if (!stock_balance) {
-      throw new Error("STOCKS NOT AVAILABLE ");
+      return {
+        success: false,
+        message: "this stock is not available",
+        data: {},
+      };
     }
-    return JSON.stringify(stock_balance);
+    return {
+      success: true,
+      message: "Stocks:",
+      data: stock_balance,
+    };
     // await redisClient.lPush(responseQueue, JSON.stringify(stock_balance));
   } catch (error) {
     return { error: error };
@@ -93,19 +112,20 @@ export const getBalanceStock = async (payload: string) => {
     // return res.status(200).json({
     //   stock: stockbalance,
     // });
-    console.log("im here");
 
     if (!stockbalance) {
-      console.log("error errorr errror");
-
-      throw new Error("stock couldnt be founds");
+      return {
+        success: false,
+        message: "this stock is not available",
+        data: {},
+      };
     }
-    console.log(stockbalance);
 
-    console.log("i hrer");
-
-    return JSON.stringify(stockbalance);
-
+    return {
+      success: true,
+      message: "Stocks",
+      data: stockbalance,
+    };
     // await redisClient.lPush(responseQueue, JSON.stringify(stockbalance));
   } catch (error) {
     return { error: error };
@@ -123,27 +143,25 @@ export const buyYes = async (payload: any) => {
       !payload.userId ||
       !payload.stockType
     ) {
-      //   return res.status(404).json({
-      //     message: "insufficient creds",
-      //   });
-      console.log("insufficientcreds");
+      return {
+        success: false,
+        message: "this credentials aren't  available",
+        data: {},
+      };
     }
 
     if (
       user_with_balances[payload.userId]!.balance <
       payload.price * payload.quantity
     ) {
-      //   return res.status(403).json({
-      //     message: "user doesn't have sufficient balance",
-      //   });
-      console.log("user doesnt have sufficient balance");
+      return {
+        success: false,
+        message: "insufficientbalance",
+        data: {},
+      };
     }
 
     if (!ORDERBOOK[payload.stockSymbol]) {
-      //   return res.status(400).json({
-      //     message: "no stock found",
-      //   });
-      // console.log("no stock found");
       ORDERBOOK[payload.stockSymbol] = {
         yes: {},
         no: {},
@@ -187,7 +205,11 @@ export const buyYes = async (payload: any) => {
         } else {
           console.error("WebSocket is not open");
         } // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
-        return JSON.stringify(ORDERBOOK);
+        return {
+          success: true,
+          message: "ORDERBOOK",
+          data: ORDERBOOK[payload.stockSymbol],
+        };
       } else {
         ORDERBOOK[payload.stockSymbol].no[newPrice].orders[payload.userId] = {
           quantity: payload.quantity,
@@ -212,7 +234,11 @@ export const buyYes = async (payload: any) => {
         } else {
           console.error("WebSocket is not open");
         } // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
-        return JSON.stringify(ORDERBOOK);
+        return {
+          success: true,
+          message: "ORDERBOOK",
+          data: ORDERBOOK[payload.stockSymbol],
+        };
       }
     }
 
@@ -275,7 +301,11 @@ export const buyYes = async (payload: any) => {
       console.error("WebSocket is not open");
     }
     // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
-    return JSON.stringify(ORDERBOOK);
+    return {
+      success: true,
+      message: "ORDERBOOK",
+      data: ORDERBOOK[payload.stockSymbol],
+    };
   } catch (error) {
     return { error: error };
   }
@@ -289,26 +319,26 @@ export const buyNo = async (payload: any) => {
       !payload.userId ||
       !payload.stockType
     ) {
-      // return res.status(404).json({
-      //   message: "insufficient credentials",
-      // });
-      console.log("insufficient credentials");
+      return {
+        success: false,
+        message: "credentails unavilable",
+        data: {},
+      };
     }
 
     if (
       user_with_balances[payload.userId].balance <
       payload.price * payload.quantity
     ) {
-      // return res.status(403).json({
-      //   message: "user doesn't have sufficient balance",
-      // });
+      return {
+        success: false,
+        message: "insufficient balance",
+        data: {},
+      };
       console.log("user doesnt have sufficient balanace");
     }
 
     if (!ORDERBOOK[payload.stockSymbol]) {
-      // return res.status(400).json({
-      //   message: "no stock found",
-      // });
       ORDERBOOK[payload.stocksymbol] = {
         yes: {},
         no: {},
@@ -345,15 +375,17 @@ export const buyNo = async (payload: any) => {
 
         user_with_balances[payload.userId].balance -=
           payload.price * payload.quantity;
-        // return res.status(200).json({
-        //   orderedStock: ORDERBOOK,
-        // });
+
         if (ws && ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify(ORDERBOOK));
         } else {
           console.error("WebSocket is not open");
         }
-        return JSON.stringify(ORDERBOOK);
+        return {
+          success: true,
+          message: "ORDERBOOK",
+          data: ORDERBOOK[payload.stockSymbol],
+        };
         // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
       } else {
         ORDERBOOK[payload.stockSymbol].yes[newPrice].orders[payload.userId] = {
@@ -367,9 +399,7 @@ export const buyNo = async (payload: any) => {
           payload.price * payload.quantity;
         user_with_balances[payload.userId].locked +=
           payload.price * payload.quantity;
-        // return res.status(200).json({
-        //   orderedStock: ORDERBOOK,
-        // });
+
         console.log(ORDERBOOK);
         if (ws && ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify(ORDERBOOK));
@@ -377,7 +407,11 @@ export const buyNo = async (payload: any) => {
           console.error("WebSocket is not open");
         }
         // await redisClient.lPush(responseQueue, JSON.stringify(ORDERBOOK));
-        return JSON.stringify(ORDERBOOK);
+        return {
+          success: true,
+          message: "ORDERBOOK",
+          data: ORDERBOOK[payload.stockSymbol],
+        };
 
         // STOCK_BALANCES[userId][stockSymbol]!["yes"].locked += quantity;
       }
@@ -445,7 +479,11 @@ export const buyNo = async (payload: any) => {
     } else {
       console.error("WebSocket is not open");
     }
-    return JSON.stringify(ORDERBOOK);
+    return {
+      success: true,
+      message: "ORDERBOOK",
+      data: ORDERBOOK[payload.stockSymbol],
+    };
 
     // return res.status(200).json({
     //   orderedStock: ORDERBOOK,
@@ -454,5 +492,84 @@ export const buyNo = async (payload: any) => {
     return {
       error: error,
     };
+  }
+};
+
+export const sellYes = async (payload: any) => {
+  console.log(payload, "this is mypayload");
+
+  try {
+    if (
+      !payload.stockSymbol ||
+      !payload.price ||
+      !payload.userId ||
+      !payload.quantity
+    ) {
+      // return res.status(400).json({
+      //   message: "Insufficient credentials",
+      // });
+      console.log("insufficient credentials");
+    }
+
+    if (
+      !STOCK_BALANCES[payload.userId] ||
+      !STOCK_BALANCES[payload.userId][payload.stockSymbol] ||
+      !STOCK_BALANCES[payload.userId][payload.stockSymbol]["yes"]
+    ) {
+      // return res.status(400).json({
+      //   message: "No such stock available for this user",
+      // });
+      console.log("no such stock available");
+    }
+
+    if (
+      STOCK_BALANCES[payload.userId][payload.stockSymbol]["yes"].quantity <
+      payload.quantity
+    ) {
+      // return res.status(400).json({
+      //   message: "You don't have enough stocks",
+      // });
+      console.log("dont have enough stocks");
+    }
+
+    STOCK_BALANCES[payload.userId][payload.stockSymbol]["yes"].locked +=
+      payload.quantity;
+    STOCK_BALANCES[payload.userId][payload.stockSymbol]["yes"].quantity -=
+      payload.quantity;
+
+    if (!ORDERBOOK[payload.stockSymbol]) {
+      ORDERBOOK[payload.stockSymbol] = { yes: {}, no: {} };
+    }
+    if (!ORDERBOOK[payload.stockSymbol].yes[payload.price]) {
+      ORDERBOOK[payload.stockSymbol].yes[payload.price] = {
+        quantity: 0,
+        orders: {},
+      };
+    }
+    if (
+      !ORDERBOOK[payload.stockSymbol].yes[payload.price].orders[payload.userId]
+    ) {
+      ORDERBOOK[payload.stockSymbol].yes[payload.price].orders[payload.userId] =
+        {
+          quantity: 0,
+          type: "normal ",
+        };
+    }
+
+    ORDERBOOK[payload.stockSymbol].yes[payload.price].quantity +=
+      payload.quantity;
+    ORDERBOOK[payload.stockSymbol].yes[payload.price].orders[
+      payload.userId
+    ].quantity += payload.quantity;
+
+    return {
+      success: true,
+      message: "sold this stock",
+      stocks: STOCK_BALANCES,
+    };
+  } catch (error) {
+    console.log("nednei");
+
+    console.log(error);
   }
 };
