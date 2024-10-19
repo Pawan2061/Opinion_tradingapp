@@ -1,7 +1,9 @@
 import { response, Response } from "express";
 import { responseQueue } from ".";
+import { WebSocket } from "ws";
 import { redisClient, ws } from "..";
 import { ORDERBOOK, STOCK_BALANCES, user_with_balances } from "../data";
+import { displayBook } from "../utils/sendbook";
 
 export const createSymbol = async (payload: any) => {
   try {
@@ -16,11 +18,16 @@ export const createSymbol = async (payload: any) => {
     };
     console.log("very close");
 
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(ORDERBOOK));
-    } else {
-      console.error("WebSocket is not open");
-    }
+    // await displayBook(JSON.stringify(ORDERBOOK));
+    ws.send(JSON.stringify(ORDERBOOK));
+
+    // if (ws && ws.readyState === WebSocket.OPEN) {
+    //   console.log("im inside websockets");
+
+    //   ws.send(JSON.stringify(ORDERBOOK));
+    // } else {
+    //   console.error("WebSocket is not open");
+    // }
 
     // const ans = await redisClient.lPush(
     //   responseQueue,

@@ -11,10 +11,12 @@
   "description": "",
   "dependencies": {
     "express": "^4.21.1",
-    "redis": "^4.7.0"
+    "redis": "^4.7.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
-    "@types/redis": "^4.0.10"
+    "@types/redis": "^4.0.10",
+    "@types/ws": "^8.5.12"
   }
 }
