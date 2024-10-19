@@ -11,8 +11,7 @@ export const createUser = async (userId: string) => {
       locked: 0,
     };
 
-    // await redisClient.lPush(responseQueue, JSON.stringify(user_with_balances));
-    return JSON.stringify(user_with_balances[userId]);
+    return JSON.stringify(user_with_balances);
   } catch (error) {
     console.log(error);
     return {
@@ -23,11 +22,11 @@ export const createUser = async (userId: string) => {
 
 export const onRampUser = async (payload: any) => {
   try {
-    // if (!payload.userId || !payload.amount) {
-    //   res.status(404).json({
-    //     message: "insufficient credentials",
-    //   });
-    // }
+    if (!payload.userId || !payload.amount) {
+      // res.status(404).json({
+      //   message: "insufficient credentials",
+      // });
+    }
     if (!user_with_balances[payload.userId]) {
       const newUser = (user_with_balances[payload.userId] = {
         balance: payload.amount,

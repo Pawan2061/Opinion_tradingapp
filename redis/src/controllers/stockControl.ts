@@ -9,8 +9,9 @@ export const createSymbol = async (payload: any) => {
   try {
     if (ORDERBOOK.hasOwnProperty(payload.stockSymbol)) {
       console.log("already there");
-
-      return new Error("this stock already exist");
+      return JSON.stringify({
+        message: "already availanble",
+      });
     }
     ORDERBOOK[payload.stockSymbol] = {
       yes: {},
@@ -18,21 +19,8 @@ export const createSymbol = async (payload: any) => {
     };
     console.log("very close");
 
-    // await displayBook(JSON.stringify(ORDERBOOK));
-    ws.send(JSON.stringify(ORDERBOOK));
-
-    // if (ws && ws.readyState === WebSocket.OPEN) {
-    //   console.log("im inside websockets");
-
-    //   ws.send(JSON.stringify(ORDERBOOK));
-    // } else {
-    //   console.error("WebSocket is not open");
-    // }
-
-    // const ans = await redisClient.lPush(
-    //   responseQueue,
-    //   JSON.stringify(ORDERBOOK)
-    // );
+    // ws.send(JSON.stringify(ORDERBOOK));
+    await displayBook(JSON.stringify(ORDERBOOK));
 
     return JSON.stringify(ORDERBOOK);
   } catch (error) {
@@ -46,9 +34,11 @@ export const getOrderbooks = async (payload: string) => {
     if (!orderbooks) {
       //   return res.status(404).json({
       //     message: "No orderbook found",
-      //   });
+      //   });2
       console.log("not found ");
     }
+
+    await displayBook(JSON.stringify(orderbooks));
 
     return JSON.stringify(orderbooks);
     // await redisClient.lPush(responseQueue, JSON.stringify(orderbooks));
