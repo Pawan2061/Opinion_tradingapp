@@ -22,10 +22,10 @@ export const createSymbol = async (payload: any) => {
       console.error("WebSocket is not open");
     }
 
-    const ans = await redisClient.lPush(
-      responseQueue,
-      JSON.stringify(ORDERBOOK)
-    );
+    // const ans = await redisClient.lPush(
+    //   responseQueue,
+    //   JSON.stringify(ORDERBOOK)
+    // );
 
     return JSON.stringify(ORDERBOOK);
   } catch (error) {

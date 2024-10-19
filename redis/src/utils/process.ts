@@ -31,7 +31,6 @@ export const processRequests = async (request: any) => {
 
   if (request.method === "createSymbol") {
     const data = await createSymbol(request.payload);
-    console.log(data, "kristy");
 
     await pubsubManager.sendOutput(request.payload.id, data);
   }

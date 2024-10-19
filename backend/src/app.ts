@@ -4,6 +4,7 @@ import { WebSocket } from "ws";
 import { createClient } from "redis";
 
 export const redisClient = createClient();
+export const subscriber = createClient();
 const app = express();
 app.use(express.json());
 
@@ -16,6 +17,7 @@ app.use("/api/v1", proboRouter);
 
 async function startRedisServer() {
   await redisClient.connect();
+  await subscriber.connect();
 
   console.log("connected to redis");
   app.listen(3000, () => {

@@ -36,13 +36,23 @@ export class PubSubManager {
     console.log("start");
 
     await this.pubClient.publish(id, JSON.stringify(data));
+    console.log(data, "my data and my", id);
+
     console.log("end");
   }
 
   public handleOutput = async (output: string) => {
-    await this.ensureRedisConnection();
-    const finalOutput = JSON.parse(output);
-    return finalOutput;
+    try {
+      console.log("inside handleoutput");
+
+      const finalOutput = JSON.parse(output);
+      console.log(finalOutput, "here");
+
+      return finalOutput;
+    } catch (error) {
+      console.log("Failed to parse output:", error);
+      throw new Error("Invalid JSON format in output");
+    }
   };
 }
 
