@@ -17,8 +17,11 @@ import {
   sellNo,
   resetMemory,
 } from "../controllers/proboController";
-import { sell } from "../controllers/trade";
+import { buy, sell } from "../controllers/trade";
 export const proboRouter = express.Router();
+proboRouter.get("/", (req: Request, res: any) => {
+  res.send("hello");
+});
 proboRouter.post("/user/create/:userId", createUser);
 proboRouter.post("/symbol/create/:stockSymbol", createSymbol);
 proboRouter.post("/onramp/inr", rampUser);
@@ -34,7 +37,7 @@ proboRouter.post("/order/sell/yes", sellYes);
 proboRouter.post("/order/sell/no", sellNo);
 proboRouter.post("/trade/mint/:stockSymbol", mintStock);
 
-// proboRouter.post("/order/buy", buy);
-// proboRouter.post("/order/sell", sell);
+proboRouter.post("/order/buy", buy);
+proboRouter.post("/order/sell", sell);
 
 proboRouter.post("/reset", resetMemory);

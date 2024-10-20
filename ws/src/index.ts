@@ -1,39 +1,56 @@
+import { WebSocket, WebSocketServer } from "ws";
 import express from "express";
-import { WebSocketServer, WebSocket } from "ws";
-import { ORDERBOOK } from "../../backend/src/data/dummy";
-const users = new Set<WebSocket>();
-
+import { createClient } from "redis";
 const app = express();
+const httpServer = app.listen(8080);
 
-const server = app.listen(8080);
-const data = JSON.stringify(ORDERBOOK);
+const wss = new WebSocketServer({
+  server: httpServer,
+});
 
-const wss = new WebSocketServer({ server });
-wss.on("connection", (ws: WebSocket) => {
-  console.log("connected");
+const redisClient = createClient();
+const users = new Map<string, any>();
 
-  ws.send(data);
+wss.on("connection", (ws) => {
+  console.log("client connexted");
+  ws.on("message", async (message: any) => {
+    const data = JSON.parse(message);
+    console.log(data);
 
-  ws.on("message", (message, isBinary) => {
-    const finalData = isBinary ? message : message.toString();
+    if (data.action === "suscribe") {
+      console.log("reached here");
 
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(finalData, { binary: isBinary });
+      const { symbol } = data;
+      console.log(symbol);
+
+      if (!users.has(symbol)) {
+        const sendData = (message: string) => {
+          if (ws.readyState === WebSocket.OPEN) {
+            const toSend = {
+              event: "orderbook_change",
+              message,
+            };
+            ws.send(JSON.stringify(data));
+          }
+        };
+
+        await redisClient.subscribe(symbol, sendData);
+        users.set(symbol, sendData);
       }
-    });
+      ws.send(JSON.stringify(data));
+    }
   });
-
   ws.on("close", () => {
-    users.delete(ws);
-    console.log("Client disconnected");
+    console.log("closing the server");
   });
 });
 
-// setInterval(() => {
-//   wss.clients.forEach((client) => {
-//     if (client.readyState === client.OPEN) {
-//       client.send(JSON.stringify(ORDERBOOK));
-//     }
-//   });
-// }, 10000);
+async function setup() {
+  try {
+    await redisClient.connect();
+  } catch (error) {
+    console.error(error, " is there");
+  }
+}
+
+setup();
