@@ -1,4 +1,6 @@
+import { Response } from "express";
 import { redisClient, subscriber } from "../app";
+import { apResponse } from "../controllers/proboController";
 
 export const handlePubSub = (uid: string): Promise<any> => {
   return new Promise((resolve) => {
@@ -8,17 +10,18 @@ export const handlePubSub = (uid: string): Promise<any> => {
   });
 };
 
-export const handleResponses = (data: any) => {
+export const handleResponses = async (data: any) => {
   try {
-    console.log(data);
-    console.log(data.data);
-    console.log(data.message);
+    const { message } = data;
+    console.log(message);
 
-    if (data.success) {
+    console.log(data.message, data.success);
+
+    if (data.success === true) {
       console.log("succeed", data);
 
       return {
-        statusId: 400,
+        statusId: 200,
         message: data.message,
         data: data.data,
       };
@@ -26,12 +29,35 @@ export const handleResponses = (data: any) => {
       console.log("failed", data);
 
       return {
-        statusId: 200,
+        statusId: 400,
         message: data.message,
         data: data.data,
       };
     }
   } catch (error) {
-    return error;
+    return {
+      statusId: 500,
+      message: "An internal error occurred",
+      error: error,
+    };
+  }
+};
+
+export const sendResponse = (res: Response, payload: any) => {
+  try {
+    const { success, ...data } = JSON.parse(payload);
+    console.log(success);
+    console.log(data);
+    console.log("im here");
+
+    if (!success) {
+      res.status(400).json(data);
+    } else {
+      console.log("not here");
+
+      res.status(200).json(data);
+    }
+  } catch (err) {
+    res.status(500).json({ error: "Invalid response from server" });
   }
 };

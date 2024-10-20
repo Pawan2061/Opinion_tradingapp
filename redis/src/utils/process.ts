@@ -6,6 +6,7 @@ import {
   getOrderbooks,
   getStocks,
   mintStock,
+  sellNo,
   sellYes,
   viewOrderbook,
 } from "../controllers/stockControl";
@@ -71,6 +72,10 @@ export const processRequests = async (request: any) => {
       break;
     case "sellyes":
       data = await sellYes(request.payload);
+      break;
+
+    case "sellNo":
+      data = await sellNo(request.payload);
       break;
 
     case "mintStock":

@@ -475,6 +475,10 @@ export const sellYes = async (payload: any) => {
         data: {},
       };
     }
+    console.log(payload.stockSymbol);
+    console.log(payload.price);
+    console.log(payload.userId);
+    console.log(payload.quantity);
 
     if (
       !STOCK_BALANCES[payload.userId] ||
@@ -562,6 +566,9 @@ export const sellNo = async (payload: any) => {
       !STOCK_BALANCES[payload.userId][payload.stockSymbol] ||
       !STOCK_BALANCES[payload.userId][payload.stockSymbol]["no"]
     ) {
+      console.log(payload.userId);
+      payload.stockSymbol;
+
       return {
         success: false,
         message: "no such stock available",
@@ -576,7 +583,7 @@ export const sellNo = async (payload: any) => {
       return {
         success: true,
         message: "you dont have enough no stocks",
-        data: STOCK_BALANCES,
+        data: {},
       };
     }
 
@@ -604,7 +611,7 @@ export const sellNo = async (payload: any) => {
         };
     }
 
-    ORDERBOOK[payload.tockSymbol].no[payload.price].quantity +=
+    ORDERBOOK[payload.stockSymbol].no[payload.price].quantity +=
       payload.quantity;
     ORDERBOOK[payload.stockSymbol].no[payload.price].orders[
       payload.userId

@@ -3,10 +3,15 @@ import { v4 as uuid } from "uuid";
 import { ORDERBOOK, STOCK_BALANCES, user_with_balances } from "../data/dummy";
 import { pubsubManager } from "../../../redis/src/pubsub";
 const requestQueue = "request";
-const responseQueue = "response";
 
 import { redisClient, subscriber } from "../app";
-import { handlePubSub, handleResponses } from "../utils/help";
+import { handlePubSub, handleResponses, sendResponse } from "../utils/help";
+
+export interface apResponse {
+  success: boolean;
+  message: string;
+  data?: any;
+}
 
 export const createUser = async (req: Request, res: any) => {
   try {
@@ -20,15 +25,22 @@ export const createUser = async (req: Request, res: any) => {
     await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
-      const data = await handlePubSub(id);
+      console.log("im inside");
 
-      return res.status(200).send(data);
+      const data = await handlePubSub(id);
+      console.log(data);
+
+      sendResponse(res, data);
+
+      // await handleResponses(data);
+
+      // return res.status(200).send(data);
     } catch (error) {
       return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
   } catch (error) {
     return res.status(400).json({
-      error: error,
+      error,
     });
   }
 };
@@ -61,7 +73,7 @@ export const createSymbol = async (req: Request, res: any) => {
     try {
       const data = await handlePubSub(id);
 
-      return res.status(200).send(data);
+      sendResponse(res, data);
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: "Failed to subscribe to channel" });
@@ -88,7 +100,7 @@ export const getBalances = async (req: Response, res: any) => {
 
     try {
       const data = await handlePubSub(id);
-      return res.status(200).send(data);
+      sendResponse(res, data);
     } catch (error) {
       return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
@@ -113,7 +125,7 @@ export const getStocks = async (req: Request, res: any) => {
     try {
       const data = await handlePubSub(id);
 
-      return res.status(200).send(data);
+      sendResponse(res, data);
     } catch (error) {
       return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
@@ -139,7 +151,7 @@ export const getUserBalance = async (req: Request, res: any) => {
 
     try {
       const data = await handlePubSub(id);
-      return res.status(200).send(data);
+      sendResponse(res, data);
     } catch (error) {
       return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
@@ -168,13 +180,7 @@ export const rampUser = async (req: Request, res: any) => {
     try {
       const data = await handlePubSub(id);
 
-      const finalData = JSON.parse(data);
-      if (finalData.success) {
-        return res.status(200).send(finalData);
-      }
-      return res
-        .status(500)
-        .json({ error: finalData.message || "An error occurred" });
+      sendResponse(res, data);
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: "Failed to subscribe to channel" });
@@ -202,7 +208,8 @@ export const getBalanceStock = async (req: Request, res: any) => {
 
     try {
       const data = await handlePubSub(id);
-      return res.status(200).send(data);
+      // return res.status(200).send(data);
+      sendResponse(res, data);
     } catch (error) {
       return res.status(400).send(error);
     }
@@ -236,7 +243,7 @@ export const buyYes = async (req: Request, res: any) => {
 
     try {
       const data = await handlePubSub(id);
-      return res.status(200).send(data);
+      sendResponse(res, data);
     } catch (error) {
       return res.status(403).json({
         error: error,
@@ -273,7 +280,7 @@ export const buyNo = async (req: Request, res: any) => {
     try {
       const data = await handlePubSub(id);
 
-      return res.status(200).send(data);
+      sendResponse(res, data);
     } catch (error) {
       return res.status(403).json({
         error: error,
@@ -302,7 +309,7 @@ export const viewOrderbook = async (req: Request, res: any) => {
 
     try {
       const data = await handlePubSub(id);
-      return res.status(200).send(data);
+      sendResponse(res, data);
     } catch (error) {
       return res.status(400).send(error);
     }
@@ -340,7 +347,7 @@ export const mintStock = async (req: Request, res: any) => {
     await redisClient.lPush(requestQueue, JSON.stringify(input));
     try {
       const data = await handlePubSub(id);
-      return res.status(200).send(data);
+      sendResponse(res, data);
     } catch (error) {
       return res.status(400).json({
         error: error,
@@ -467,7 +474,7 @@ export const sellYes = async (req: Request, res: any) => {
     try {
       const data = await handlePubSub(id);
 
-      return res.status(200).send(data);
+      sendResponse(res, data);
     } catch (error) {
       return res.status(403).json({
         error: error,
@@ -515,9 +522,9 @@ export const sellYes = async (req: Request, res: any) => {
     // ORDERBOOK[stockSymbol].yes[price].quantity += quantity;
     // ORDERBOOK[stockSymbol].yes[price].orders[userId].quantity += quantity;
 
-    return res.status(200).json({
-      stockbalance: STOCK_BALANCES,
-    });
+    // return res.status(200).json({
+    //   stockbalance: STOCK_BALANCES,
+    // });
   } catch (error) {
     return res.status(500).json({
       message: "An error occurred while processing the request",
@@ -544,8 +551,10 @@ export const sellNo = async (req: Request, res: any) => {
 
     try {
       const data = await handlePubSub(id);
-      return res.status(200).send(data);
+      sendResponse(res, data);
     } catch (error) {
+      console.log(error);
+
       return {
         error: error,
       };
@@ -617,9 +626,7 @@ export const getOrderbook = async (req: Request, res: any) => {
 
     try {
       const data = await handlePubSub(id);
-      console.log(data, "dipen here");
-
-      return res.status(200).send(data);
+      sendResponse(res, data);
     } catch (error) {
       return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
