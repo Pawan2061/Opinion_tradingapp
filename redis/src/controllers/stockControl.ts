@@ -646,14 +646,6 @@ export const mintStock = async (payload: any) => {
         data: {},
       };
     }
-    // STOCK_BALANCES[userId][symbol]["yes"] = {
-    //   quantity: quantity,
-    //   locked: 0,
-    // };
-    // STOCK_BALANCES[userId][symbol]["no"] = {
-    //   quantity: quantity,
-    //   locked: 0,
-    // };xs
 
     if (!ORDERBOOK[payload.symbol]) {
       ORDERBOOK[payload.symbol] = {
@@ -691,6 +683,27 @@ export const mintStock = async (payload: any) => {
       success: true,
       message: "minted this stock",
       data: ORDERBOOK[payload.symbol],
+    };
+  } catch (error) {
+    return {
+      error: error,
+    };
+  }
+};
+
+export const reset = async (payload: any) => {
+  try {
+    Object.keys(STOCK_BALANCES).forEach((key) => delete STOCK_BALANCES[key]);
+    Object.keys(user_with_balances).forEach(
+      (key) => delete user_with_balances[key]
+    );
+    Object.keys(ORDERBOOK).forEach((key) => delete ORDERBOOK[key]);
+    console.log("deleted");
+
+    return {
+      success: true,
+      message: "reset everything",
+      data: ORDERBOOK,
     };
   } catch (error) {
     return {

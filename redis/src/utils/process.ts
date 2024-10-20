@@ -6,6 +6,7 @@ import {
   getOrderbooks,
   getStocks,
   mintStock,
+  reset,
   sellNo,
   sellYes,
   viewOrderbook,
@@ -80,6 +81,10 @@ export const processRequests = async (request: any) => {
 
     case "mintStock":
       data = await mintStock(request.payload);
+      break;
+
+    case "reset":
+      data = await reset(request.payload);
       break;
 
     default:
