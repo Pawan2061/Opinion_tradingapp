@@ -9,39 +9,75 @@ const wss = new WebSocketServer({
 });
 
 const redisClient = createClient();
-const users = new Map<string, any>();
+const users = new Map<string, Set<WebSocket>>();
 
 wss.on("connection", (ws) => {
   console.log("client connexted");
+
   ws.on("message", async (message: any) => {
+    // wss.clients.forEach((client)=>{
+    //   if(ws.readyState===WebSocket.OPEN){
+    //     client.send(JSON.stringify(message.))
+    //   }
+    // })
+
     const data = JSON.parse(message);
     console.log(data);
 
-    if (data.action === "suscribe") {
+    if (data.type === "subscribe") {
       console.log("reached here");
 
-      const { symbol } = data;
-      console.log(symbol);
+      const { stockSymbol } = data;
+      console.log(stockSymbol);
 
-      if (!users.has(symbol)) {
+      if (!users.has(stockSymbol)) {
+        console.log("already inside");
+
         const sendData = (message: string) => {
-          if (ws.readyState === WebSocket.OPEN) {
-            const toSend = {
-              event: "orderbook_change",
-              message,
-            };
-            ws.send(JSON.stringify(data));
-          }
+          console.log("data");
+
+          users.get(stockSymbol)?.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(
+                JSON.stringify({
+                  event: "orderbook_change",
+                  data: stockSymbol,
+                })
+              );
+            }
+          });
         };
 
-        await redisClient.subscribe(symbol, sendData);
-        users.set(symbol, sendData);
+        await redisClient.subscribe(stockSymbol, sendData);
+
+        users.set(stockSymbol, new Set([ws]));
+      } else {
+        users.get(stockSymbol)?.add(ws);
       }
-      ws.send(JSON.stringify(data));
+
+      redisClient.on("message", (data) => {
+        console.log(data, "first");
+
+        ws.send(
+          JSON.stringify({
+            event: "orderbook_change",
+            data: data,
+          })
+        );
+      });
+      // await redisClient.subscribe(symbol, sendData);
+      // users.set(symbol, sendData);
+      // ws.send(JSON.stringify(data));
     }
   });
   ws.on("close", () => {
-    console.log("closing the server");
+    console.log("Client disconnected");
+
+    // Optionally: Unsubscribe from Redis if needed
+    users.forEach((sendData, symbol) => {
+      redisClient.unsubscribe(symbol); // Unsubscribe logic
+      users.delete(symbol); // Remove user from map
+    });
   });
 });
 

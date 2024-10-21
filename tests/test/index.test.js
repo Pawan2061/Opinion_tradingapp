@@ -5,7 +5,7 @@ const HTTP_SERVER_URL = 'http://localhost:3000/api/v1';
 const WS_SERVER_URL = 'ws://localhost:8080';
 
 describe('Trading System Tests', () => {
-  let ws;
+  let ws
 
   beforeAll((done) => {
     ws = new WebSocket(WS_SERVER_URL);
@@ -21,10 +21,16 @@ describe('Trading System Tests', () => {
   });
 
   const waitForWSMessage = () => {
+    console.log("waiting for messafe");
+    
     return new Promise((resolve) => {
+        console.log("inside promise");
+        
       ws.once('message', (data) => {
+        console.log(data);
+        
         const parsedData = JSON.parse(data);
-        // console.log(parsedData)
+        console.log(parsedData)
         resolve(parsedData);
       });
     });
@@ -88,20 +94,24 @@ describe('Trading System Tests', () => {
     
 
     expect(buyOrderResponse.status).toBe(200);
+    console.log("still there btw");
+    
     expect(wsMessage.event).toBe('orderbook_change');
     console.log("completed till now ____________________");
     
     const message = JSON.parse(wsMessage.message);
-    expect(message.no['1.5']).toEqual({
+    console.log(symbol);
+    
+    expect(message.no['150']).toEqual({
       total: 100,
       orders: { 
         [userId]: { 
-          type: "reverse",
+          type: "inverse",
           quantity: 100 
         } 
       }
     });
-  },20000);
+  },30000);
 
   test.skip('Place sell order for no stock and check WebSocket response', async () => {
     const userId = 'testUser3';

@@ -177,7 +177,7 @@ export const buyYes = async (payload: any) => {
 
       if (!ORDERBOOK[payload.stockSymbol].no[newPrice]) {
         ORDERBOOK[payload.stockSymbol].no[newPrice] = {
-          quantity: 0,
+          total: 0,
           orders: {},
         };
       }
@@ -189,8 +189,7 @@ export const buyYes = async (payload: any) => {
         ORDERBOOK[payload.stockSymbol].no[newPrice].orders[
           payload.userId
         ].type = "inverse";
-        ORDERBOOK[payload.stockSymbol].yes[newPrice].quantity +=
-          payload.quantity;
+        ORDERBOOK[payload.stockSymbol].yes[newPrice].total += payload.quantity;
         user_with_balances[payload.userId].locked +=
           payload.price * payload.quantity;
 
@@ -211,8 +210,7 @@ export const buyYes = async (payload: any) => {
           quantity: payload.quantity,
           type: "inverse",
         };
-        ORDERBOOK[payload.stockSymbol].no[newPrice].quantity +=
-          payload.quantity;
+        ORDERBOOK[payload.stockSymbol].no[newPrice].total += payload.quantity;
         user_with_balances[payload.userId].locked +=
           payload.price * payload.quantity;
 
@@ -272,9 +270,9 @@ export const buyYes = async (payload: any) => {
         console.log("order is processing 3");
       }
 
-      ORDERBOOK[payload.stockSymbol].yes[payload.price].quantity -=
+      ORDERBOOK[payload.stockSymbol].yes[payload.price].total -=
         payload.quantity - totalAmount;
-      if (ORDERBOOK[payload.stockSymbol].yes[payload.price].quantity == 0) {
+      if (ORDERBOOK[payload.stockSymbol].yes[payload.price].total == 0) {
         delete ORDERBOOK[payload.stockSymbol].yes[payload.price];
       }
       console.log("order is processing 4");
@@ -342,7 +340,7 @@ export const buyNo = async (payload: any) => {
 
       if (!ORDERBOOK[payload.stockSymbol].yes[newPrice]) {
         ORDERBOOK[payload.stockSymbol].yes[newPrice] = {
-          quantity: 0,
+          total: 0,
           orders: {},
         };
       }
@@ -351,8 +349,7 @@ export const buyNo = async (payload: any) => {
         ORDERBOOK[payload.stockSymbol].yes[newPrice].orders[
           payload.userId
         ].quantity += payload.quantity;
-        ORDERBOOK[payload.stockSymbol].yes[newPrice].quantity +=
-          payload.quantity;
+        ORDERBOOK[payload.stockSymbol].yes[newPrice].total += payload.quantity;
 
         ORDERBOOK[payload.stockSymbol].yes[newPrice].orders[
           payload.userId
@@ -376,8 +373,7 @@ export const buyNo = async (payload: any) => {
           quantity: payload.quantity,
           type: "inverse",
         };
-        ORDERBOOK[payload.stockSymbol].yes[newPrice].quantity +=
-          payload.quantity;
+        ORDERBOOK[payload.stockSymbol].yes[newPrice].total += payload.quantity;
 
         user_with_balances[payload.userId].balance -=
           payload.price * payload.quantity;
@@ -426,10 +422,10 @@ export const buyNo = async (payload: any) => {
           subtraction;
       }
 
-      ORDERBOOK[payload.stockSymbol].no[payload.price]!.quantity -=
+      ORDERBOOK[payload.stockSymbol].no[payload.price]!.total -=
         payload.quantity - totalAmount;
 
-      if (ORDERBOOK[payload.stockSymbol].no[payload.price].quantity == 0) {
+      if (ORDERBOOK[payload.stockSymbol].no[payload.price].total == 0) {
         delete ORDERBOOK[payload.stockSymbol].no[payload.price];
       }
 
@@ -510,7 +506,7 @@ export const sellYes = async (payload: any) => {
     }
     if (!ORDERBOOK[payload.stockSymbol].yes[payload.price]) {
       ORDERBOOK[payload.stockSymbol].yes[payload.price] = {
-        quantity: 0,
+        total: 0,
         orders: {},
       };
     }
@@ -524,8 +520,7 @@ export const sellYes = async (payload: any) => {
         };
     }
 
-    ORDERBOOK[payload.stockSymbol].yes[payload.price].quantity +=
-      payload.quantity;
+    ORDERBOOK[payload.stockSymbol].yes[payload.price].total += payload.quantity;
     ORDERBOOK[payload.stockSymbol].yes[payload.price].orders[
       payload.userId
     ].quantity += payload.quantity;
@@ -594,7 +589,7 @@ export const sellNo = async (payload: any) => {
     }
     if (!ORDERBOOK[payload.stockSymbol].no[payload.price]) {
       ORDERBOOK[payload.stockSymbol].no[payload.price] = {
-        quantity: 0,
+        total: 0,
         orders: {},
       };
     }
@@ -608,8 +603,7 @@ export const sellNo = async (payload: any) => {
         };
     }
 
-    ORDERBOOK[payload.stockSymbol].no[payload.price].quantity +=
-      payload.quantity;
+    ORDERBOOK[payload.stockSymbol].no[payload.price].total += payload.quantity;
     ORDERBOOK[payload.stockSymbol].no[payload.price].orders[
       payload.userId
     ].quantity += payload.quantity;
@@ -652,11 +646,11 @@ export const mintStock = async (payload: any) => {
     }
 
     if (!ORDERBOOK[payload.symbol].yes[5] || !ORDERBOOK[payload.symbol].no[5]) {
-      ORDERBOOK[payload.symbol].yes[5] = { quantity: 0, orders: {} };
-      ORDERBOOK[payload.symbol].no[5] = { quantity: 0, orders: {} };
+      ORDERBOOK[payload.symbol].yes[5] = { total: 0, orders: {} };
+      ORDERBOOK[payload.symbol].no[5] = { total: 0, orders: {} };
     }
-    ORDERBOOK[payload.symbol].yes[5].quantity += payload.quantity;
-    ORDERBOOK[payload.symbol].no[5].quantity += payload.quantity;
+    ORDERBOOK[payload.symbol].yes[5].total += payload.quantity;
+    ORDERBOOK[payload.symbol].no[5].total += payload.quantity;
 
     ORDERBOOK[payload.symbol].yes[5].orders = {
       [payload.userId]: {

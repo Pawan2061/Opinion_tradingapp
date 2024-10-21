@@ -75,7 +75,7 @@ export interface OrderBook {
   [stockSymbol: string]: {
     yes: {
       [price: number]: {
-        quantity: number;
+        total: number;
         orders: {
           [userId: string]: orderType;
         };
@@ -83,7 +83,7 @@ export interface OrderBook {
     };
     no: {
       [price: number]: {
-        quantity: number;
+        total: number;
         orders: {
           [userId: string]: orderType;
         };

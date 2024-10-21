@@ -45,6 +45,8 @@ export const handleResponses = async (data: any) => {
 
 export const sendResponse = (res: Response, payload: any) => {
   try {
+    console.log(payload);
+
     const { success, ...data } = JSON.parse(payload);
     console.log(success);
     console.log(data);
@@ -54,8 +56,9 @@ export const sendResponse = (res: Response, payload: any) => {
       res.status(400).json(data);
     } else {
       console.log("not here");
+      console.log(data.data);
 
-      res.status(200).json(data);
+      res.status(200).send(data.data);
     }
   } catch (err) {
     res.status(500).json({ error: "Invalid response from server" });
