@@ -158,6 +158,7 @@ wss.on("connection", (ws) => {
             }
           });
         };
+        console.log(`orderbook.${stockSymbol}`);
 
         await redisClient.subscribe(`orderbook.${stockSymbol}`, listener); // Subscribing to Redis channel
         users.set(stockSymbol, new Set([ws]));

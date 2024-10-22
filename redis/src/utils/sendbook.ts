@@ -11,6 +11,7 @@ export const displayBook = async (symbol: string, orderbook: any) => {
     console.log(orderbook);
 
     // ws.send(JSON.stringify(orderbook));
+    console.log(`orderbook.${symbol}`);
 
     await pubClient.publish(`orderbook.${symbol}`, JSON.stringify(orderbook));
     console.log("ppubslieshd");

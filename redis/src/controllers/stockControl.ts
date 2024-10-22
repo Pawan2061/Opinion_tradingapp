@@ -46,7 +46,7 @@ export const getOrderbooks = async (payload: string) => {
       };
     }
 
-    // await displayBook(JSON.stringify(orderbooks));
+    await displayBook(payload, ORDERBOOK[payload]);
 
     return {
       success: true,
@@ -73,7 +73,7 @@ export const viewOrderbook = async (payload: string) => {
 
     const book = ORDERBOOK[payload];
 
-    // await displayBook(JSON.stringify(ORDERBOOK[payload]));
+    await displayBook(payload, ORDERBOOK[payload]);
     return {
       success: true,
       message: "ORDERBOOK",
@@ -361,7 +361,8 @@ export const buyNo = async (payload: any) => {
         user_with_balances[payload.userId].balance -=
           payload.price * payload.quantity;
 
-        // await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
+        await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
+
         return {
           success: true,
           message: "ORDERBOOK",
@@ -381,7 +382,7 @@ export const buyNo = async (payload: any) => {
           payload.price * payload.quantity;
 
         console.log(ORDERBOOK);
-        // await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
+        await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
 
         return {
           success: true,
@@ -438,7 +439,7 @@ export const buyNo = async (payload: any) => {
         payload.price * payload.quantity;
     }
 
-    // await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
+    await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
 
     return {
       success: true,
@@ -524,7 +525,7 @@ export const sellYes = async (payload: any) => {
     ORDERBOOK[payload.stockSymbol].yes[payload.price].orders[
       payload.userId
     ].quantity += payload.quantity;
-    // await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
+    await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
 
     return {
       success: true,
@@ -611,7 +612,7 @@ export const sellNo = async (payload: any) => {
       payload.userId
     ].type = "normal ";
 
-    // await displayBook(JSON.stringify(ORDERBOOK[payload.stockSymbol]));
+    await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
 
     return {
       success: true,
@@ -669,7 +670,7 @@ export const mintStock = async (payload: any) => {
 
     user_with_balances[payload.userId].balance -=
       payload.quantity * payload.price;
-    // await displayBook(JSON.stringify(ORDERBOOK[payload.symbol]));
+    await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
     return {
       success: true,
       message: "minted this stock",

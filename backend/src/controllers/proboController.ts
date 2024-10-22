@@ -20,15 +20,13 @@ export const createUser = async (req: Request, res: any) => {
       payload: req.params.userId,
     };
 
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
-
     try {
-      console.log("im inside");
+      const data = handlePubSub(id);
 
-      const data = await handlePubSub(id);
-      console.log(data);
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
 
-      sendResponse(res, data);
+      sendResponse(res, finalData);
     } catch (error) {
       return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
@@ -62,12 +60,15 @@ export const createSymbol = async (req: Request, res: any) => {
       },
     };
 
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
-      const data = await handlePubSub(id);
+      const data = handlePubSub(id);
 
-      sendResponse(res, data);
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: "Failed to subscribe to channel" });
@@ -90,11 +91,15 @@ export const getBalances = async (req: Response, res: any) => {
       payload: {},
     };
 
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
-      const data = await handlePubSub(id);
-      sendResponse(res, data);
+      const data = handlePubSub(id);
+
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
@@ -114,12 +119,15 @@ export const getStocks = async (req: Request, res: any) => {
       payload: {},
     };
 
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
-      const data = await handlePubSub(id);
+      const data = handlePubSub(id);
 
-      sendResponse(res, data);
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
@@ -141,11 +149,15 @@ export const getUserBalance = async (req: Request, res: any) => {
       payload: userId,
     };
 
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
-      const data = await handlePubSub(id);
-      sendResponse(res, data);
+      const data = handlePubSub(id);
+
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
@@ -169,12 +181,15 @@ export const rampUser = async (req: Request, res: any) => {
       },
     };
 
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
-      const data = await handlePubSub(id);
+      const data = handlePubSub(id);
 
-      sendResponse(res, data);
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: "Failed to subscribe to channel" });
@@ -198,11 +213,15 @@ export const getBalanceStock = async (req: Request, res: any) => {
       payload: userId,
     };
 
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
-      const data = await handlePubSub(id);
-      sendResponse(res, data);
+      const data = handlePubSub(id);
+
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       return res.status(400).send(error);
     }
@@ -231,12 +250,15 @@ export const buyYes = async (req: Request, res: any) => {
       },
     };
 
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
     console.log("before parsing");
 
     try {
-      const data = await handlePubSub(id);
-      sendResponse(res, data);
+      const data = handlePubSub(id);
+
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       return res.status(403).json({
         error: error,
@@ -268,12 +290,15 @@ export const buyNo = async (req: Request, res: any) => {
       },
     };
 
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
-      const data = await handlePubSub(id);
+      const data = handlePubSub(id);
 
-      sendResponse(res, data);
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       return res.status(403).json({
         error: error,
@@ -298,11 +323,15 @@ export const viewOrderbook = async (req: Request, res: any) => {
       payload: stockSymbol,
     };
 
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
-      const data = await handlePubSub(id);
-      sendResponse(res, data);
+      const data = handlePubSub(id);
+
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       return res.status(400).send(error);
     }
@@ -330,10 +359,14 @@ export const mintStock = async (req: Request, res: any) => {
       },
     };
 
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    // await redisClient.lPush(requestQueue, JSON.stringify(input));
     try {
-      const data = await handlePubSub(id);
-      sendResponse(res, data);
+      const data = handlePubSub(id);
+
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       return res.status(400).json({
         error: error,
@@ -364,12 +397,15 @@ export const sellYes = async (req: Request, res: any) => {
       },
     };
 
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
-      const data = await handlePubSub(id);
+      const data = handlePubSub(id);
 
-      sendResponse(res, data);
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       return res.status(403).json({
         error: error,
@@ -397,11 +433,15 @@ export const sellNo = async (req: Request, res: any) => {
         quantity: quantity,
       },
     };
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
-      const data = await handlePubSub(id);
-      sendResponse(res, data);
+      const data = handlePubSub(id);
+
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       console.log(error);
 
@@ -426,11 +466,15 @@ export const getOrderbook = async (req: Request, res: any) => {
       payload: {},
     };
 
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
-      const data = await handlePubSub(id);
-      sendResponse(res, data);
+      const data = handlePubSub(id);
+
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       return res.status(500).json({ error: "Failed to subscribe to channel" });
     }
@@ -449,13 +493,15 @@ export const resetMemory = async (req: Request, res: any) => {
       method: "reset",
       payload: {},
     };
-    await redisClient.lPush(requestQueue, JSON.stringify(input));
+    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
-      const data = await handlePubSub(id);
-      console.log(data, "data is there");
+      const data = handlePubSub(id);
 
-      sendResponse(res, data);
+      await redisClient.lPush(requestQueue, JSON.stringify(input));
+      const finalData = await data;
+
+      sendResponse(res, finalData);
     } catch (error) {
       return res.status(500).json({ error: "Failed to subscribe to channel" });
     }

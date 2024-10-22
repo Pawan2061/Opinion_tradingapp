@@ -3,7 +3,11 @@ import { redisClient, subscriber } from "../app";
 import { apResponse } from "../controllers/proboController";
 
 export const handlePubSub = (uid: string): Promise<any> => {
-  return new Promise((resolve) => {
+  const time = 5000;
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      subscriber.unsubscribe(uid), reject(new Error("timeout"));
+    }, 5000);
     subscriber.subscribe(uid, (data) => {
       resolve(data);
     });
