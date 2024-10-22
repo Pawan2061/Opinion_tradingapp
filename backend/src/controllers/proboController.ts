@@ -345,7 +345,7 @@ export const viewOrderbook = async (req: Request, res: any) => {
 export const mintStock = async (req: Request, res: any) => {
   try {
     const { userId, quantity, price, stockSymbol } = req.body;
-    const symbol = req.params.stockSymbol;
+    // const symbol = req.params.stockSymbol;
 
     const id = uuid();
     const input = {
@@ -355,7 +355,7 @@ export const mintStock = async (req: Request, res: any) => {
         userId: userId,
         quantity: quantity,
         price: price,
-        symbol: symbol,
+        symbol: stockSymbol,
       },
     };
 
@@ -383,7 +383,7 @@ export const mintStock = async (req: Request, res: any) => {
 
 export const sellYes = async (req: Request, res: any) => {
   try {
-    const { stockSymbol, price, userId, quantity } = req.body;
+    const { stockSymbol, price, userId, quantity, stockType } = req.body;
     const id = uuid();
 
     const input = {
@@ -394,6 +394,7 @@ export const sellYes = async (req: Request, res: any) => {
         price: price,
         userId: userId,
         quantity: quantity,
+        stockType: stockType,
       },
     };
 
@@ -420,7 +421,7 @@ export const sellYes = async (req: Request, res: any) => {
 };
 export const sellNo = async (req: Request, res: any) => {
   try {
-    const { stockSymbol, price, userId, quantity } = req.body;
+    const { stockSymbol, price, userId, quantity, stockType } = req.body;
     const id = uuid();
 
     const input = {
@@ -431,6 +432,7 @@ export const sellNo = async (req: Request, res: any) => {
         price: price,
         userId: userId,
         quantity: quantity,
+        stockType: stockType,
       },
     };
     // await redisClient.lPush(requestQueue, JSON.stringify(input));

@@ -6,15 +6,9 @@ export const displayBook = async (symbol: string, orderbook: any) => {
   await pubClient.connect();
 
   try {
-    console.log("_________________________________");
-    console.log(symbol);
-    console.log(orderbook);
-
-    // ws.send(JSON.stringify(orderbook));
-    console.log(`orderbook.${symbol}`);
+    console.log(`orderbook.${symbol}  this is nothing else`);
 
     await pubClient.publish(`orderbook.${symbol}`, JSON.stringify(orderbook));
-    console.log("ppubslieshd");
   } catch (error) {
     console.log(error);
 

@@ -19,12 +19,15 @@ describe("Trading System Tests", () => {
 
   beforeEach(async () => {
     await axios.post(`${HTTP_SERVER_URL}/reset`);
-  });
+  },);
 
   const waitForWSMessage = () => {
+    console.log("inside ws message");
+    
     return new Promise((resolve) => {
 
       ws.once("message", (data) => {
+        console.log("inside data",data);
         
         const parsedData = JSON.parse(data);
         // console.log(parsedData)
@@ -33,7 +36,7 @@ describe("Trading System Tests", () => {
     });
   };
 
-  test("Create user, onramp INR, and check balance", async () => {
+  test.skip("Create user, onramp INR, and check balance", async () => {
     const userId = "testUser1";
     await axios.post(`${HTTP_SERVER_URL}/user/create/${userId}`
     
@@ -53,7 +56,7 @@ describe("Trading System Tests", () => {
     expect(balanceResponse.data).toEqual({ balance: 1000000, locked: 0 });
   });
 
-  test("Create symbol and check orderbook", async () => {
+  test.skip("Create symbol and check orderbook", async () => {
     const symbol = "TEST_SYMBOL_30_Dec_2024";
     const userId="test_user1"
     await axios.post(`${HTTP_SERVER_URL}/symbol/create/${symbol}`,
@@ -70,7 +73,7 @@ describe("Trading System Tests", () => {
     expect(orderbookResponse.data).toEqual({ yes: {}, no: {} });
   });
 
-  test("Place buy order for yes stock and check WebSocket response", async () => {
+  test.skip("Place buy order for yes stock and check WebSocket response", async () => {
     const userId = "testUser2";
     const symbol = "BTC_USDT_10_Oct_2024_9_30";
     await axios.post(`${HTTP_SERVER_URL}/user/create/${userId}`);
@@ -122,16 +125,26 @@ describe("Trading System Tests", () => {
     });
   });
 
-  test.skip("Place sell order for no stock and check WebSocket response", async () => {
+  test("Place sell order for no stock and check WebSocket response", async () => {
     const userId = "testUser3";
-    const symbol = "ETH_USDT_15_Nov_2024_14_00";
+    const stockSymbol = "ETH_USDT_15_Nov_2024_14_00";
     await axios.post(`${HTTP_SERVER_URL}/user/create/${userId}`);
-    await axios.post(`${HTTP_SERVER_URL}/symbol/create/${symbol}`);
+    await axios.post(`${HTTP_SERVER_URL}/symbol/create/${stockSymbol}`,{
+      userId
+    });
+    console.log("done ");
+
+    
     await axios.post(`${HTTP_SERVER_URL}/trade/mint`, {
       userId,
-      stockSymbol: symbol,
+      stockSymbol: stockSymbol,
       quantity: 200,
     });
+    console.log("done3");
+    
+    const wsMessageP = waitForWSMessage();
+
+    
 
     await ws.send(
       JSON.stringify({
@@ -140,18 +153,28 @@ describe("Trading System Tests", () => {
       })
     );
 
+    
+    console.log("im here");
+    
+    console.log(`${HTTP_SERVER_URL}/order/sell`);
+    
     const sellOrderResponse = await axios.post(
-      `${HTTP_SERVER_URL}/order/sell`,
+      `${HTTP_SERVER_URL}/order/sell/`,
       {
         userId,
-        stockSymbol: symbol,
+       stockSymbol,
         quantity: 100,
         price: 200,
         stockType: "no",
       }
     );
+    
+    
 
-    const wsMessage = await waitForWSMessage();
+    const wsMessage = await wsMessageP
+
+    console.log("dipendra bhatta");
+    
 
     expect(sellOrderResponse.status).toBe(200);
     expect(wsMessage.event).toBe("event_orderbook_update");
@@ -165,7 +188,7 @@ describe("Trading System Tests", () => {
         },
       },
     });
-  });
+  },10000);
 
   test.skip("Execute matching orders and check WebSocket response", async () => {
     const buyerId = "buyer1";

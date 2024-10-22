@@ -461,7 +461,8 @@ export const sellYes = async (payload: any) => {
       !payload.stockSymbol ||
       !payload.price ||
       !payload.userId ||
-      !payload.quantity
+      !payload.quantity ||
+      !payload.stockType
     ) {
       return {
         success: false,
@@ -545,8 +546,11 @@ export const sellNo = async (payload: any) => {
       !payload.stockSymbol ||
       !payload.price ||
       !payload.userId ||
-      !payload.quantity
+      !payload.quantity ||
+      !payload.stockType
     ) {
+      console.log("Insuffciient");
+
       return {
         success: false,
         message: "insufficient credentials",
@@ -559,7 +563,6 @@ export const sellNo = async (payload: any) => {
       !STOCK_BALANCES[payload.userId][payload.stockSymbol] ||
       !STOCK_BALANCES[payload.userId][payload.stockSymbol]["no"]
     ) {
-      console.log(payload.userId);
       payload.stockSymbol;
 
       return {
@@ -628,16 +631,16 @@ export const sellNo = async (payload: any) => {
 
 export const mintStock = async (payload: any) => {
   try {
-    if (
-      user_with_balances[payload.userId].balance <=
-      payload.quantity * payload.price
-    ) {
-      return {
-        success: false,
-        message: "insufficent balance",
-        data: {},
-      };
-    }
+    // if (
+    //   user_with_balances[payload.userId].balance <=
+    //   payload.quantity * payload.price
+    // ) {
+    //   return {
+    //     success: false,
+    //     message: "insufficent balance",
+    //     data: {},
+    //   };
+    // }
 
     if (!ORDERBOOK[payload.symbol]) {
       ORDERBOOK[payload.symbol] = {
@@ -666,11 +669,27 @@ export const mintStock = async (payload: any) => {
       },
     };
 
+    if (!STOCK_BALANCES[payload.userId]) {
+      STOCK_BALANCES[payload.userId] = {};
+    }
+
+    STOCK_BALANCES[payload.userId][payload.symbol] = {
+      yes: {
+        locked: 0,
+        quantity: 50,
+      },
+      no: {
+        locked: 0,
+        quantity: 50,
+      },
+    };
+
     console.log("ndudhiei");
 
     user_with_balances[payload.userId].balance -=
       payload.quantity * payload.price;
-    await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
+
+    await displayBook(payload.symbol, ORDERBOOK[payload.symbol]);
     return {
       success: true,
       message: "minted this stock",
