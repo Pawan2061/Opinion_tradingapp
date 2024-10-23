@@ -15,6 +15,7 @@ func CreateUser(userId string) models.UserResponse {
 		}
 
 	}
+
 	users[userId] = models.UserBalance{
 		Balance: 0,
 		Locked:  0,

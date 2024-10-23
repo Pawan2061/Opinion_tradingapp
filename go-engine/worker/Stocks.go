@@ -13,8 +13,8 @@ func createSymbol(payload models.CreateSymbol) models.UserResponse {
 	}
 
 	models.Orderbooks[payload.Stock] = models.Pricing{
-		Yes: make(map[float64]models.Ordertype),
-		No:  make(map[float64]models.Ordertype),
+		Yes: make(map[int]models.Ordertype),
+		No:  make(map[int]models.Ordertype),
 	}
 
 	return models.UserResponse{
@@ -96,6 +96,11 @@ func getUserStock(payload string) models.UserResponse {
 			Message: "no such orderbook available",
 			Data:    nil,
 			Success: false,
+		}
+	} else {
+		return models.UserResponse{
+			Message: "These are the stocks",
+			Data:    orderbook,
 		}
 	}
 }

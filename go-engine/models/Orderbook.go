@@ -11,8 +11,8 @@ type Ordertype struct {
 }
 
 type Pricing struct {
-	Yes map[float64]Ordertype
-	No  map[float64]Ordertype
+	Yes map[int]Ordertype
+	No  map[int]Ordertype
 }
 
 type Orderbook map[string]Pricing
