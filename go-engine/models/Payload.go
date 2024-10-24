@@ -25,3 +25,19 @@ type NoPayload struct {
 	UserId      string
 	StockType   string
 }
+
+type BuyYes struct {
+	Stocksymbol string
+	Price       int
+	UserId      string
+	Quantity    int
+	StockType   string
+}
+
+type BuyNo struct {
+	Stocksymbol string
+	Price       int
+	UserId      string
+	Quantity    int
+	StockType   string
+}
