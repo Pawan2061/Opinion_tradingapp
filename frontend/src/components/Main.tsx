@@ -1,4 +1,8 @@
+import { vud } from "../assets";
+import { useColor } from "./hooks/button";
+
 export default function Main() {
+  const color = useColor();
   return (
     <section
       className="bg-[url('https://probo.in/assets/images/home/header/header-bg.svg')]  bg-center h-[640px] bg-no-repeat"
@@ -30,6 +34,40 @@ export default function Main() {
             src="https://probo.in/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fheader.19c7be25.webp&w=1200&q=75"
             alt=""
           />
+        </div>
+      </div>
+
+      <div className="h-[500px] bg-[rgb(38,38,38)] flex flex-col lg:flex-row justify-start mx-auto p-4 lg:p-0">
+        <div className="text-white flex flex-col justify-center flex-1 mx-4 md:mx-8 space-y-2 lg:space-y-4">
+          <h1 className="text-[32px] md:text-[42px]">
+            <a href=""> Samachar</a>{" "}
+            <span className="text-gray-500">
+              {" "}
+              <a href="">Vichar</a>
+            </span>{" "}
+            <a href="">
+              {" "}
+              <span className="text-gray-500">Upachar</span>
+            </a>
+          </h1>
+          <h2 className="text-[24px] md:text-[30px]">Be in the know</h2>
+          <p className="text-[16px] md:text-[20px]">
+            Build your knowledge and form your opinions and views about upcoming
+            events in the world
+          </p>
+        </div>
+        <div className="flex justify-center items-center flex-1 mt-6 lg:mt-0">
+          <div className="bg-white w-[200px] md:w-[240px] h-[400px] md:h-[380px] rounded-3xl shadow-lg border-4 border-gray-700 overflow-hidden flex items-center justify-center">
+            <video
+              className="rounded-xl"
+              muted
+              loop
+              autoPlay
+              height="100%"
+              width="100%"
+              src={vud}
+            ></video>
+          </div>
         </div>
       </div>
     </section>
