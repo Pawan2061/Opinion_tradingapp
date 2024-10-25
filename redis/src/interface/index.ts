@@ -68,7 +68,7 @@ export type MINTED_STOCKS = {
 };
 
 export interface orderType {
-  type: "normal " | "inverse";
+  type: "normal" | "inverse";
   quantity: number;
 }
 export interface OrderBook {

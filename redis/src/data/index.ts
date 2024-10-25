@@ -31,11 +31,11 @@ export const ORDERBOOK: OrderBook = {
         orders: {
           user1: {
             quantity: 2,
-            type: "normal ",
+            type: "normal",
           },
           user2: {
             quantity: 10,
-            type: "normal ",
+            type: "normal",
           },
         },
       },
@@ -44,15 +44,15 @@ export const ORDERBOOK: OrderBook = {
         orders: {
           user1: {
             quantity: 3,
-            type: "normal ",
+            type: "normal",
           },
           user2: {
             quantity: 3,
-            type: "normal ",
+            type: "normal",
           },
           user5: {
             quantity: 6,
-            type: "normal ",
+            type: "normal",
           },
         },
       },
@@ -63,7 +63,7 @@ export const ORDERBOOK: OrderBook = {
         orders: {
           user1: {
             quantity: 3,
-            type: "normal ",
+            type: "normal",
           },
           user2: {
             quantity: 3,
@@ -71,7 +71,7 @@ export const ORDERBOOK: OrderBook = {
           },
           user5: {
             quantity: 6,
-            type: "normal ",
+            type: "normal",
           },
         },
       },

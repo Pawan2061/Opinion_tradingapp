@@ -18,26 +18,4 @@ model User {
 
   email    String @unique
   password String
-
-  total_balance Int @default(0)
-
-  stocks Stocks[]
-
-  role Role @default(User)
-}
-
-model Stocks {
-  id String @id @default(uuid())
-
-  name     String?
-  quantity Int     @default(0)
-
-  price  Int     @default(0)
-  user   User?   @relation(fields: [userId], references: [userId])
-  userId String?
-}
-
-enum Role {
-  User
-  Admin
 }

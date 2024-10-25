@@ -46,7 +46,7 @@ export const getOrderbooks = async (payload: string) => {
       };
     }
 
-    await displayBook(payload, ORDERBOOK[payload]);
+    await displayBook(payload, JSON.stringify(ORDERBOOK));
 
     return {
       success: true,
@@ -470,10 +470,6 @@ export const sellYes = async (payload: any) => {
         data: {},
       };
     }
-    console.log(payload.stockSymbol);
-    console.log(payload.price);
-    console.log(payload.userId);
-    console.log(payload.quantity);
 
     if (
       !STOCK_BALANCES[payload.userId] ||
@@ -518,7 +514,7 @@ export const sellYes = async (payload: any) => {
       ORDERBOOK[payload.stockSymbol].yes[payload.price].orders[payload.userId] =
         {
           quantity: 0,
-          type: "normal ",
+          type: "normal",
         };
     }
 
@@ -531,7 +527,7 @@ export const sellYes = async (payload: any) => {
     return {
       success: true,
       message: "sold this stock",
-      data: STOCK_BALANCES,
+      data: STOCK_BALANCES[payload.userId],
     };
   } catch (error) {
     return {
@@ -603,7 +599,7 @@ export const sellNo = async (payload: any) => {
       ORDERBOOK[payload.stockSymbol].no[payload.price].orders[payload.userId] =
         {
           quantity: 0,
-          type: "normal ",
+          type: "normal",
         };
     }
 
@@ -613,7 +609,7 @@ export const sellNo = async (payload: any) => {
     ].quantity += payload.quantity;
     ORDERBOOK[payload.stockSymbol].no[payload.price].orders[
       payload.userId
-    ].type = "normal ";
+    ].type = "normal";
 
     await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
 
@@ -659,13 +655,13 @@ export const mintStock = async (payload: any) => {
     ORDERBOOK[payload.symbol].yes[5].orders = {
       [payload.userId]: {
         quantity: payload.quantity,
-        type: "normal ",
+        type: "normal",
       },
     };
     ORDERBOOK[payload.symbol].no[5].orders = {
       [payload.userId]: {
         quantity: payload.quantity,
-        type: "normal ",
+        type: "normal",
       },
     };
 
@@ -676,11 +672,11 @@ export const mintStock = async (payload: any) => {
     STOCK_BALANCES[payload.userId][payload.symbol] = {
       yes: {
         locked: 0,
-        quantity: 50,
+        quantity: payload.quantity,
       },
       no: {
         locked: 0,
-        quantity: 50,
+        quantity: payload.quantity,
       },
     };
 

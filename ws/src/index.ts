@@ -143,8 +143,14 @@ wss.on("connection", (ws) => {
       const { stockSymbol } = data;
 
       if (!users.has(stockSymbol)) {
-        const listener = (message: string) => {
+        console.log("inside websockets");
+
+        const listener = async (message: string) => {
+          console.log(message, "message is here");
+
           users.get(stockSymbol)?.forEach((client) => {
+            console.log("inside clients");
+
             if (client.readyState === WebSocket.OPEN) {
               const data = {
                 event: `event_orderbook_update`,
@@ -158,9 +164,10 @@ wss.on("connection", (ws) => {
             }
           });
         };
+
         console.log(`orderbook.${stockSymbol}`);
 
-        await redisClient.subscribe(`orderbook.${stockSymbol}`, listener); // Subscribing to Redis channel
+        await redisClient.subscribe(`orderbook.${stockSymbol}`, listener);
         users.set(stockSymbol, new Set([ws]));
 
         console.log(`Subscribed to orderbook.${stockSymbol}`);
@@ -168,8 +175,6 @@ wss.on("connection", (ws) => {
         users.get(stockSymbol)?.add(ws);
       }
     }
-
-    // handle unsubscribe logic
   });
 });
 
