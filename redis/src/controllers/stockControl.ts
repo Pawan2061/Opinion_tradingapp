@@ -133,8 +133,6 @@ export const getBalanceStock = async (payload: string) => {
 
 export const buyYes = async (payload: any) => {
   try {
-    console.log(payload, "data is here");
-
     if (
       !payload.stockSymbol ||
       !payload.price ||
@@ -243,8 +241,6 @@ export const buyYes = async (payload: any) => {
           ORDERBOOK[payload.stockSymbol].yes[payload.price].orders[user].type
         );
 
-        console.log("order is processing 1");
-
         let currentValue =
           ORDERBOOK[payload.stockSymbol].yes[payload.price].orders[user]
             .quantity;
@@ -258,7 +254,6 @@ export const buyYes = async (payload: any) => {
         if (!STOCK_BALANCES[payload.userId]) {
           STOCK_BALANCES[payload.userId] = {};
         }
-        console.log("order is processing 2");
 
         if (!STOCK_BALANCES[payload.userId][payload.stockSymbol]) {
           STOCK_BALANCES[payload.userId][payload.stockSymbol] = {
@@ -267,7 +262,6 @@ export const buyYes = async (payload: any) => {
         }
         STOCK_BALANCES[payload.userId][payload.stockSymbol]["yes"].quantity +=
           subtraction;
-        console.log("order is processing 3");
       }
 
       ORDERBOOK[payload.stockSymbol].yes[payload.price].total -=
@@ -275,7 +269,6 @@ export const buyYes = async (payload: any) => {
       if (ORDERBOOK[payload.stockSymbol].yes[payload.price].total == 0) {
         delete ORDERBOOK[payload.stockSymbol].yes[payload.price];
       }
-      console.log("order is processing 4");
 
       user_with_balances[payload.userId].balance -=
         payload.price * payload.quantity;
@@ -336,7 +329,7 @@ export const buyNo = async (payload: any) => {
     }
 
     if (!ORDERBOOK[payload.stockSymbol].no[payload.price]) {
-      const newPrice = 10 - payload.price;
+      const newPrice = 1000 - payload.price;
 
       if (!ORDERBOOK[payload.stockSymbol].yes[newPrice]) {
         ORDERBOOK[payload.stockSymbol].yes[newPrice] = {
@@ -682,8 +675,8 @@ export const mintStock = async (payload: any) => {
 
     console.log("ndudhiei");
 
-    user_with_balances[payload.userId].balance -=
-      payload.quantity * payload.price;
+    // user_with_balances[payload.userId].balance -=
+    //   payload.quantity * payload.price;
 
     await displayBook(payload.symbol, ORDERBOOK[payload.symbol]);
     return {

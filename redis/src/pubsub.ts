@@ -19,38 +19,27 @@ export class PubSubManager {
   private async ensureRedisConnection() {
     try {
       if (!this.pubClient.isOpen) {
-        console.log("Connecting pub client to Redis...");
         await this.pubClient.connect();
       }
       if (!this.subClient.isOpen) {
-        console.log("Connecting sub client to Redis...");
         await this.subClient.connect();
       }
     } catch (error) {
-      console.error("Failed to connect to Redis:", error);
       throw error;
     }
   }
   public async sendOutput(id: string, data: any) {
     await this.ensureRedisConnection();
-    console.log("start");
-    console.log(data);
 
     await this.pubClient.publish(id, JSON.stringify(data));
-
-    console.log("end");
   }
 
   public handleOutput = async (output: string) => {
     try {
-      console.log("inside handleoutput");
-
       const finalOutput = JSON.parse(output);
-      console.log(finalOutput, "here");
 
       return finalOutput;
     } catch (error) {
-      console.log("Failed to parse output:", error);
       throw new Error("Invalid JSON format in output");
     }
   };

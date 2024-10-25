@@ -26,6 +26,8 @@ describe("Trading System Tests", () => {
     return new Promise((resolve) => {
       console.log("inside promises");
       ws.once("message", (data) => {
+        console.log(data);
+        
         
         
         const parsedData = JSON.parse(data);
@@ -195,7 +197,7 @@ describe("Trading System Tests", () => {
     });
   },15000);
 
-  test.skip("Execute matching orders and check WebSocket response", async () => {
+  test("Execute matching orders and check WebSocket response", async () => {
     const buyerId = "buyer1";
     const sellerId = "seller1";
     const symbol = "AAPL_USDT_20_Jan_2025_10_00";
@@ -204,7 +206,10 @@ describe("Trading System Tests", () => {
 
     await axios.post(`${HTTP_SERVER_URL}/user/create/${buyerId}`);
     await axios.post(`${HTTP_SERVER_URL}/user/create/${sellerId}`);
-    await axios.post(`${HTTP_SERVER_URL}/symbol/create/${symbol}`);
+    await axios.post(`${HTTP_SERVER_URL}/symbol/create/${symbol}`,{
+
+      userId:buyerId
+    });
     await axios.post(`${HTTP_SERVER_URL}/onramp/inr`, {
       userId: buyerId,
       amount: 1000000,
@@ -215,7 +220,13 @@ describe("Trading System Tests", () => {
       quantity: 100,
     });
 
+    const wsMessageP=waitForWSMessage()
+
+
+
+    
     await ws.send(JSON.stringify({ type: "subscribe", stockSymbol: symbol }));
+
 
     await axios.post(`${HTTP_SERVER_URL}/order/sell`, {
       userId: sellerId,
@@ -225,7 +236,8 @@ describe("Trading System Tests", () => {
       stockType: "yes",
     });
 
-    await waitForWSMessage();
+    
+// const wsMessage=await wsMessageP    
 
     await axios.post(`${HTTP_SERVER_URL}/order/buy`, {
       userId: buyerId,
@@ -234,21 +246,28 @@ describe("Trading System Tests", () => {
       price,
       stockType: "yes",
     });
+    
 
-    const executionWsMessage = await waitForWSMessage();
+    const executionWsMessage = await wsMessageP
 
+
+    
     expect(executionWsMessage.event).toBe("event_orderbook_update");
     expect(executionWsMessage.yes?.[price / 100]).toBeUndefined();
 
     const buyerStockBalance = await axios.get(
       `${HTTP_SERVER_URL}/balance/stock/${buyerId}`
     );
+    
+    console.log(buyerStockBalance.data);
+    
     const sellerInrBalance = await axios.get(
       `${HTTP_SERVER_URL}/balance/inr/${sellerId}`
     );
+    
 
-    expect(buyerStockBalance.data.msg[symbol].yes.quantity).toBe(quantity);
-    expect(sellerInrBalance.data.msg.balance).toBe(price * quantity);
+    expect(buyerStockBalance.data[symbol].yes.quantity).toBe(quantity);
+    expect(sellerInrBalance.data.balance).toBe(price * quantity);
   },15000);
 
   test.skip("Execute minting opposite orders with higher quantity and check WebSocket response", async () => {
