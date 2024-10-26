@@ -1,3 +1,4 @@
+import { buyNoOrder, buyYesOrder } from "../controllers";
 import {
   buyNo,
   buyYes,
@@ -65,11 +66,11 @@ export const processRequests = async (request: any) => {
       break;
 
     case "buyYes":
-      data = await buyYes(request.payload);
+      data = await buyYesOrder(request.payload);
       break;
 
     case "buyNo":
-      data = await buyNo(request.payload);
+      data = await buyNoOrder(request.payload);
       break;
     case "sellyes":
       data = await sellYes(request.payload);

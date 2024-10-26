@@ -1,5 +1,4 @@
 import { response, Response } from "express";
-import { responseQueue } from ".";
 import { WebSocket } from "ws";
 import { redisClient, ws } from "..";
 import { ORDERBOOK, STOCK_BALANCES, user_with_balances } from "../data";

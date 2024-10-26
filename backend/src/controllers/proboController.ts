@@ -43,7 +43,7 @@ export const createSymbol = async (req: Request, res: any) => {
 
     const { userId } = req.body;
 
-    if (!stockSymbol || !userId) {
+    if (!stockSymbol) {
       return res.status(404).json({
         message: "Insufficient data",
       });

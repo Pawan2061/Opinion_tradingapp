@@ -2,7 +2,6 @@ import { json, request, Request, Response } from "express";
 
 import { user_with_balances } from "../data";
 import { redisClient } from "..";
-import { responseQueue } from ".";
 
 export const createUser = async (userId: string) => {
   try {
