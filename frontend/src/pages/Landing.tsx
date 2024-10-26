@@ -6,7 +6,6 @@ import GallerySection from "../components/ui/Gallery";
 export default function Landing() {
   return (
     <div>
-      <Navbar />
       <Main />
       <Slider />
       <GallerySection />

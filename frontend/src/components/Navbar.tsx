@@ -1,7 +1,7 @@
 export default function Navbar() {
   return (
     <div className="sticky top-0 z-50">
-      <nav className="bg-[rgb(245,245,245)]  text-[rgb(38,38,38)] h-[65px] mb-0 overflow-hidden box-border ">
+      <nav className="bg-white  text-[rgb(38,38,38)] h-[65px] mb-0 overflow-hidden box-border ">
         <div className="container mx-auto flex items-center justify-between h-full border border-gray-200 border-t-0 border-l-0 border-r-0">
           <a href="/" className="flex items-center max-w-[112px]">
             <img
