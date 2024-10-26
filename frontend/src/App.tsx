@@ -1,11 +1,9 @@
-import Main from "./components/Main";
-import Navbar from "./components/Navbar";
+import Landing from "./pages/Landing";
 
 export default function Home() {
   return (
-    <div>
-      <Navbar />
-      <Main />
+    <div className="flex flex-col">
+      <Landing />
     </div>
   );
 }
