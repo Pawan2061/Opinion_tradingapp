@@ -1,2 +1,4 @@
 1. change the buttons in the navbar and the main page
 2. update the color of the buttons for the second main page
+3.update active links to the eventnavbar
+

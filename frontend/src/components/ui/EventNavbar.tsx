@@ -1,7 +1,50 @@
 export default function EventNavbar() {
-  <div className="flex overflow-x-auto space-x-2">
-    <h1>1</h1>
-    <h1>2</h1>
-    <h1>3</h1>
-  </div>;
+  return (
+    <div className="border-b w-full h-auto p-2 items-center align-middle">
+      <div className="flex mx-24 overflow-x-auto space-x-12 no-scrollbar">
+        <a
+          href="#"
+          className="border-[#000000]  font-work-sans text-xs border-b-2"
+        >
+          Pawan
+        </a>
+        <a href="#" className="font-work-sans text-xs">
+          Pawan
+        </a>
+        <a href="#" className="font-work-sans text-xs ">
+          Pawan
+        </a>
+        <a href="#" className="font-work-sans text-xs ">
+          Pawan
+        </a>
+        <a href="#" className="font-work-sans text-xs ">
+          Pawan
+        </a>
+        <a href="#" className="font-work-sans text-xs ">
+          Pawan
+        </a>
+        <a href="#" className="font-work-sans text-xs ">
+          Pawan
+        </a>
+        <a href="#" className="font-work-sans text-xs ">
+          Pawan
+        </a>
+        <a href="#" className="font-work-sans text-xs ">
+          Pawan
+        </a>
+        <a href="#" className="font-work-sans text-xs ">
+          Pawan
+        </a>
+        <a href="#" className="font-work-sans text-xs ">
+          Pawan
+        </a>
+        <a href="#" className="font-work-sans text-xs ">
+          Pawan
+        </a>
+        <a href="#" className="font-work-sans text-xs ">
+          Pawan
+        </a>
+      </div>
+    </div>
+  );
 }
