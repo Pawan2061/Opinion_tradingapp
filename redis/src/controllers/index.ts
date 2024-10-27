@@ -22,6 +22,7 @@ export const buyYesOrder = async (payload: any) => {
       data: {},
     };
   }
+  console.log(payload.price);
 
   if (
     user_with_balances[payload.userId]!.balance <
@@ -223,9 +224,6 @@ export const buyNoOrder = async (payload: any) => {
     availableNoQuantity = stockOrderBook.no[payload.price].total;
     availableYesQuantity = stockOrderBook.yes[1000 - payload.price]?.total || 0;
   }
-
-  console.log("Available 'Yes' Quantity:", availableYesQuantity);
-  console.log("Available 'No' Quantity:", availableNoQuantity);
 
   let remainingQuantity = payload.quantity;
 
