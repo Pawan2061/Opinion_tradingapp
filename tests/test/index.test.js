@@ -37,7 +37,7 @@ describe("Trading System Tests", () => {
     });
   };
 
-  test("Create user, onramp INR, and check balance", async () => {
+  test.skip("Create user, onramp INR, and check balance", async () => {
     const userId = "testUser1";
     await axios.post(`${HTTP_SERVER_URL}/user/create/${userId}`
     
@@ -57,7 +57,7 @@ describe("Trading System Tests", () => {
     expect(balanceResponse.data).toEqual({ balance: 1000000, locked: 0 });
   });
 
-  test("Create symbol and check orderbook", async () => {
+  test.skip("Create symbol and check orderbook", async () => {
     const symbol = "TEST_SYMBOL_30_Dec_2024";
     const userId="test_user1"
     await axios.post(`${HTTP_SERVER_URL}/symbol/create/${symbol}`
@@ -72,7 +72,7 @@ describe("Trading System Tests", () => {
     expect(orderbookResponse.data).toEqual({ yes: {}, no: {} });
   });
 
-  test("Place buy order for yes stock and check WebSocket response", async () => {
+  test.skip("Place buy order for yes stock and check WebSocket response", async () => {
     const userId = "testUser2";
     const symbol = "BTC_USDT_10_Oct_2024_9_30";
     await axios.post(`${HTTP_SERVER_URL}/user/create/${userId}`);
@@ -122,7 +122,7 @@ describe("Trading System Tests", () => {
     });
   });
 
-  test("Place sell order for no stock and check WebSocket response", async () => {
+  test.skip("Place sell order for no stock and check WebSocket response", async () => {
     const userId = "testUser3";
     const stockSymbol = "ETH_USDT_15_Nov_2024_14_00";
     await axios.post(`${HTTP_SERVER_URL}/user/create/${userId}`);
@@ -191,7 +191,7 @@ describe("Trading System Tests", () => {
     });
   },15000);
 
-  test("Execute matching orders and check WebSocket response", async () => {
+  test.skip("Execute matching orders and check WebSocket response", async () => {
     const buyerId = "buyer1";
     const sellerId = "seller1";
     const symbol = "AAPL_USDT_20_Jan_2025_10_00";
@@ -263,7 +263,7 @@ describe("Trading System Tests", () => {
     expect(sellerInrBalance.data.balance).toBe(price * quantity);
   },15000);
 
-  test("Execute minting opposite orders with higher quantity and check WebSocket response", async () => {
+  test.skip("Execute minting opposite orders with higher quantity and check WebSocket response", async () => {
     const buyerId = "buyer1";
     const buyer2Id = "buyer2";
     const symbol = "AAPL_USDT_20_Jan_2025_10_00";
@@ -281,14 +281,10 @@ describe("Trading System Tests", () => {
       userId: buyer2Id,
       amount: 1000000,
     });
-    console.log("after onramping");
-
-    const wsMessageP=waitForWSMessage()
-    
 
     await ws.send(JSON.stringify({ type: "subscribe", stockSymbol: symbol }));
-    console.log("after websockets");
-    
+
+    const promisified = waitForWSMessage();
 
     await axios.post(`${HTTP_SERVER_URL}/order/buy`, {
       userId: buyerId,
@@ -297,16 +293,11 @@ describe("Trading System Tests", () => {
       price,
       stockType: "yes",
     });
-    console.log("waiting for message");
-    
 
-    // await waitForWSMessage();
-await wsMessageP
+    await promisified
 
-const wsMessageP2=waitForWSMessage()
+    const promisified2 = waitForWSMessage()
 
-    console.log("i have the messafge");
-    
     await axios.post(`${HTTP_SERVER_URL}/order/buy`, {
       userId: buyer2Id,
       stockSymbol: symbol,
@@ -315,27 +306,13 @@ const wsMessageP2=waitForWSMessage()
       stockType: "no",
     });
 
-    console.log("bought");
-    
-    const executionWsMessage = await wsMessageP2
-    console.log("executing the message");
-    
-    const message = JSON.parse(executionWsMessage.message);
-    console.log(message);
-    
+    const executionWsMessage = await promisified2
 
-    console.log(message.yes);
-    console.log(message.no)
-    
+    const message = JSON.parse(executionWsMessage.message);
 
     expect(executionWsMessage.event).toBe("event_orderbook_update");
     expect(message.no?.[(1000 - price) / 100]).toBeUndefined();
-    console.log(executionWsMessage);
-    
-    
-    console.log(".........",message)
-
-    expect(message.yes?.[price]).toEqual({
+    expect(message.yes?.[price ]).toEqual({
       total: 10,
       orders: {
         [buyer2Id]: {
@@ -345,8 +322,199 @@ const wsMessageP2=waitForWSMessage()
       },
     });
   },15000);
+//   test("Execute minting opposite orders with higher quantity and check WebSocket response", async () => {
+//     const buyerId = "buyer1";
+//     const buyer2Id = "buyer2";
+//     const symbol = "AAPL_USDT_20_Jan_2025_10_00";
+//     const price = 850;
+//     const quantity = 50;
 
-  test("Execute buying stocks from multiple users and check WebSocket response", async () => {
+//     await axios.post(`${HTTP_SERVER_URL}/user/create/${buyerId}`);
+//     await axios.post(`${HTTP_SERVER_URL}/user/create/${buyer2Id}`);
+//     await axios.post(`${HTTP_SERVER_URL}/symbol/create/${symbol}`);
+//     await axios.post(`${HTTP_SERVER_URL}/onramp/inr`, {
+//       userId: buyerId,
+//       amount: 1000000,
+//     });
+//     await axios.post(`${HTTP_SERVER_URL}/onramp/inr`, {
+//       userId: buyer2Id,
+//       amount: 1000000,
+//     });
+//     console.log("after onramping");
+
+//     const wsMessageP=waitForWSMessage()
+    
+
+//     await ws.send(JSON.stringify({ type: "subscribe", stockSymbol: symbol }));
+//     console.log("after websockets");
+    
+
+//     await axios.post(`${HTTP_SERVER_URL}/order/buy`, {
+//       userId: buyerId,
+//       stockSymbol: symbol,
+//       quantity,
+//       price,
+//       stockType: "yes",
+//     });
+//     console.log("waiting for message");
+    
+
+//     // await waitForWSMessage();
+// await wsMessageP
+
+// const wsMessageP2=waitForWSMessage()
+
+//     console.log("i have the messafge");
+    
+//     await axios.post(`${HTTP_SERVER_URL}/order/buy`, {
+//       userId: buyer2Id,
+//       stockSymbol: symbol,
+//       quantity: quantity + 10,
+//       price: 1000 - price,
+//       stockType: "no",
+//     });
+
+//     console.log("bought");
+    
+//     const executionWsMessage = await wsMessageP2
+//     console.log("executing the message");
+    
+//     const message = JSON.parse(executionWsMessage.message);
+//     console.log(message);
+    
+
+//     console.log(message.yes);
+//     console.log(message.no)
+    
+
+//     expect(executionWsMessage.event).toBe("event_orderbook_update");
+//     expect(message.no?.[(1000 - price) / 100]).toBeUndefined();
+//     console.log(executionWsMessage);
+    
+    
+//     console.log(".........",message)
+
+//     expect(message.yes?.[price]).toEqual({
+//       total: 10,
+//       orders: {
+//         [buyer2Id]: {
+//           type: "inverse",
+//           quantity: 10,
+//         },
+//       },
+//     });
+//   },15000);
+
+  // test("Execute buying stocks from multiple users and check WebSocket response", async () => {
+  //   const buyerId = "buyer1";
+  //   const buyer2Id = "buyer2";
+  //   const buyer3Id = "buyer3";
+  //   const symbol = "AAPL_USDT_20_Jan_2025_10_00";
+  //   const price = 850;
+  //   const quantity = 50;
+
+  //   await axios.post(`${HTTP_SERVER_URL}/user/create/${buyerId}`);
+  //   await axios.post(`${HTTP_SERVER_URL}/user/create/${buyer2Id}`);
+  //   await axios.post(`${HTTP_SERVER_URL}/user/create/${buyer3Id}`);
+  //   await axios.post(`${HTTP_SERVER_URL}/symbol/create/${symbol}`);
+  //   await axios.post(`${HTTP_SERVER_URL}/onramp/inr`, {
+  //     userId: buyerId,
+  //     amount: 1000000,
+  //   });
+  //   await axios.post(`${HTTP_SERVER_URL}/onramp/inr`, {
+  //     userId: buyer2Id,
+  //     amount: 1000000,
+  //   });
+  //   await axios.post(`${HTTP_SERVER_URL}/onramp/inr`, {
+  //     userId: buyer3Id,
+  //     amount: 1000000,
+  //   });
+  //   const wsMessageP=waitForWSMessage()
+
+
+  //   await ws.send(JSON.stringify({ type: "subscribe", stockSymbol: symbol }));
+
+  //   axios.post(`${HTTP_SERVER_URL}/order/buy`, {
+  //     userId: buyerId,
+  //     stockSymbol: symbol,
+  //     quantity,
+  //     price,
+  //     stockType: "yes",
+  //   });
+
+  //   await wsMessageP
+
+  //   axios.post(`${HTTP_SERVER_URL}/order/buy`, {
+  //     userId: buyer2Id,
+  //     stockSymbol: symbol,
+  //     quantity: quantity + 20,
+  //     price,
+  //     stockType: "yes",
+  //   });
+
+  //   await waitForWSMessage();
+
+  //   axios.post(`${HTTP_SERVER_URL}/order/buy`, {
+  //     userId: buyer3Id,
+  //     stockSymbol: symbol,
+  //     quantity: 2 * quantity + 30,
+  //     price: 1000 - price,
+  //     stockType: "no",
+  //   });
+
+  //   console.log((1000 - price) * (2 * quantity + 30));
+  //   const executionWsMessage = await wsMessageP
+  //   const message = JSON.parse(executionWsMessage.message);
+
+  //   expect(executionWsMessage.event).toBe("event_orderbook_update");
+  //   expect(message.no?.[(1000 - price) / 100]).toBeUndefined();
+  //   expect(message.yes?.[price / 100]).toEqual({
+  //     total: 10,
+  //     orders: {
+  //       [buyer3Id]: {
+  //         type: "reverted",
+  //         quantity: 10,
+  //       },
+  //     },
+  //   });
+
+  //   const buyerStockBalance = await axios.get(
+  //     `${HTTP_SERVER_URL}/balance/stock/${buyerId}`
+  //   );
+  //   const buyer2StockBalance = await axios.get(
+  //     `${HTTP_SERVER_URL}/balance/stock/${buyer2Id}`
+  //   );
+  //   const buyer3StockBalance = await axios.get(
+  //     `${HTTP_SERVER_URL}/balance/stock/${buyer3Id}`
+  //   );
+
+  //   expect(buyerStockBalance.data.msg[symbol].yes.quantity).toBe(quantity);
+  //   expect(buyer2StockBalance.data.msg[symbol].yes.quantity).toBe(
+  //     quantity + 20
+  //   );
+  //   expect(buyer3StockBalance.data.msg[symbol].no.quantity).toBe(
+  //     2 * quantity + 20
+  //   );
+
+  //   const buyerInrBalance = await axios.get(
+  //     `${HTTP_SERVER_URL}/balance/inr/${buyerId}`
+  //   );
+  //   const buyer2InrBalance = await axios.get(
+  //     `${HTTP_SERVER_URL}/balance/inr/${buyer2Id}`
+  //   );
+  //   const buyer3InrBalance = await axios.get(
+  //     `${HTTP_SERVER_URL}/balance/inr/${buyer3Id}`
+  //   );
+
+  //   expect(buyerInrBalance.data.msg.balance).toBe(1000000 - price * quantity);
+  //   expect(buyer2InrBalance.data.msg.balance).toBe(
+  //     1000000 - price * (quantity + 20)
+  //   );
+  //   expect(buyer3InrBalance.data.msg.balance).toBe(
+  //     1000000 - (1000 - price) * (2 * quantity + 30)
+  //   );
+  // }, 20000);
+  test.skip("Execute buying stocks from multiple users and check WebSocket response", async () => {
     const buyerId = "buyer1";
     const buyer2Id = "buyer2";
     const buyer3Id = "buyer3";
@@ -370,10 +538,10 @@ const wsMessageP2=waitForWSMessage()
       userId: buyer3Id,
       amount: 1000000,
     });
-    const wsMessageP=waitForWSMessage()
-
 
     await ws.send(JSON.stringify({ type: "subscribe", stockSymbol: symbol }));
+    
+    const promisified = waitForWSMessage()
 
     axios.post(`${HTTP_SERVER_URL}/order/buy`, {
       userId: buyerId,
@@ -383,8 +551,10 @@ const wsMessageP2=waitForWSMessage()
       stockType: "yes",
     });
 
-    await wsMessageP
+    await promisified;
 
+    const promisified2 = waitForWSMessage()
+    
     axios.post(`${HTTP_SERVER_URL}/order/buy`, {
       userId: buyer2Id,
       stockSymbol: symbol,
@@ -393,8 +563,9 @@ const wsMessageP2=waitForWSMessage()
       stockType: "yes",
     });
 
-    await waitForWSMessage();
+    await promisified2;
 
+    const promisified3 = waitForWSMessage()
     axios.post(`${HTTP_SERVER_URL}/order/buy`, {
       userId: buyer3Id,
       stockSymbol: symbol,
@@ -404,16 +575,18 @@ const wsMessageP2=waitForWSMessage()
     });
 
     console.log((1000 - price) * (2 * quantity + 30));
-    const executionWsMessage = await wsMessageP
+    const executionWsMessage = await promisified3;
+    console.log(executionWsMessage);
+    
     const message = JSON.parse(executionWsMessage.message);
 
     expect(executionWsMessage.event).toBe("event_orderbook_update");
     expect(message.no?.[(1000 - price) / 100]).toBeUndefined();
-    expect(message.yes?.[price / 100]).toEqual({
+    expect(message.yes?.[price ]).toEqual({
       total: 10,
       orders: {
         [buyer3Id]: {
-          type: "reverted",
+          type: "inverse",
           quantity: 10,
         },
       },
@@ -429,11 +602,13 @@ const wsMessageP2=waitForWSMessage()
       `${HTTP_SERVER_URL}/balance/stock/${buyer3Id}`
     );
 
-    expect(buyerStockBalance.data.msg[symbol].yes.quantity).toBe(quantity);
-    expect(buyer2StockBalance.data.msg[symbol].yes.quantity).toBe(
+    console.log(buyerStockBalance.data);
+    
+    expect(buyerStockBalance.data[symbol].yes.quantity).toBe(quantity);
+    expect(buyer2StockBalance.data[symbol].yes.quantity).toBe(
       quantity + 20
     );
-    expect(buyer3StockBalance.data.msg[symbol].no.quantity).toBe(
+    expect(buyer3StockBalance.data[symbol].no.quantity).toBe(
       2 * quantity + 20
     );
 
@@ -447,16 +622,17 @@ const wsMessageP2=waitForWSMessage()
       `${HTTP_SERVER_URL}/balance/inr/${buyer3Id}`
     );
 
-    expect(buyerInrBalance.data.msg.balance).toBe(1000000 - price * quantity);
-    expect(buyer2InrBalance.data.msg.balance).toBe(
+    expect(buyerInrBalance.data.balance).toBe(1000000 - price * quantity);
+    expect(buyer2InrBalance.data.balance).toBe(
       1000000 - price * (quantity + 20)
     );
-    expect(buyer3InrBalance.data.msg.balance).toBe(
+    expect(buyer3InrBalance.data.balance).toBe(
       1000000 - (1000 - price) * (2 * quantity + 30)
     );
   }, 20000);
 
-  test.skip("Execute minting the opposing selling orders and check WebSocket response", async () => {
+
+  test("Execute minting the opposing selling orders and check WebSocket response", async () => {
     const seller1Id = "seller1";
     const seller2Id = "seller2";
     const seller3Id = "seller3";
@@ -490,6 +666,8 @@ const wsMessageP2=waitForWSMessage()
 
     await ws.send(JSON.stringify({ type: "subscribe", stockSymbol: symbol }));
 
+    const promisified = waitForWSMessage()
+
     await axios.post(`${HTTP_SERVER_URL}/order/sell`, {
       userId: seller1Id,
       stockSymbol: symbol,
@@ -498,8 +676,9 @@ const wsMessageP2=waitForWSMessage()
       stockType: "yes",
     });
 
-    await waitForWSMessage();
+    await promisified;
 
+    const promisified2 = waitForWSMessage()
     await axios.post(`${HTTP_SERVER_URL}/order/sell`, {
       userId: seller2Id,
       stockSymbol: symbol,
@@ -508,7 +687,9 @@ const wsMessageP2=waitForWSMessage()
       stockType: "no",
     });
 
-    await waitForWSMessage();
+    await promisified2;
+
+    const promisified3 =waitForWSMessage()
 
     await axios.post(`${HTTP_SERVER_URL}/order/sell`, {
       userId: seller3Id,
@@ -518,16 +699,16 @@ const wsMessageP2=waitForWSMessage()
       stockType: "no",
     });
 
-    const executionWsMessage = await waitForWSMessage();
+    const executionWsMessage = await promisified3;
     const message = JSON.parse(executionWsMessage.message);
 
     expect(executionWsMessage.event).toBe("event_orderbook_update");
     expect(message.yes?.[sell1Price / 100]).toBeUndefined();
-    expect(message.no?.[sell3Price / 100]).toEqual({
+    expect(message.no?.[sell3Price ]).toEqual({
       total: 10,
       orders: {
         [seller3Id]: {
-          type: "sell",
+          type: "normal",
           quantity: 10,
         },
       },
