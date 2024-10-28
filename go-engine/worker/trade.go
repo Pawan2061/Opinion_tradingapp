@@ -266,7 +266,6 @@ func BuyYes(payload models.BuyYes) models.UserResponse {
 
 			}
 			if stock, exists := models.STOCK_BALANCES[payload.UserId][payload.Stocksymbol]; !exists {
-				// models.STOCK_BALANCES[payload.UserId][payload.Stocksymbol]
 				stock[payload.Stocksymbol] = models.Outcome{
 					Quantity: 0,
 					Locked:   0,
@@ -290,7 +289,6 @@ func BuyYes(payload models.BuyYes) models.UserResponse {
 		models.INR_BALANCES[payload.UserId] = user
 	}
 
-	// return the displaybook here
 	return models.UserResponse{
 		Success: true,
 		Message: "Orderbook",
@@ -298,4 +296,66 @@ func BuyYes(payload models.BuyYes) models.UserResponse {
 	}
 
 }
-func BuyNo() {}
+
+func BuyNo(payload models.BuyNo) models.UserResponse {
+	if payload.Stocksymbol == "" || payload.Price <= 0 ||
+		payload.UserId == "" || payload.Quantity <= 0 ||
+		payload.StockType == "" {
+		return models.UserResponse{
+			Success: false,
+			Message: "Invalid request: All fields must be provided with valid values",
+			Data:    nil,
+		}
+	}
+
+	user := models.INR_BALANCES[payload.UserId]
+	if user.Balance < payload.Price*payload.Quantity {
+		return models.UserResponse{
+			Success: false,
+			Message: "Insufficient balance",
+			Data:    map[string]interface{}{},
+		}
+	}
+
+	pricing, exists := models.Orderbooks[payload.Stocksymbol]
+	if !exists {
+		pricing = models.Pricing{
+			Yes: make(map[int]models.Ordertype),
+			No:  make(map[int]models.Ordertype),
+		}
+	}
+
+	ordertype, priceExists := pricing.No[payload.Price]
+	if !priceExists {
+		ordertype = models.Ordertype{
+			Total:  0,
+			Orders: make(map[string]models.Orders),
+		}
+	}
+
+	newOrder, orderExists := ordertype.Orders[payload.UserId]
+	if orderExists {
+		newOrder.Quantity += payload.Quantity
+	} else {
+		newOrder = models.Orders{
+			Quantity: payload.Quantity,
+			Type:     "inverse",
+		}
+	}
+
+	ordertype.Orders[payload.UserId] = newOrder
+	ordertype.Total += payload.Quantity
+
+	pricing.No[payload.Price] = ordertype
+	models.Orderbooks[payload.Stocksymbol] = pricing
+
+	user.Locked += payload.Price * payload.Quantity
+	user.Balance -= payload.Price * payload.Quantity
+	models.INR_BALANCES[payload.UserId] = user
+
+	return models.UserResponse{
+		Success: true,
+		Message: "Orderbook updated",
+		Data:    models.Orderbooks[payload.Stocksymbol],
+	}
+}
