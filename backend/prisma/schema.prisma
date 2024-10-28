@@ -14,8 +14,18 @@ datasource db {
 }
 
 model User {
-  userId String @unique @default(uuid())
-
-  email    String @unique
+  userId   String   @id @default(uuid())
+  username String   @unique
   password String
+  markets  Market[]
+}
+
+model Market {
+  id            String   @id @default(uuid())
+  symbol        String
+  description   String
+  sourceOfTruth String   @unique
+  User          User?    @relation(fields: [UserId], references: [userId])
+  UserId        String?
+  endTime       DateTime @default(now())
 }
