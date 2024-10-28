@@ -1,7 +1,7 @@
 import { response, Response } from "express";
 import { WebSocket } from "ws";
 import { redisClient, ws } from "..";
-import { ORDERBOOK, STOCK_BALANCES, user_with_balances } from "../data";
+import { ORDERBOOK, STOCK_BALANCES, INR_BALANCES } from "../data";
 import { displayBook } from "../utils/sendbook";
 
 export const createSymbol = async (payload: any) => {
@@ -20,7 +20,6 @@ export const createSymbol = async (payload: any) => {
     };
     console.log("very close");
 
-    // ws.send(JSON.stringify(ORDERBOOK));
     const stocksymbol = payload.stockSymbol;
     await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
 
@@ -52,7 +51,6 @@ export const getOrderbooks = async (payload: string) => {
       message: "ORDERBOOKS:",
       data: ORDERBOOK,
     };
-    // await redisClient.lPush(responseQueue, JSON.stringify(orderbooks));
   } catch (error) {
     return { error: error };
   }
@@ -98,7 +96,6 @@ export const getStocks = async (payload: string) => {
       message: "Stocks:",
       data: stock_balance,
     };
-    // await redisClient.lPush(responseQueue, JSON.stringify(stock_balance));
   } catch (error) {
     return { error: error };
   }
@@ -107,9 +104,7 @@ export const getStocks = async (payload: string) => {
 export const getBalanceStock = async (payload: string) => {
   try {
     const stockbalance = STOCK_BALANCES[payload];
-    // return res.status(200).json({
-    //   stock: stockbalance,
-    // });
+    //
 
     if (!stockbalance) {
       return {
@@ -124,7 +119,6 @@ export const getBalanceStock = async (payload: string) => {
       message: "Stocks",
       data: stockbalance,
     };
-    // await redisClient.lPush(responseQueue, JSON.stringify(stockbalance));
   } catch (error) {
     return { error: error };
   }
@@ -147,7 +141,7 @@ export const buyYes = async (payload: any) => {
     }
 
     if (
-      user_with_balances[payload.userId]!.balance <
+      INR_BALANCES[payload.userId]!.balance <
       payload.price * payload.quantity
     ) {
       return {
@@ -168,7 +162,6 @@ export const buyYes = async (payload: any) => {
       ORDERBOOK[payload.stockSymbol].yes = {};
     }
 
-    // Handle logic for a new price on the "yes" side
     if (!ORDERBOOK[payload.stockSymbol].yes[payload.price]) {
       const newPrice = 1000 - payload.price;
 
@@ -187,14 +180,11 @@ export const buyYes = async (payload: any) => {
           payload.userId
         ].type = "inverse";
         ORDERBOOK[payload.stockSymbol].yes[newPrice].total += payload.quantity;
-        user_with_balances[payload.userId].locked +=
-          payload.price * payload.quantity;
+        INR_BALANCES[payload.userId].locked += payload.price * payload.quantity;
 
-        user_with_balances[payload.userId].balance -=
+        INR_BALANCES[payload.userId].balance -=
           payload.price * payload.quantity;
-        // return res.status(200).json({
-        //   orderedStock: ORDERBOOK,
-        // });
+        // r
 
         await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
         return {
@@ -208,17 +198,11 @@ export const buyYes = async (payload: any) => {
           type: "inverse",
         };
         ORDERBOOK[payload.stockSymbol].no[newPrice].total += payload.quantity;
-        user_with_balances[payload.userId].locked +=
+        INR_BALANCES[payload.userId].locked += payload.price * payload.quantity;
+
+        INR_BALANCES[payload.userId].balance -=
           payload.price * payload.quantity;
 
-        // STOCK_BALANCES[userId][stockSymbol]["no"].locked += quantity;
-
-        user_with_balances[payload.userId].balance -=
-          payload.price * payload.quantity;
-        // ws.send(JSON.stringify(ORDERBOOK));
-        // return res.status(200).json({
-        //   orderedStock: ORDERBOOK,
-        // });
         console.log(ORDERBOOK);
         await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
 
@@ -244,7 +228,7 @@ export const buyYes = async (payload: any) => {
           ORDERBOOK[payload.stockSymbol].yes[payload.price].orders[user]
             .quantity;
         let subtraction = Math.min(totalAmount, currentValue);
-        user_with_balances[user].balance += payload.price * subtraction;
+        INR_BALANCES[user].balance += payload.price * subtraction;
 
         ORDERBOOK[payload.stockSymbol].yes[payload.price].orders[
           user
@@ -269,13 +253,10 @@ export const buyYes = async (payload: any) => {
         delete ORDERBOOK[payload.stockSymbol].yes[payload.price];
       }
 
-      user_with_balances[payload.userId].balance -=
-        payload.price * payload.quantity;
+      INR_BALANCES[payload.userId].balance -= payload.price * payload.quantity;
     } else {
-      user_with_balances[payload.userId].balance -=
-        payload.price * payload.quantity;
-      user_with_balances[payload.userId].locked +=
-        payload.price * payload.quantity;
+      INR_BALANCES[payload.userId].balance -= payload.price * payload.quantity;
+      INR_BALANCES[payload.userId].locked += payload.price * payload.quantity;
     }
     const stockSymbol = payload.stockSymbol;
     await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
@@ -306,7 +287,7 @@ export const buyNo = async (payload: any) => {
     }
 
     if (
-      user_with_balances[payload.userId].balance <
+      INR_BALANCES[payload.userId].balance <
       payload.price * payload.quantity
     ) {
       return {
@@ -347,10 +328,9 @@ export const buyNo = async (payload: any) => {
           payload.userId
         ].type = "inverse";
         // STOCK_BALANCES[userId][stockSymbol]["yes"].locked += quantity;
-        user_with_balances[payload.userId].locked +=
-          payload.price * payload.quantity;
+        INR_BALANCES[payload.userId].locked += payload.price * payload.quantity;
 
-        user_with_balances[payload.userId].balance -=
+        INR_BALANCES[payload.userId].balance -=
           payload.price * payload.quantity;
 
         await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
@@ -368,10 +348,9 @@ export const buyNo = async (payload: any) => {
         };
         ORDERBOOK[payload.stockSymbol].yes[newPrice].total += payload.quantity;
 
-        user_with_balances[payload.userId].balance -=
+        INR_BALANCES[payload.userId].balance -=
           payload.price * payload.quantity;
-        user_with_balances[payload.userId].locked +=
-          payload.price * payload.quantity;
+        INR_BALANCES[payload.userId].locked += payload.price * payload.quantity;
 
         console.log(ORDERBOOK);
         await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
@@ -396,7 +375,7 @@ export const buyNo = async (payload: any) => {
             .quantity;
         let subtraction = Math.min(totalAmount, currentValue);
 
-        user_with_balances[user].balance += payload.price * subtraction;
+        INR_BALANCES[user].balance += payload.price * subtraction;
 
         ORDERBOOK[payload.stockSymbol].no[payload.price].orders[
           user
@@ -422,13 +401,10 @@ export const buyNo = async (payload: any) => {
         delete ORDERBOOK[payload.stockSymbol].no[payload.price];
       }
 
-      user_with_balances[payload.userId].balance -=
-        payload.price * payload.quantity;
+      INR_BALANCES[payload.userId].balance -= payload.price * payload.quantity;
     } else {
-      user_with_balances[payload.userId].balance -=
-        payload.price * payload.quantity;
-      user_with_balances[payload.userId].locked +=
-        payload.price * payload.quantity;
+      INR_BALANCES[payload.userId].balance -= payload.price * payload.quantity;
+      INR_BALANCES[payload.userId].locked += payload.price * payload.quantity;
     }
 
     await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
@@ -620,7 +596,7 @@ export const sellNo = async (payload: any) => {
 export const mintStock = async (payload: any) => {
   try {
     // if (
-    //   user_with_balances[payload.userId].balance <=
+    //   INR_BALANCES[payload.userId].balance <=
     //   payload.quantity * payload.price
     // ) {
     //   return {
@@ -674,9 +650,6 @@ export const mintStock = async (payload: any) => {
 
     console.log("ndudhiei");
 
-    // user_with_balances[payload.userId].balance -=
-    //   payload.quantity * payload.price;
-
     await displayBook(payload.symbol, ORDERBOOK[payload.symbol]);
     return {
       success: true,
@@ -693,9 +666,7 @@ export const mintStock = async (payload: any) => {
 export const reset = async (payload: any) => {
   try {
     Object.keys(STOCK_BALANCES).forEach((key) => delete STOCK_BALANCES[key]);
-    Object.keys(user_with_balances).forEach(
-      (key) => delete user_with_balances[key]
-    );
+    Object.keys(INR_BALANCES).forEach((key) => delete INR_BALANCES[key]);
     Object.keys(ORDERBOOK).forEach((key) => delete ORDERBOOK[key]);
     console.log("deleted");
 

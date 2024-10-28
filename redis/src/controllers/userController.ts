@@ -1,6 +1,6 @@
 import { json, request, Request, Response } from "express";
 
-import { user_with_balances } from "../data";
+import { INR_BALANCES } from "../data";
 import { redisClient } from "..";
 
 export const createUser = async (userId: string) => {
@@ -12,7 +12,7 @@ export const createUser = async (userId: string) => {
         data: {},
       };
     }
-    user_with_balances[userId] = {
+    INR_BALANCES[userId] = {
       balance: 0,
       locked: 0,
     };
@@ -20,7 +20,7 @@ export const createUser = async (userId: string) => {
     return {
       success: true,
       message: "user created successfully",
-      data: user_with_balances[userId],
+      data: INR_BALANCES[userId],
     };
   } catch (error) {
     console.log(error);
@@ -39,29 +39,24 @@ export const onRampUser = async (payload: any) => {
       };
     }
 
-    if (!user_with_balances[payload.userId]) {
-      const newUser = (user_with_balances[payload.userId] = {
+    if (!INR_BALANCES[payload.userId]) {
+      const newUser = (INR_BALANCES[payload.userId] = {
         balance: payload.amount,
         locked: 0,
       });
-      // await redisClient.lPush(
-      //   responseQueue,
-      //   JSON.stringify(user_with_balances)
-      // );
 
       return {
         success: true,
         message: "New user created and balance updated.",
-        data: user_with_balances[payload.userId],
+        data: INR_BALANCES[payload.userId],
       };
     }
-    user_with_balances[payload.userId].balance += payload.amount;
+    INR_BALANCES[payload.userId].balance += payload.amount;
 
-    // await redisClient.lPush(responseQueue, JSON.stringify(user_with_balances));
     return {
       success: true,
       message: "Balance updated successfully.",
-      data: user_with_balances[payload.userId],
+      data: INR_BALANCES[payload.userId],
     };
   } catch (error) {
     return {
@@ -74,11 +69,8 @@ export const onRampUser = async (payload: any) => {
 
 export const getBalances = async (payload: string) => {
   try {
-    const userBalances = user_with_balances;
+    const userBalances = INR_BALANCES;
     if (!userBalances) {
-      // return res.status(404).json({
-      //   message: "no balances found",
-      // });
       console.log("error");
       return {
         success: false,
@@ -92,8 +84,6 @@ export const getBalances = async (payload: string) => {
       message: "User balances:",
       data: userBalances,
     };
-
-    // await redisClient.lPush(responseQueue, JSON.stringify(userBalances));
   } catch (error) {
     return {
       error: error,
@@ -103,22 +93,15 @@ export const getBalances = async (payload: string) => {
 
 export const getUserBalance = async (payload: string) => {
   try {
-    const user = user_with_balances[payload];
+    const user = INR_BALANCES[payload];
 
     if (user) {
-      // res.status(200).json({
-      //   id,
-      //   balance: user.balance,
-      //   locked: user.locked,
-      // });
-      // await redisClient.lPush(responseQueue, JSON.stringify(user));
       return {
         success: true,
         message: "Userbalance",
         data: user,
       };
     } else {
-      // res.status(404).json({ message: "User not found" });
       return {
         success: false,
         message: "user not found",

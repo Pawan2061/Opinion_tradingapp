@@ -60,8 +60,6 @@ export const createSymbol = async (req: Request, res: any) => {
       },
     };
 
-    // await redisClient.lPush(requestQueue, JSON.stringify(input));
-
     try {
       const data = handlePubSub(id);
 
@@ -91,8 +89,6 @@ export const getBalances = async (req: Response, res: any) => {
       payload: {},
     };
 
-    // await redisClient.lPush(requestQueue, JSON.stringify(input));
-
     try {
       const data = handlePubSub(id);
 
@@ -118,8 +114,6 @@ export const getStocks = async (req: Request, res: any) => {
       method: "getStocks",
       payload: {},
     };
-
-    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
       const data = handlePubSub(id);
@@ -148,8 +142,6 @@ export const getUserBalance = async (req: Request, res: any) => {
       method: "getUserBalance",
       payload: userId,
     };
-
-    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
       const data = handlePubSub(id);
@@ -181,8 +173,6 @@ export const rampUser = async (req: Request, res: any) => {
       },
     };
 
-    // await redisClient.lPush(requestQueue, JSON.stringify(input));
-
     try {
       const data = handlePubSub(id);
 
@@ -212,8 +202,6 @@ export const getBalanceStock = async (req: Request, res: any) => {
       method: "getBalanceStock",
       payload: userId,
     };
-
-    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
       const data = handlePubSub(id);
@@ -290,8 +278,6 @@ export const buyNo = async (req: Request, res: any) => {
       },
     };
 
-    // await redisClient.lPush(requestQueue, JSON.stringify(input));
-
     try {
       const data = handlePubSub(id);
 
@@ -323,8 +309,6 @@ export const viewOrderbook = async (req: Request, res: any) => {
       payload: stockSymbol,
     };
 
-    // await redisClient.lPush(requestQueue, JSON.stringify(input));
-
     try {
       const data = handlePubSub(id);
 
@@ -345,7 +329,6 @@ export const viewOrderbook = async (req: Request, res: any) => {
 export const mintStock = async (req: Request, res: any) => {
   try {
     const { userId, quantity, price, stockSymbol } = req.body;
-    // const symbol = req.params.stockSymbol;
 
     const id = uuid();
     const input = {
@@ -359,7 +342,6 @@ export const mintStock = async (req: Request, res: any) => {
       },
     };
 
-    // await redisClient.lPush(requestQueue, JSON.stringify(input));
     try {
       const data = handlePubSub(id);
 
@@ -398,8 +380,6 @@ export const sellYes = async (req: Request, res: any) => {
       },
     };
 
-    // await redisClient.lPush(requestQueue, JSON.stringify(input));
-
     try {
       const data = handlePubSub(id);
 
@@ -435,7 +415,6 @@ export const sellNo = async (req: Request, res: any) => {
         stockType: stockType,
       },
     };
-    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
       const data = handlePubSub(id);
@@ -468,8 +447,6 @@ export const getOrderbook = async (req: Request, res: any) => {
       payload: {},
     };
 
-    // await redisClient.lPush(requestQueue, JSON.stringify(input));
-
     try {
       const data = handlePubSub(id);
 
@@ -495,7 +472,6 @@ export const resetMemory = async (req: Request, res: any) => {
       method: "reset",
       payload: {},
     };
-    // await redisClient.lPush(requestQueue, JSON.stringify(input));
 
     try {
       const data = handlePubSub(id);

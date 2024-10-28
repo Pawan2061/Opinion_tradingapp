@@ -6,7 +6,7 @@ import {
   userWithBalance,
 } from "../interfaces";
 
-export const user_with_balances: userWithBalance = {
+export const INR_BALANCES: userWithBalance = {
   // user1: {
   //   balance: 10000,
   //   locked: 0,

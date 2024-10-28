@@ -91,7 +91,6 @@ describe("Trading System Tests", () => {
     );
     const promisified = waitForWSMessage();
 
-    console.log("bought");
     
 
     const buyOrderResponse = await axios.post(`${HTTP_SERVER_URL}/order/buy`, {
@@ -101,9 +100,7 @@ describe("Trading System Tests", () => {
       price: 850,
       stockType: "yes",
     });
-    console.log("going");
     
-    console.log("not here");
     const wsMessage = await promisified
 
     console.log("wsMessage " + JSON.stringify(wsMessage));

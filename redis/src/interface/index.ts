@@ -25,26 +25,6 @@ export interface Stock {
   };
 }
 
-// export interface OrderBook {
-//   [stockSymbol: string]: {
-//     yes: {
-//       [price: number]: {
-//         quantity: number;
-//         orders: {
-//           [userId: string]: number;
-//         };
-//       };
-//     };
-//     no: {
-//       [price: number]: {
-//         quantity: number;
-//         orders: {
-//           [userId: string]: number;
-//         };
-//       };
-//     };
-//   };
-// }
 export interface OrderResponse {
   orderedStock: {
     total: number;

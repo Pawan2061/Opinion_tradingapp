@@ -49,7 +49,6 @@ async function executeProcess() {
 
   await processRequests(JSON.parse(resp!.element));
 
-  // const data = await createUser(resp?.element || "");
   executeProcess();
 }
 

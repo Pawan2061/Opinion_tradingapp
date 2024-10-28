@@ -1,4 +1,4 @@
-import { ORDERBOOK, STOCK_BALANCES, user_with_balances } from "../data";
+import { ORDERBOOK, STOCK_BALANCES, INR_BALANCES } from "../data";
 import { displayBook } from "../utils/sendbook";
 
 export const buyYesOrder = async (payload: any) => {
@@ -25,7 +25,7 @@ export const buyYesOrder = async (payload: any) => {
   console.log(payload.price);
 
   if (
-    user_with_balances[payload.userId]!.balance <
+    INR_BALANCES[payload.userId]!.balance <
     payload.price * payload.quantity
   ) {
     return {
@@ -35,9 +35,8 @@ export const buyYesOrder = async (payload: any) => {
     };
   }
 
-  user_with_balances[payload.userId].balance -=
-    payload.price * payload.quantity;
-  user_with_balances[payload.userId].locked += payload.price * payload.quantity;
+  INR_BALANCES[payload.userId].balance -= payload.price * payload.quantity;
+  INR_BALANCES[payload.userId].locked += payload.price * payload.quantity;
 
   let availableYesQuantity = 0;
   let availableNoQuantity = 0;
@@ -47,9 +46,6 @@ export const buyYesOrder = async (payload: any) => {
     availableYesQuantity = stockOrderBook.yes[payload.price].total;
     availableNoQuantity = stockOrderBook.no[1000 - payload.price]?.total || 0;
   }
-
-  console.log("Available 'Yes' Quantity:", availableYesQuantity);
-  console.log("Available 'No' Quantity:", availableNoQuantity);
 
   let remainingQuantity = payload.quantity;
 
@@ -64,21 +60,19 @@ export const buyYesOrder = async (payload: any) => {
       userOrder.quantity -= quantityToMatch;
       stockOrderBook.yes[payload.price].total -= quantityToMatch;
 
-      console.log("Remaining Quantity Before:", remainingQuantity);
       remainingQuantity -= quantityToMatch;
-      console.log("Remaining Quantity After:", remainingQuantity);
 
       if (userOrder.type === "normal") {
         if (STOCK_BALANCES[user][payload.stockSymbol].yes) {
           STOCK_BALANCES[user][payload.stockSymbol].yes.locked -=
             quantityToMatch;
-          user_with_balances[user].balance += quantityToMatch * payload.price;
+          INR_BALANCES[user].balance += quantityToMatch * payload.price;
         }
       } else if (userOrder.type === "inverse") {
         if (STOCK_BALANCES[user][payload.stockSymbol].no) {
           STOCK_BALANCES[user][payload.stockSymbol].no.quantity +=
             quantityToMatch;
-          user_with_balances[user].locked -= quantityToMatch * payload.price;
+          INR_BALANCES[user].locked -= quantityToMatch * payload.price;
         }
       }
 
@@ -103,23 +97,20 @@ export const buyYesOrder = async (payload: any) => {
       userOrder.quantity -= quantityToMatch;
       stockOrderBook.no[1000 - payload.price].total -= quantityToMatch;
 
-      console.log("Remaining Quantity Before in 'No':", remainingQuantity);
       remainingQuantity -= quantityToMatch;
-      console.log("Remaining Quantity After in 'No':", remainingQuantity);
 
       if (userOrder.type === "normal") {
         if (STOCK_BALANCES[user][payload.stockSymbol].no) {
           STOCK_BALANCES[user][payload.stockSymbol].no.locked -=
             quantityToMatch;
-          user_with_balances[user].balance +=
+          INR_BALANCES[user].balance +=
             quantityToMatch * (1000 - payload.price);
         }
       } else if (userOrder.type === "inverse") {
         if (STOCK_BALANCES[user][payload.stockSymbol].yes) {
           STOCK_BALANCES[user][payload.stockSymbol].yes.quantity +=
             quantityToMatch;
-          user_with_balances[user].locked -=
-            quantityToMatch * (1000 - payload.price);
+          INR_BALANCES[user].locked -= quantityToMatch * (1000 - payload.price);
         }
       }
 
@@ -167,7 +158,7 @@ export const buyYesOrder = async (payload: any) => {
       payload.quantity - remainingQuantity;
   }
 
-  user_with_balances[payload.userId].locked -=
+  INR_BALANCES[payload.userId].locked -=
     (payload.quantity - remainingQuantity) * payload.price;
 
   await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
@@ -202,7 +193,7 @@ export const buyNoOrder = async (payload: any) => {
   }
 
   if (
-    user_with_balances[payload.userId]!.balance <
+    INR_BALANCES[payload.userId]!.balance <
     payload.price * payload.quantity
   ) {
     return {
@@ -212,9 +203,8 @@ export const buyNoOrder = async (payload: any) => {
     };
   }
 
-  user_with_balances[payload.userId].balance -=
-    payload.price * payload.quantity;
-  user_with_balances[payload.userId].locked += payload.price * payload.quantity;
+  INR_BALANCES[payload.userId].balance -= payload.price * payload.quantity;
+  INR_BALANCES[payload.userId].locked += payload.price * payload.quantity;
 
   let availableYesQuantity = 0;
   let availableNoQuantity = 0;
@@ -238,21 +228,19 @@ export const buyNoOrder = async (payload: any) => {
       userOrder.quantity -= quantityToMatch;
       stockOrderBook.no[payload.price].total -= quantityToMatch;
 
-      console.log("Remaining Quantity Before:", remainingQuantity);
       remainingQuantity -= quantityToMatch;
-      console.log("Remaining Quantity After:", remainingQuantity);
 
       if (userOrder.type === "normal") {
         if (STOCK_BALANCES[user][payload.stockSymbol].no) {
           STOCK_BALANCES[user][payload.stockSymbol].no.locked -=
             quantityToMatch;
-          user_with_balances[user].balance += quantityToMatch * payload.price;
+          INR_BALANCES[user].balance += quantityToMatch * payload.price;
         }
       } else if (userOrder.type === "inverse") {
         if (STOCK_BALANCES[user][payload.stockSymbol].yes) {
           STOCK_BALANCES[user][payload.stockSymbol].yes.quantity +=
             quantityToMatch;
-          user_with_balances[user].locked -= quantityToMatch * payload.price;
+          INR_BALANCES[user].locked -= quantityToMatch * payload.price;
         }
       }
 
@@ -277,23 +265,20 @@ export const buyNoOrder = async (payload: any) => {
       userOrder.quantity -= quantityToMatch;
       stockOrderBook.yes[1000 - payload.price].total -= quantityToMatch;
 
-      console.log("Remaining Quantity Before in 'Yes':", remainingQuantity);
       remainingQuantity -= quantityToMatch;
-      console.log("Remaining Quantity After in 'Yes':", remainingQuantity);
 
       if (userOrder.type === "normal") {
         if (STOCK_BALANCES[user][payload.stockSymbol].yes) {
           STOCK_BALANCES[user][payload.stockSymbol].yes.locked -=
             quantityToMatch;
-          user_with_balances[user].balance +=
+          INR_BALANCES[user].balance +=
             quantityToMatch * (1000 - payload.price);
         }
       } else if (userOrder.type === "inverse") {
         if (STOCK_BALANCES[user][payload.stockSymbol].no) {
           STOCK_BALANCES[user][payload.stockSymbol].no.quantity +=
             quantityToMatch;
-          user_with_balances[user].locked -=
-            quantityToMatch * (1000 - payload.price);
+          INR_BALANCES[user].locked -= quantityToMatch * (1000 - payload.price);
         }
       }
 
@@ -343,7 +328,7 @@ export const buyNoOrder = async (payload: any) => {
       payload.quantity - remainingQuantity;
   }
 
-  user_with_balances[payload.userId].locked -=
+  INR_BALANCES[payload.userId].locked -=
     (payload.quantity - remainingQuantity) * payload.price;
 
   await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);

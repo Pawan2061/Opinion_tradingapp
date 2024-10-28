@@ -8,11 +8,6 @@ export const subscriber = createClient();
 const app = express();
 app.use(express.json());
 
-// ws.on("open", () => {
-//   console.log("socketio");
-//   ws.send("ehfue");
-//   // ws.send(data);
-// });
 app.use("/api/v1", proboRouter);
 
 async function startRedisServer() {
