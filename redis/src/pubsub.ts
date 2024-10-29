@@ -1,4 +1,5 @@
 import { createClient, RedisClientType } from "redis";
+const redis_url = process.env.REDIS_URL || "redis://localhost:6379";
 
 export class PubSubManager {
   private static instance: PubSubManager;
@@ -6,8 +7,12 @@ export class PubSubManager {
   private subClient: RedisClientType;
 
   private constructor() {
-    this.subClient = createClient({});
-    this.pubClient = createClient({});
+    this.subClient = createClient({
+      url: redis_url,
+    });
+    this.pubClient = createClient({
+      url: redis_url,
+    });
   }
   public static getInstance(): PubSubManager {
     if (!PubSubManager.instance) {

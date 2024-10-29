@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  redis:
+    image: redis
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  redis-engine:
+    build:
+      context: ./redis
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3002:3002"
+
+
+  ws-server:
+    build:
+      context: ./ws
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://redis:6379
+   
+    ports:
+      - "8080:8080"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+      - ws-server
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3000:3000"

@@ -1,0 +1,30 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.proboRouter = void 0;
+const express_1 = __importDefault(require("express"));
+const proboController_1 = require("../controllers/proboController");
+const trade_1 = require("../controllers/trade");
+exports.proboRouter = express_1.default.Router();
+exports.proboRouter.get("/", (req, res) => {
+    res.send("hello");
+});
+exports.proboRouter.post("/user/create/:userId", proboController_1.createUser);
+exports.proboRouter.post("/symbol/create/:stockSymbol", proboController_1.createSymbol);
+exports.proboRouter.post("/onramp/inr", proboController_1.rampUser);
+exports.proboRouter.get("/balances/inr", proboController_1.getBalances);
+exports.proboRouter.get("/balance/inr/:id", proboController_1.getUserBalance);
+exports.proboRouter.get("/orderbook", proboController_1.getOrderbook);
+exports.proboRouter.get("/balances/stock", proboController_1.getStocks);
+exports.proboRouter.get("/balance/stock/:userId", proboController_1.getBalanceStock);
+exports.proboRouter.get("/orderbook/:stockSymbol", proboController_1.viewOrderbook);
+exports.proboRouter.post("/order/buy/yes", proboController_1.buyYes);
+exports.proboRouter.post("/order/buy/no", proboController_1.buyNo);
+exports.proboRouter.post("/order/sell/yes", proboController_1.sellYes);
+exports.proboRouter.post("/order/sell/no", proboController_1.sellNo);
+exports.proboRouter.post("/trade/mint/", proboController_1.mintStock);
+exports.proboRouter.post("/order/buy", trade_1.buy);
+exports.proboRouter.post("/order/sell", trade_1.sell);
+exports.proboRouter.post("/reset", proboController_1.resetMemory);

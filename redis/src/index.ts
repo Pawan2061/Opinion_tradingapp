@@ -1,9 +1,7 @@
 import express from "express";
 import { createClient } from "redis";
 
-import { createUser } from "./controllers/userController";
 import { processRequests } from "./utils/process";
-import { queueRequest } from "./interface/request";
 import { WebSocket } from "ws";
 const app = express();
 
@@ -21,9 +19,14 @@ ws.on("close", () => {
 ws.on("error", () => {
   console.log("connectiion error");
 });
-export const redisClient = createClient({});
+const redis_url = process.env.REDIS_URL || "redis://localhost:6379";
+export const redisClient = createClient({
+  url: redis_url,
+});
 
-export const pubClient = createClient({});
+export const pubClient = createClient({
+  url: redis_url,
+});
 
 async function redisConnect() {
   try {

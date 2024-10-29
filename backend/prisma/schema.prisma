@@ -29,3 +29,9 @@ model Market {
   UserId        String?
   endTime       DateTime @default(now())
 }
+
+model Categories {
+  id          String @id @default(uuid())
+  title       String
+  description String
+}

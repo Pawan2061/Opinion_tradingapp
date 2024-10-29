@@ -2,7 +2,11 @@ import { createClient } from "redis";
 import { ws } from "..";
 
 export const displayBook = async (symbol: string, orderbook: any) => {
-  const pubClient = createClient();
+  const redis_url = process.env.REDIS_URL || "redis://localhost:6379";
+
+  const pubClient = createClient({
+    url: redis_url,
+  });
   await pubClient.connect();
 
   try {
