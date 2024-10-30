@@ -22,7 +22,6 @@ export const createUser = async (req: Request, res: any) => {
 
     try {
       const data = handlePubSub(id);
-
       await redisClient.lPush(requestQueue, JSON.stringify(input));
       const finalData = await data;
 

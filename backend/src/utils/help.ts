@@ -20,6 +20,7 @@ export const handleResponses = async (data: any) => {
     console.log(message);
 
     console.log(data.message, data.success);
+    1;
 
     if (data.success === true) {
       console.log("succeed", data);
