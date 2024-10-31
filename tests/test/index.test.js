@@ -528,7 +528,9 @@ describe("Trading System Tests", () => {
 
     expect(executionWsMessage.event).toBe("event_orderbook_update");
     expect(message.yes?.[sell1Price / 100]).toBeUndefined();
-    expect(message.no?.[sell3Price ]).toEqual({
+    console.log(message);
+    
+    expect(message.no?.[sell3Price]).toEqual({
       total: 10,
       orders: {
         [seller3Id]: {
@@ -536,7 +538,7 @@ describe("Trading System Tests", () => {
           quantity: 10,
         },
       },
-    });
+    }); 
 
     const seller1StockBalace = await axios.get(
       `${HTTP_SERVER_URL}/balance/stock/${seller1Id}`

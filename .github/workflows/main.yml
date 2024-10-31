@@ -1,0 +1,8 @@
+name: ci for opinion app
+on:
+  push:
+    branches:
+      - main
+jobs:
+  backend:
+    runs-on: ubuntu-latest

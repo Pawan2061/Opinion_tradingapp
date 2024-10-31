@@ -220,6 +220,7 @@ export const buyYes = async (payload: any) => {
       for (let user in ORDERBOOK[payload.stockSymbol].yes[payload.price]
         .orders) {
         if (totalAmount <= 0) break;
+
         console.log(
           ORDERBOOK[payload.stockSymbol].yes[payload.price].orders[user].type
         );
@@ -243,6 +244,7 @@ export const buyYes = async (payload: any) => {
             yes: { locked: 0, quantity: 0 },
           };
         }
+
         STOCK_BALANCES[payload.userId][payload.stockSymbol]["yes"].quantity +=
           subtraction;
       }
@@ -490,6 +492,7 @@ export const sellYes = async (payload: any) => {
     ORDERBOOK[payload.stockSymbol].yes[payload.price].orders[
       payload.userId
     ].quantity += payload.quantity;
+
     await displayBook(payload.stockSymbol, ORDERBOOK[payload.stockSymbol]);
 
     return {
