@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { v4 as uuid } from "uuid";
 const requestQueue = "request";
+const newrequestQueue = "request1";
 
 import { redisClient, subscriber } from "../app";
 import { handlePubSub, handleResponses, sendResponse } from "../utils/help";
@@ -23,6 +24,8 @@ export const createUser = async (req: Request, res: any) => {
     try {
       const data = handlePubSub(id);
       await redisClient.lPush(requestQueue, JSON.stringify(input));
+      await redisClient.lPush(newrequestQueue, JSON.stringify(input));
+
       const finalData = await data;
 
       sendResponse(res, finalData);
