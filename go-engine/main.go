@@ -13,12 +13,8 @@ import (
 var client *redis.Client
 
 func initRedis() {
-	fmt.Println("reacheing here")
 	redis_url := utils.LoadEnv("REDIS_URL")
 
-	fmt.Println("reached	 here")
-
-	fmt.Println(redis_url)
 	url, err := redis.ParseURL(redis_url)
 	if err != nil {
 		log.Fatal("parse error")
@@ -28,14 +24,12 @@ func initRedis() {
 	if client == nil {
 		log.Fatal("no client")
 	}
-	fmt.Print(client)
 
 }
 func processRequest(payload map[string]interface{}) {
 
 }
 func executeProcess() {
-	fmt.Println("inside executre process")
 	ctx := context.Background()
 	requestQueue := "request1"
 
@@ -48,12 +42,10 @@ func executeProcess() {
 		fmt.Println("pasting the result", result)
 
 		if err != nil {
-			fmt.Print(err.Error())
 			log.Fatal("error while popping")
 		}
 
 		var requestData map[string]interface{}
-		fmt.Println("enfiefoe")
 		err = json.Unmarshal([]byte(result[1]), &requestData)
 		if err != nil {
 			log.Println("Error parsing JSON:", err)
@@ -73,9 +65,6 @@ func executeProcess() {
 func main() {
 
 	initRedis()
-	fmt.Println("connected to redis")
 	executeProcess()
-
-	fmt.Println(("this is the start"))
 
 }
