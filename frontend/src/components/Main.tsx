@@ -37,7 +37,7 @@ export default function Main() {
         <div className="max-w-xs md:max-w-md lg:max-w-lg">
           <img
             className="rounded-lg"
-            src="https://probo.in/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fheader.19c7be25.webp&w=1200&q=75"
+            src="https://probo.in/_next/image?url=https%3A%2F%2Fd39axbyagw7ipf.cloudfront.net%2Fimages%2Fhome%2Fheader%2Fheader.webp&w=1200&q=75"
             alt="Header image"
           />
         </div>

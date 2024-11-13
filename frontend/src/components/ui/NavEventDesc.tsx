@@ -2,7 +2,7 @@ import ScrollCard from "./scrollCard";
 
 export function EventDescNav() {
   return (
-    <div className="max-w-xl">
+    <div className="max-w-xl lg:ml-24">
       <h2 className="font-semibold font-work-sans border-b-2 pb-2">
         All Events
       </h2>
