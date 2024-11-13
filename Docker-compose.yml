@@ -9,7 +9,7 @@ services:
 
   redis-engine:
     build:
-      context: ./redis
+      context: ./worker
       dockerfile: Dockerfile
     depends_on:
       - redis

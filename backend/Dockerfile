@@ -8,11 +8,10 @@ RUN npm install
 
 COPY . .
 
+
+
 RUN npm install -g typescript ts-node
 RUN npm run build
-
-RUN npx prisma generate
-
 
 EXPOSE 3000
 
