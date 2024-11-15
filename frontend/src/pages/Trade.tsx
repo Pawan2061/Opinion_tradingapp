@@ -1,4 +1,5 @@
 import { ArrowUpIcon, ArrowDownIcon } from "lucide-react";
+import { Trade } from "../components/TradeDash";
 
 const TableHeader = ({ title }: { title: string }) => (
   <div className="mb-2">
@@ -80,7 +81,7 @@ type AnsData = WsData | null;
 const OrderBook = ({ wsData }: { wsData: AnsData }) => {
   const yesOrders_const = [
     { price: 6.5, quantity: 50 },
-    { price: 7, quantity: 977 },
+    { price: 7, quantity: 7 },
     { price: 8, quantity: 54 },
     { price: 8.5, quantity: 1 },
     { price: 9, quantity: 3 },
@@ -91,35 +92,43 @@ const OrderBook = ({ wsData }: { wsData: AnsData }) => {
     { price: 4.5, quantity: 5 },
     { price: 5.5, quantity: 1 },
     { price: 6, quantity: 3 },
-    { price: 6.5, quantity: 8 },
+    { price: 6.5, quantity: 1 },
   ];
 
   const yesOrders = wsData ? wsData.yes : yesOrders_const;
   const noOrders = wsData ? wsData.no : noOrders_const;
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-lg h-[28rem] relative top-24">
-      <div className="flex items-center justify-between border-b border-slate-100 p-4">
-        <div className="flex items-center gap-3">
-          <h1 className="text-xl font-semibold text-slate-800">Order Book</h1>
-          <span className="text-sm text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-            Live
-          </span>
+    <div className="flex flex-col md:flex-row gap-6">
+      {/* OrderBook Section */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-lg md:w-2/3 h-[28rem] p-6">
+        <div className="flex items-center justify-between border-b border-slate-100 p-4">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-semibold text-slate-800">Order Book</h1>
+            <span className="text-sm text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+              Live
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span>Buy</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <span>Sell</span>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span>Buy</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-            <span>Sell</span>
-          </div>
+        <div className="grid grid-cols-2 gap-8">
+          <OrderSection type="YES" orders={yesOrders!} />
+          <OrderSection type="NO" orders={noOrders!} />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-8 p-6">
-        <OrderSection type="YES" orders={yesOrders!} />
-        <OrderSection type="NO" orders={noOrders!} />
+
+      {/* Trade Section */}
+      <div className="md:w-1/3">
+        <Trade />
       </div>
     </div>
   );
