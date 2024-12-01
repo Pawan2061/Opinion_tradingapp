@@ -3,7 +3,6 @@ import Landing from "../pages/Landing";
 import Events from "../pages/Events";
 import Navbar from "../components/Navbar";
 import OrderBook from "../pages/Trade";
-import { Trade } from "../components/TradeDash";
 const Approutes = () => {
   return (
     <Router>
@@ -11,7 +10,7 @@ const Approutes = () => {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/events" element={<Events />} />
-        <Route path="/trade" element={<OrderBook wsData={null} />} />
+        <Route path="/trade" element={<OrderBook />} />
         {/* <Route path="/trade" element={<Trade />} /> */}
       </Routes>
     </Router>

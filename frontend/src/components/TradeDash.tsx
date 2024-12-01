@@ -76,6 +76,8 @@ export const Trade = () => {
           ? "http://localhost:3000/api/v1/order/buy"
           : "http://localhost:3000/api/v1/order/sell";
 
+      console.log(orderPayload);
+
       const response = await axios.post(endpoint, orderPayload);
 
       console.log("Order placed successfully:", response.data);

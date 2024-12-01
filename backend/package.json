@@ -6,14 +6,13 @@
     "start": "tsc && node dist/app.js",
     "dev": "nodemon src/app.ts",
     "build": "tsc"
-
-
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/uuid": "^10.0.0",
     "@types/ws": "^8.5.12",
@@ -23,6 +22,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.20.0",
+    "cors": "^2.8.5",
     "express": "^4.21.1",
     "express-async-handler": "^1.2.0",
     "redis": "^4.7.0",

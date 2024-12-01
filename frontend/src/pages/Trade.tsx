@@ -1,5 +1,7 @@
 import { ArrowUpIcon, ArrowDownIcon } from "lucide-react";
 import { Trade } from "../components/TradeDash";
+import { useEffect, useState } from "react";
+import { transform } from "../utils/calc";
 
 const TableHeader = ({ title }: { title: string }) => (
   <div className="mb-2">
@@ -78,7 +80,27 @@ interface WsData {
 
 type AnsData = WsData | null;
 
-const OrderBook = ({ wsData }: { wsData: AnsData }) => {
+const OrderBook = () => {
+  const [ansData, setAnsData] = useState<WsData | null>(null);
+  useEffect(() => {
+    const conn = new WebSocket("ws://localhost:8080");
+    conn.onopen = () => {
+      console.log("WebSocket connected");
+      const data = JSON.stringify({
+        stockSymbol: "BTC_USDT_10_Oct_2024_9_30",
+        type: "subscribe",
+      });
+      conn.send(data);
+    };
+
+    conn.onmessage = (message) => {
+      const res = JSON.parse(message.data);
+      console.log(res.message);
+      const ws_transformed = transform(res.message);
+      console.log("ans:", ws_transformed);
+      setAnsData(ws_transformed);
+    };
+  }, []);
   const yesOrders_const = [
     { price: 6.5, quantity: 50 },
     { price: 7, quantity: 7 },
@@ -95,12 +117,14 @@ const OrderBook = ({ wsData }: { wsData: AnsData }) => {
     { price: 6.5, quantity: 1 },
   ];
 
-  const yesOrders = wsData ? wsData.yes : yesOrders_const;
-  const noOrders = wsData ? wsData.no : noOrders_const;
+  const yesOrders = ansData ? ansData.yes : yesOrders_const;
+  console.log(yesOrders, "yes orders are here");
+
+  const noOrders = ansData ? ansData.no : noOrders_const;
+  console.log(noOrders, "no orders are here");
 
   return (
     <div className="flex flex-col md:flex-row gap-6">
-      {/* OrderBook Section */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-lg md:w-2/3 h-[28rem] p-6">
         <div className="flex items-center justify-between border-b border-slate-100 p-4">
           <div className="flex items-center gap-3">
@@ -126,7 +150,6 @@ const OrderBook = ({ wsData }: { wsData: AnsData }) => {
         </div>
       </div>
 
-      {/* Trade Section */}
       <div className="md:w-1/3">
         <Trade />
       </div>
