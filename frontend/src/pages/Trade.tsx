@@ -95,7 +95,7 @@ const OrderBook = () => {
 
     conn.onmessage = (message) => {
       const res = JSON.parse(message.data);
-      console.log(res.message);
+
       const ws_transformed = transform(res.message);
       console.log("ans:", ws_transformed);
       setAnsData(ws_transformed);

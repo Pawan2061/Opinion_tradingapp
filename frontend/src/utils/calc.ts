@@ -12,8 +12,8 @@ interface OrderData {
   };
 }
 interface WsData {
-  yes?: StockData[];
-  no?: StockData[];
+  yes: StockData[];
+  no: StockData[];
 }
 
 interface payload {
@@ -21,32 +21,28 @@ interface payload {
   no: { [price: string]: OrderData };
 }
 export function transform(data: payload): WsData {
+  // const yesData = JSON.parse(data as any).yes as any;
+  console.log(JSON.parse(data as any).yes, "data.yes in transform");
+  console.log(data?.no, "data.no in transform");
+
   const wsData: WsData = {
     yes: [],
     no: [],
   };
 
-  if (!data) {
-    return wsData;
-  }
-
-  if (Object.keys(data.yes).length > 0) {
-    Object.entries(data.yes).forEach(([price, orderData]) => {
-      wsData.yes!.push({
-        price: parseInt(price),
-        quantity: orderData.total,
-      });
+  Object.entries(data.yes).forEach(([price, orderData]) => {
+    wsData.yes!.push({
+      price: parseFloat(price),
+      quantity: orderData.total,
     });
-  }
+  });
 
-  if (Object.keys(data.no).length > 0) {
-    Object.entries(data.no).forEach(([price, orderData]) => {
-      wsData.no!.push({
-        price: parseInt(price),
-        quantity: orderData.total,
-      });
+  Object.entries(data.no).forEach(([price, orderData]) => {
+    wsData.no!.push({
+      price: parseFloat(price),
+      quantity: orderData.total,
     });
-  }
+  });
 
   return wsData;
 }
