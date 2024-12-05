@@ -1,3 +1,5 @@
+import SignupLoginPopover from "./ui/auth";
+
 export default function Navbar() {
   return (
     <div className="sticky top-0 z-50  mx-2">
@@ -49,12 +51,13 @@ export default function Navbar() {
               For 18 years and above only
             </span>
 
-            <button
+            {/* <button
               id="download_btn_navbar"
               className="bg-gray-700 hover:bg-gray-600 text-white py-1 px-4 rounded"
             >
-              Download App
-            </button>
+              Join
+            </button> */}
+            <SignupLoginPopover />
             <button
               id="trade_online_btn_navbar"
               className="bg-blue-600 hover:bg-blue-500 text-white py-1 px-4 rounded"

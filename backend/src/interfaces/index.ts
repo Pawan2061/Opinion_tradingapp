@@ -77,3 +77,9 @@ export interface Apiresponse<T = any> {
   message: string;
   data: T;
 }
+
+export interface JwtPayload {
+  id: string;
+  username: string;
+  password: string;
+}

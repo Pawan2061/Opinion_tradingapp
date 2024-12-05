@@ -5,12 +5,50 @@ const newrequestQueue = "request1";
 
 import { redisClient, subscriber } from "../app";
 import { handlePubSub, handleResponses, sendResponse } from "../utils/help";
+import prisma from "../utils/prisma";
+import { createToken } from "../utils/jwt";
+import { JwtPayload } from "../interfaces";
 
 export interface apResponse {
   success: boolean;
   message: string;
   data?: any;
 }
+
+export const auth = async (req: Request, res: any) => {
+  try {
+    const { username, password } = await req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({
+        message: "insufficient credentials",
+      });
+    }
+    const user = await prisma.user.create({
+      data: {
+        username: username,
+        password: password,
+      },
+    });
+    const payload: JwtPayload = {
+      id: user.userId,
+      username: user.username,
+      password: user.password,
+    };
+
+    const token = await createToken(payload);
+
+    return res.status(200).json({
+      message: "user created successfully",
+      user: user,
+      token: token,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      error: error,
+    });
+  }
+};
 
 export const createUser = async (req: Request, res: any) => {
   try {
