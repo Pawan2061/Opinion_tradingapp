@@ -21,28 +21,35 @@ interface payload {
   no: { [price: string]: OrderData };
 }
 export function transform(data: payload): WsData {
-  // const yesData = JSON.parse(data as any).yes as any;
+  const parse = JSON.parse(data as any);
+  console.log("type of ", typeof parse);
+
+  const yesData = JSON.parse(data as any).yes as any;
+  console.log(yesData, "yes data is here");
+
   console.log(JSON.parse(data as any).yes, "data.yes in transform");
-  console.log(data?.no, "data.no in transform");
+  console.log(data, "data.no in transform");
 
   const wsData: WsData = {
     yes: [],
     no: [],
   };
+  console.log(parse.yes, "wow");
 
-  Object.entries(data.yes).forEach(([price, orderData]) => {
+  Object.entries(parse.yes).forEach(([price, orderData]: any) => {
     wsData.yes!.push({
       price: parseFloat(price),
       quantity: orderData.total,
     });
   });
 
-  Object.entries(data.no).forEach(([price, orderData]) => {
+  Object.entries(parse.no).forEach(([price, orderData]: any) => {
     wsData.no!.push({
       price: parseFloat(price),
       quantity: orderData.total,
     });
   });
+  console.log(wsData, "data to be displayed is here");
 
   return wsData;
 }

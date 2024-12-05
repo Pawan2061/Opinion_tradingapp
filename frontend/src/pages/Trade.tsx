@@ -78,8 +78,6 @@ interface WsData {
   no?: StockData[];
 }
 
-type AnsData = WsData | null;
-
 const OrderBook = () => {
   const [ansData, setAnsData] = useState<WsData | null>(null);
   useEffect(() => {
@@ -95,6 +93,7 @@ const OrderBook = () => {
 
     conn.onmessage = (message) => {
       const res = JSON.parse(message.data);
+      console.log(res.message);
 
       const ws_transformed = transform(res.message);
       console.log("ans:", ws_transformed);
