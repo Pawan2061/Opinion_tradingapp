@@ -15,3 +15,9 @@ export interface UserStockBalance {
     no?: stock;
   };
 }
+
+export interface AuthPayload {
+  email: string;
+  username: string;
+  password: string;
+}

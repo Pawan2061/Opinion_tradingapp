@@ -52,3 +52,21 @@ export const userIdSelector = selector<string>({
     }
   },
 });
+
+export const authState = atom({
+  key: "authstate",
+  default: null,
+});
+
+export const authSelector = selector({
+  key: "authselector",
+  get: ({ get }) => {
+    const user = get(authState);
+    if (!user) {
+      return null;
+    }
+    return {
+      username: user,
+    };
+  },
+});

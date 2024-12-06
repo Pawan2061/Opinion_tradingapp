@@ -16,12 +16,14 @@ import {
   buyNo,
   sellNo,
   resetMemory,
+  auth,
 } from "../controllers/proboController";
 import { buy, sell } from "../controllers/trade";
 export const proboRouter = express.Router();
 proboRouter.get("/", (req: Request, res: any) => {
-  res.send("hello");
+  return res.send("hello");
 });
+proboRouter.post("/auth", auth);
 proboRouter.post("/user/create/:userId", createUser);
 proboRouter.post("/symbol/create/:stockSymbol", createSymbol);
 proboRouter.post("/onramp/inr", rampUser);

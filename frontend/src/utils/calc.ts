@@ -1,3 +1,6 @@
+import { AuthPayload } from "../interface/types";
+import axios from "axios";
+
 interface StockData {
   price: number;
   quantity: number;
@@ -52,4 +55,15 @@ export function transform(data: payload): WsData {
   console.log(wsData, "data to be displayed is here");
 
   return wsData;
+}
+
+export async function hanldeAuth(data: AuthPayload) {
+  try {
+    const response = await axios.post("http://localhost:3000/auth", data);
+    console.log(response, "response here");
+
+    return response.data;
+  } catch (error) {
+    return "auth failed";
+  }
 }

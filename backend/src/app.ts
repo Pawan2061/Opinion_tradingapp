@@ -1,9 +1,10 @@
-import express, { json } from "express";
+import express, { json, Response } from "express";
 import { proboRouter } from "./routes/proboRoute";
 import { WebSocket } from "ws";
 import cors from "cors";
 import { createClient } from "redis";
-const redis_url = process.env.REDIS_URL || "redis://localhost:6379";
+import { auth } from "./controllers/proboController";
+const redis_url = "redis://localhost:6379";
 
 export const redisClient = createClient({
   url: redis_url,
@@ -18,6 +19,7 @@ app.use(express.json());
 
 app.use("/api/v1", proboRouter);
 
+app.post("/auth", auth);
 async function startRedisServer() {
   await redisClient.connect();
   await subscriber.connect();

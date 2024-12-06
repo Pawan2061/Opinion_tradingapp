@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import { hanldeAuth } from "../../utils/calc";
+import { queryClient } from "../../main";
 
 const SignupLoginPopover = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -6,31 +9,42 @@ const SignupLoginPopover = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const mutation = useMutation({
+    mutationFn: hanldeAuth,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
+  });
 
   const handleLogin = (e: any) => {
     e.preventDefault();
-    // Implement login logic here
     console.log("Login attempt:", { username, password });
-    // Reset form after submission
     setUsername("");
     setPassword("");
     setIsOpen(false);
+    mutation.mutate({
+      email,
+      username,
+      password,
+    });
   };
 
   const handleSignup = (e: any) => {
     e.preventDefault();
-    // Implement signup logic here
     console.log("Signup attempt:", { username, email, password });
-    // Reset form after submission
     setUsername("");
     setEmail("");
     setPassword("");
     setIsOpen(false);
+    mutation.mutate({
+      email,
+      username,
+      password,
+    });
   };
 
   return (
     <div className="relative">
-      {/* Join Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="bg-gray-700 hover:bg-gray-600 text-white py-1 px-4 rounded"
@@ -38,11 +52,9 @@ const SignupLoginPopover = () => {
         Join
       </button>
 
-      {/* Popover */}
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-lg shadow-xl w-96 p-6">
-            {/* Tabs */}
             <div className="flex mb-4 border-b">
               <button
                 onClick={() => setActiveTab("login")}
@@ -66,7 +78,6 @@ const SignupLoginPopover = () => {
               </button>
             </div>
 
-            {/* Login Tab */}
             {activeTab === "login" && (
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
@@ -112,7 +123,6 @@ const SignupLoginPopover = () => {
               </form>
             )}
 
-            {/* Signup Tab */}
             {activeTab === "signup" && (
               <form onSubmit={handleSignup} className="space-y-4">
                 <div>
@@ -175,7 +185,6 @@ const SignupLoginPopover = () => {
               </form>
             )}
 
-            {/* Close Button */}
             <button
               onClick={() => setIsOpen(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"

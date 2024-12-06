@@ -51,12 +51,6 @@ export default function Navbar() {
               For 18 years and above only
             </span>
 
-            {/* <button
-              id="download_btn_navbar"
-              className="bg-gray-700 hover:bg-gray-600 text-white py-1 px-4 rounded"
-            >
-              Join
-            </button> */}
             <SignupLoginPopover />
             <button
               id="trade_online_btn_navbar"
@@ -72,12 +66,6 @@ export default function Navbar() {
                 className="w-full h-auto"
               />
             </div>
-
-            {/* <div className="md:hidden flex flex-col space-y-1 cursor-pointer">
-                <div className="w-6 h-0.5 bg-[rgb(38,38,38)]"></div>
-                <div className="w-6 h-0.5 bg-[rgb(38,38,38)]"></div>
-                <div className="w-6 h-0.5 bg-[rgb(38,38,38)]"></div>
-              </div> */}
           </div>
         </div>
       </nav>

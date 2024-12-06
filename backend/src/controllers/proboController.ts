@@ -17,6 +17,8 @@ export interface apResponse {
 
 export const auth = async (req: Request, res: any) => {
   try {
+    console.log("starting ");
+
     const { username, password } = await req.body;
 
     if (!username || !password) {
