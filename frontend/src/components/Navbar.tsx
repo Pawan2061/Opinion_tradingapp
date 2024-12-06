@@ -1,6 +1,11 @@
+import { useRecoilValue } from "recoil";
 import SignupLoginPopover from "./ui/auth";
+import { authSelector } from "../recoil/atom";
 
 export default function Navbar() {
+  const userdata = useRecoilValue(authSelector);
+  console.log(userdata?.user, "user data is here");
+
   return (
     <div className="sticky top-0 z-50  mx-2">
       <nav className="bg-white  text-[rgb(38,38,38)] h-[65px] mb-0 overflow-hidden box-border ">
@@ -51,7 +56,12 @@ export default function Navbar() {
               For 18 years and above only
             </span>
 
-            <SignupLoginPopover />
+            {userdata?.user ? (
+              <>Welcome {userdata.user}</>
+            ) : (
+              <SignupLoginPopover />
+            )}
+
             <button
               id="trade_online_btn_navbar"
               className="bg-blue-600 hover:bg-blue-500 text-white py-1 px-4 rounded"

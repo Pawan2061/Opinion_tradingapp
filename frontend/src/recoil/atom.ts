@@ -53,12 +53,12 @@ export const userIdSelector = selector<string>({
   },
 });
 
-export const authState = atom({
+export const authState = atom<string | null>({
   key: "authstate",
   default: null,
 });
 
-export const authSelector = selector({
+export const authSelector = selector<{ user: string } | null>({
   key: "authselector",
   get: ({ get }) => {
     const user = get(authState);
@@ -66,7 +66,7 @@ export const authSelector = selector({
       return null;
     }
     return {
-      username: user,
+      user,
     };
   },
 });

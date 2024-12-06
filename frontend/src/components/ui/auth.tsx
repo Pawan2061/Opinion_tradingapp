@@ -2,17 +2,26 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { hanldeAuth } from "../../utils/calc";
 import { queryClient } from "../../main";
+import { useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import { authState } from "../../recoil/atom";
 
 const SignupLoginPopover = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [auth, setAuthState] = useRecoilState(authState);
+
   const [email, setEmail] = useState("");
   const mutation = useMutation({
     mutationFn: hanldeAuth,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["todos"] });
+
+      setAuthState(data.user.username);
+      navigate("/events");
     },
   });
 
@@ -116,6 +125,7 @@ const SignupLoginPopover = () => {
                 </div>
                 <button
                   type="submit"
+                  disabled={mutation.isPending}
                   className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300"
                 >
                   Login
@@ -178,6 +188,7 @@ const SignupLoginPopover = () => {
                 </div>
                 <button
                   type="submit"
+                  disabled={mutation.isPending}
                   className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition duration-300"
                 >
                   Signup
