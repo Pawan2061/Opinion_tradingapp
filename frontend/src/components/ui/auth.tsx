@@ -18,7 +18,7 @@ const SignupLoginPopover = () => {
   const mutation = useMutation({
     mutationFn: hanldeAuth,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
 
       setAuthState(data.user.username);
       navigate("/events");

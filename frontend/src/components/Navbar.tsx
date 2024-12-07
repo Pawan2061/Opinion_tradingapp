@@ -1,13 +1,14 @@
 import { useRecoilValue } from "recoil";
 import SignupLoginPopover from "./ui/auth";
 import { authSelector } from "../recoil/atom";
+import UserInfo from "./ui/Userinfo";
 
 export default function Navbar() {
   const userdata = useRecoilValue(authSelector);
   console.log(userdata?.user, "user data is here");
 
   return (
-    <div className="sticky top-0 z-50  mx-2">
+    <div className="sticky top-0 z-10  mx-2">
       <nav className="bg-white  text-[rgb(38,38,38)] h-[65px] mb-0 overflow-hidden box-border ">
         <div className="container mx-auto flex items-center justify-between h-full border border-gray-200 border-t-0 border-l-0 border-r-0">
           <a href="/" className="flex items-center max-w-[112px]">
@@ -25,7 +26,7 @@ export default function Navbar() {
             >
               Trading
             </a>
-            <a
+            {/* <a
               href="/team-11"
               className="text-xs font-work-sans hover:text-gray-600"
             >
@@ -48,7 +49,7 @@ export default function Navbar() {
               className="text-xs font-work-sans hover:text-gray-600"
             >
               Careers
-            </a>
+            </a> */}
           </div>
 
           <div className="flex items-center space-x-4">
@@ -57,24 +58,26 @@ export default function Navbar() {
             </span>
 
             {userdata?.user ? (
-              <>Welcome {userdata.user}</>
+              // <>Welcome {userdata.user}</>
+              <UserInfo />
             ) : (
+              // <UserInfo />
               <SignupLoginPopover />
             )}
 
-            <button
+            {/* <button
               id="trade_online_btn_navbar"
               className="bg-blue-600 hover:bg-blue-500 text-white py-1 px-4 rounded"
             >
               Trade Online
-            </button>
+            </button> */}
 
             <div className="flex items-center justify-center max-w-[20px]">
-              <img
+              {/* <img
                 src="/_next/static/media/translation.5ad894fb.png"
                 alt="Translation"
                 className="w-full h-auto"
-              />
+              /> */}
             </div>
           </div>
         </div>
