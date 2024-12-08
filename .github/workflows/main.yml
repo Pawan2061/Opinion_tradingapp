@@ -27,9 +27,9 @@ jobs:
       - name: push to dockerhub
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
+          context: ./frontend
           push: true
-          tags: pawan063/probobackend
+          tags: pawan063/probofrontend
 
   api:
     runs-on: ubuntu-latest
@@ -38,14 +38,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Setup Go
-        uses: actions/setup-go@v4
+      - name: Setup Node.js for api
+        uses: actions/setup-node@v1
         with:
-          go-version: "1.21"
-
-      - name: Installing the dependencies
-        working-directory: ./sfu/backend
-        run: go mod tidy
+          node-version: "22"
 
       - name: login in to dockerhub
         uses: docker/login-action@v3
@@ -56,6 +52,6 @@ jobs:
       - name: push to dockerhub
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend
+          context: ./backend
           push: true
-          tags: pawan063/probofrontend
+          tags: pawan063/probobackend
