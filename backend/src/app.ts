@@ -4,7 +4,7 @@ import { WebSocket } from "ws";
 import cors from "cors";
 import { createClient } from "redis";
 import { auth } from "./controllers/proboController";
-const redis_url = "redis://localhost:6379";
+const redis_url = process.env.REDIS_HOST || "redis://localhost:6379";
 
 export const redisClient = createClient({
   url: redis_url,
