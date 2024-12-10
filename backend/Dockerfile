@@ -12,7 +12,9 @@ COPY . .
 
 RUN npm install -g typescript ts-node
 RUN npm run build
+RUN npx prisma generate
+
 
 EXPOSE 3000
 
-CMD ["node", "dist/app.js"]
+CMD npx prisma migrate deploy && node dist/index.js
