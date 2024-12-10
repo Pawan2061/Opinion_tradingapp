@@ -28,12 +28,17 @@ export default function Navbar() {
             </a>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <span className="hidden md:inline text-xs w-36  text-wrap  ">
-              For 18 years and above only
-            </span>
-
-            {userdata?.user ? <UserInfo /> : <SignupLoginPopover />}
+          <div className="flex items-center space-x-2">
+            {userdata?.user ? (
+              <UserInfo />
+            ) : (
+              <div className="flex">
+                <span className="hidden md:inline text-xs w-36  text-wrap  ">
+                  For 18 years and above only
+                </span>
+                <SignupLoginPopover />
+              </div>
+            )}
           </div>
         </div>
       </nav>

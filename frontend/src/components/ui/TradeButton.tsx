@@ -1,11 +1,11 @@
 import React from "react";
 
 export interface PriceButtonProps {
-  type: string; // e.g., 'Buy', 'Sell', 'Yes', 'No'
-  price?: string; // Price is optional, it may or may not be provided
-  isActive: boolean; // Determines if the button is active
-  onClick: () => void; // Function to handle the button click
-  variant?: "price" | "trade"; // Optional variant for button styling
+  type: string;
+  price?: string;
+  isActive: boolean;
+  onClick: () => void;
+  variant?: "price" | "trade";
 }
 
 export const TradeButton: React.FC<PriceButtonProps> = ({

@@ -1,17 +1,16 @@
+import { useRecoilValue } from "recoil";
 import ScrollCard from "./scrollCard";
 
 export function EventDescNav() {
   return (
-    <div className="max-w-xl lg:ml-24">
-      <h2 className="font-semibold font-work-sans border-b-2 pb-2">
+    <div className="max-w-xl lg:ml-24 space-y-2">
+      <h2 className="font-semibold font-work-sans border-b-2 pb-2 ">
         All Events
       </h2>
-      <div className="grid grid-cols-2 gap-3 mt-4">
-        {Array.from({ length: 10 }).map((_, index) => (
-          <div key={index}>
-            <ScrollCard />
-          </div>
-        ))}
+      <div className="max-w-lg  mx-auto  gap-8 mx-automt-4">
+        <div>
+          <ScrollCard />
+        </div>
       </div>
     </div>
   );

@@ -13,14 +13,6 @@ export default function Slider() {
       <div className="relative flex-grow flex-shrink-0 overflow-y-auto z-10 w-1/3">
         <div className="overflow-y-auto h-[calc(100vh-2rem)]">
           <div className="hidden md:grid grid-cols-2 gap-4 p-4">
-            {/* Card 1 */}
-            <ScrollCard />
-            <ScrollCard />
-            <ScrollCard />
-            <ScrollCard />
-            <ScrollCard />
-            <ScrollCard />
-            <ScrollCard />
             <ScrollCard />
           </div>
         </div>
