@@ -26,30 +26,6 @@ export default function Navbar() {
             >
               Trading
             </a>
-            {/* <a
-              href="/team-11"
-              className="text-xs font-work-sans hover:text-gray-600"
-            >
-              Team 11
-            </a>
-            <a
-              href="/read"
-              className="text-xs  font-work-sans hover:text-gray-600"
-            >
-              Read
-            </a>
-            <a
-              href="/cares"
-              className="text-xs font-work-sans hover:text-gray-600"
-            >
-              Cares
-            </a>
-            <a
-              href="/careers"
-              className="text-xs font-work-sans hover:text-gray-600"
-            >
-              Careers
-            </a> */}
           </div>
 
           <div className="flex items-center space-x-4">
@@ -57,28 +33,7 @@ export default function Navbar() {
               For 18 years and above only
             </span>
 
-            {userdata?.user ? (
-              // <>Welcome {userdata.user}</>
-              <UserInfo />
-            ) : (
-              // <UserInfo />
-              <SignupLoginPopover />
-            )}
-
-            {/* <button
-              id="trade_online_btn_navbar"
-              className="bg-blue-600 hover:bg-blue-500 text-white py-1 px-4 rounded"
-            >
-              Trade Online
-            </button> */}
-
-            <div className="flex items-center justify-center max-w-[20px]">
-              {/* <img
-                src="/_next/static/media/translation.5ad894fb.png"
-                alt="Translation"
-                className="w-full h-auto"
-              /> */}
-            </div>
+            {userdata?.user ? <UserInfo /> : <SignupLoginPopover />}
           </div>
         </div>
       </nav>

@@ -1,15 +1,16 @@
+import { useNavigate } from "react-router-dom";
 import { EventDescNav } from "./NavEventDesc";
 
 export default function Eventbody() {
+  const navigate = useNavigate();
   const description = {
     yes: "probability of yes",
     no: "probability of no",
   };
 
   return (
-    <section className="mx-6 mt-5 space-y-3">
+    <section className=" mx-6 mt-5 space-y-3">
       <div className="flex flex-col lg:flex-row justify-center lg:gap-x-32 space-y-8 lg:space-y-0">
-        {/* Top Stories Section */}
         <div className="flex flex-col max-w-xl space-y-2">
           <h1 className="font-work-sans font-semibold">Top Stories</h1>
           <div className="bg-white shadow-2xl rounded-2xl p-4 flex flex-col lg:flex-row justify-around">
@@ -39,12 +40,14 @@ export default function Eventbody() {
                 <div>
                   <button
                     type="button"
+                    onClick={() => navigate("/trade")}
                     className="text-white bg-gradient-to-r from-blue-300 via-blue-400 to-blue-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-100 dark:focus:ring-blue-300 font-medium rounded-md text-sm px-6 py-1 me-2 mb-2"
                   >
                     Yes ₹ 2
                   </button>
                   <button
                     type="button"
+                    onClick={() => navigate("/trade")}
                     className="text-white bg-gradient-to-r from-red-200 via-red-300 to-red-400 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-300 font-medium rounded-md text-sm px-6 py-1 me-2 mb-2"
                   >
                     No ₹ 8
