@@ -1,4 +1,3 @@
-import { useRecoilValue } from "recoil";
 import ScrollCard from "./scrollCard";
 
 export function EventDescNav() {

@@ -13,6 +13,7 @@ const SignupLoginPopover = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [auth, setAuthState] = useRecoilState(authState);
+  console.log(auth);
 
   const [email, setEmail] = useState("");
   const mutation = useMutation({

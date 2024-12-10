@@ -37,10 +37,10 @@ const UserInfo = () => {
     };
   }, [isPopupOpen]);
 
-  const handleLogout = () => {
-    console.log("User logged out");
-    setIsPopupOpen(false);
-  };
+  // const handleLogout = () => {
+  //   console.log("User logged out");
+  //   setIsPopupOpen(false);
+  // };
 
   return (
     <div className="">
