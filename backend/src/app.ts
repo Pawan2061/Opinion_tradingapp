@@ -31,3 +31,7 @@ async function startRedisServer() {
 }
 
 startRedisServer();
+
+// REDIS_URL=redis://redis-service:6379
+// DATABASE_URL="postgresql://Pawan2061:eTuqbHO0GJD8@ep-icy-fire-a52bon09.us-east-2.aws.neon.tech/twitter?sslmode=require"
+// JWT_SECRET="pawan2911"
