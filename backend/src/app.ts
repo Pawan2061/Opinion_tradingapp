@@ -3,7 +3,7 @@ import { proboRouter } from "./routes/proboRoute";
 import { WebSocket } from "ws";
 import cors from "cors";
 import { createClient } from "redis";
-import { auth } from "./controllers/proboController";
+import { authLogin, authSignup } from "./controllers/proboController";
 const redis_url = process.env.REDIS_HOST || "redis://localhost:6379";
 
 console.log(process.env.REDIS_HOST);
@@ -21,7 +21,9 @@ app.use(express.json());
 
 app.use("/api/v1", proboRouter);
 
-app.post("/auth", auth);
+app.post("/authSignup", authSignup);
+app.post("/authLogin", authLogin);
+
 async function startRedisServer() {
   await redisClient.connect();
   await subscriber.connect();

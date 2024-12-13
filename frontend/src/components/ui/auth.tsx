@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { hanldeAuth } from "../../utils/calc";
+import { handleSignin, hanldeAuth } from "../../utils/calc";
 import { queryClient } from "../../main";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
@@ -16,8 +16,17 @@ const SignupLoginPopover = () => {
   console.log(auth);
 
   const [email, setEmail] = useState("");
-  const mutation = useMutation({
+  const signUpmutation = useMutation({
     mutationFn: hanldeAuth,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+
+      setAuthState(data.user.username);
+      navigate("/events");
+    },
+  });
+  const loginMutation = useMutation({
+    mutationFn: handleSignin,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
 
@@ -32,7 +41,7 @@ const SignupLoginPopover = () => {
     setUsername("");
     setPassword("");
     setIsOpen(false);
-    mutation.mutate({
+    loginMutation.mutate({
       email,
       username,
       password,
@@ -46,7 +55,7 @@ const SignupLoginPopover = () => {
     setEmail("");
     setPassword("");
     setIsOpen(false);
-    mutation.mutate({
+    signUpmutation.mutate({
       email,
       username,
       password,
@@ -124,9 +133,26 @@ const SignupLoginPopover = () => {
                     required
                   />
                 </div>
+                <div>
+                  <label
+                    htmlFor="signup-email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="signup-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter email"
+                    required
+                  />
+                </div>
                 <button
                   type="submit"
-                  disabled={mutation.isPending}
+                  disabled={loginMutation.isPending}
                   className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300"
                 >
                   Login
@@ -189,7 +215,7 @@ const SignupLoginPopover = () => {
                 </div>
                 <button
                   type="submit"
-                  disabled={mutation.isPending}
+                  disabled={signUpmutation.isPending}
                   className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition duration-300"
                 >
                   Signup

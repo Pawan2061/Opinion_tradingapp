@@ -59,7 +59,18 @@ export function transform(data: payload): WsData {
 
 export async function hanldeAuth(data: AuthPayload) {
   try {
-    const response = await axios.post("http://localhost:3000/auth", data);
+    const response = await axios.post("http://localhost:3000/authSignup", data);
+    console.log(response, "response here");
+
+    return response.data;
+  } catch (error) {
+    return "auth failed";
+  }
+}
+
+export async function handleSignin(data: AuthPayload) {
+  try {
+    const response = await axios.post("http://localhost:3000/authLogin", data);
     console.log(response, "response here");
 
     return response.data;

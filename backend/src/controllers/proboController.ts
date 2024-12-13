@@ -15,7 +15,7 @@ export interface apResponse {
   data?: any;
 }
 
-export const auth = async (req: Request, res: any) => {
+export const authSignup = async (req: Request, res: any) => {
   try {
     console.log("starting ");
 
@@ -57,6 +57,44 @@ export const auth = async (req: Request, res: any) => {
   }
 };
 
+export const authLogin = async (req: Request, res: any) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({
+        message: "insufficient credentials",
+      });
+    }
+    const user = await prisma.user.findFirst({
+      where: {
+        username: username,
+      },
+    });
+    if (!user) {
+      return res.status(400).json({
+        message: "user not found",
+      });
+    }
+    const payload: JwtPayload = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      password: user.password,
+    };
+
+    const token = await createToken(payload);
+
+    return res.status(200).json({
+      message: "user created successfully",
+      user: user,
+      token: token,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      message: error,
+    });
+  }
+};
 export const createUser = async (req: Request, res: any) => {
   try {
     const id = uuid();
