@@ -22,7 +22,7 @@ export default function ScrollCard() {
                 width="20px"
                 src="https://probo.in/_next/image?url=https%3A%2F%2Fprobo.gumlet.io%2Fimage%2Fupload%2Fprobo_product_images%2FBar_Chart.png&w=32&q=75"
                 alt=""
-              />{" "}
+              />
               <h1 className="text-xs text-[#545454] font-work-sans">
                 {orderbook.name}
               </h1>

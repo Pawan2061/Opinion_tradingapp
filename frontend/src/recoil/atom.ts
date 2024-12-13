@@ -1,6 +1,8 @@
 import { atom, DefaultValue, selector } from "recoil";
 import { userState } from "../interface/types";
 
+import { recoilPersist } from "recoil-persist";
+
 export const userBalanceState = atom<userState>({
   key: "users",
   default: {
@@ -53,9 +55,16 @@ export const userIdSelector = selector<string>({
   },
 });
 
+const { persistAtom } = recoilPersist({
+  key: "auth",
+  storage: localStorage,
+});
+
 export const authState = atom<string | null>({
   key: "authstate",
   default: null,
+
+  effects_UNSTABLE: [persistAtom],
 });
 
 export const authSelector = selector<{ user: string } | null>({
