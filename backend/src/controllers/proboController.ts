@@ -19,22 +19,25 @@ export const auth = async (req: Request, res: any) => {
   try {
     console.log("starting ");
 
-    const { username, password } = await req.body;
+    const { username, password, email } = await req.body;
 
     if (!username || !password) {
       return res.status(400).json({
         message: "insufficient credentials",
       });
     }
+
     const user = await prisma.user.create({
       data: {
+        email: email,
         username: username,
         password: password,
       },
     });
     const payload: JwtPayload = {
-      id: user.userId,
+      id: user.id,
       username: user.username,
+      email: user.email,
       password: user.password,
     };
 

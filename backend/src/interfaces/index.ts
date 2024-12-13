@@ -80,6 +80,7 @@ export interface Apiresponse<T = any> {
 
 export interface JwtPayload {
   id: string;
+  email: string;
   username: string;
   password: string;
 }

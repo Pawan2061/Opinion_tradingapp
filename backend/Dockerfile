@@ -17,4 +17,4 @@ RUN npx prisma generate
 
 EXPOSE 3000
 
-CMD npx prisma migrate deploy && node dist/index.js
+CMD npx prisma migrate deploy && node dist/app.js

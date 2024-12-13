@@ -6,6 +6,8 @@ import { createClient } from "redis";
 import { auth } from "./controllers/proboController";
 const redis_url = process.env.REDIS_HOST || "redis://localhost:6379";
 
+console.log(process.env.REDIS_HOST);
+
 export const redisClient = createClient({
   url: redis_url,
 });
@@ -31,7 +33,3 @@ async function startRedisServer() {
 }
 
 startRedisServer();
-
-// REDIS_URL=redis://redis-service:6379
-// DATABASE_URL="postgresql://Pawan2061:eTuqbHO0GJD8@ep-icy-fire-a52bon09.us-east-2.aws.neon.tech/twitter?sslmode=require"
-// JWT_SECRET="pawan2911"
