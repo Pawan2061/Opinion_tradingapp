@@ -8,8 +8,8 @@ export default function Navbar() {
   console.log(userdata?.user, "user data is here");
 
   return (
-    <div className="sticky top-0 z-10  mx-2">
-      <nav className="bg-white  text-[rgb(38,38,38)] h-[65px] mb-0 overflow-hidden box-border ">
+    <div className="sticky top-0 z-10 mx-2">
+      <nav className="bg-white text-[rgb(38,38,38)] h-[65px] mb-0 overflow-hidden box-border">
         <div className="container mx-auto flex items-center justify-between h-full border border-gray-200 border-t-0 border-l-0 border-r-0">
           <a href="/" className="flex items-center max-w-[112px]">
             <img
@@ -32,8 +32,8 @@ export default function Navbar() {
             {userdata?.user ? (
               <UserInfo />
             ) : (
-              <div className="flex">
-                <span className="hidden md:inline text-xs w-36  text-wrap  ">
+              <div className="flex items-center">
+                <span className="hidden md:inline text-xs w-36 text-wrap">
                   For 18 years and above only
                 </span>
                 <SignupLoginPopover />
