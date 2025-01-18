@@ -6,7 +6,6 @@ export default function Landing() {
     <div>
       <Main />
       <Slider />
-      {/* <GallerySection /> */}
     </div>
   );
 }

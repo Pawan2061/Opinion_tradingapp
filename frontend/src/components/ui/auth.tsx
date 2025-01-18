@@ -66,31 +66,31 @@ const SignupLoginPopover = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="bg-gray-700 hover:bg-gray-600 text-white py-1 px-4 rounded"
+        className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-2 px-6 rounded-full font-semibold transition duration-300 shadow-md"
       >
-        Join
+        Sign In
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-xl w-96 p-6">
-            <div className="flex mb-4 border-b">
+        <div className="fixed inset-0   z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
+            <div className="flex mb-6 gap-4">
               <button
                 onClick={() => setActiveTab("login")}
-                className={`flex-1 py-2 text-center ${
+                className={`flex-1 py-2 text-center font-semibold rounded-lg transition-all duration-300 ${
                   activeTab === "login"
-                    ? "border-b-2 border-blue-600 text-blue-600"
-                    : "text-gray-500"
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md"
+                    : "bg-gray-100/80 text-gray-600 hover:bg-gray-200/80"
                 }`}
               >
                 Login
               </button>
               <button
                 onClick={() => setActiveTab("signup")}
-                className={`flex-1 py-2 text-center ${
+                className={`flex-1 py-2 text-center font-semibold rounded-lg transition-all duration-300 ${
                   activeTab === "signup"
-                    ? "border-b-2 border-blue-600 text-blue-600"
-                    : "text-gray-500"
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md"
+                    : "bg-gray-100/80 text-gray-600 hover:bg-gray-200/80"
                 }`}
               >
                 Signup
@@ -98,11 +98,11 @@ const SignupLoginPopover = () => {
             </div>
 
             {activeTab === "login" && (
-              <form onSubmit={handleLogin} className="space-y-4">
+              <form onSubmit={handleLogin} className="space-y-5">
                 <div>
                   <label
                     htmlFor="login-username"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
                   >
                     Username
                   </label>
@@ -111,15 +111,15 @@ const SignupLoginPopover = () => {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter username"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                    placeholder="Enter your username"
                     required
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="login-password"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
                   >
                     Password
                   </label>
@@ -128,44 +128,44 @@ const SignupLoginPopover = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter password"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                    placeholder="Enter your password"
                     required
                   />
                 </div>
                 <div>
                   <label
-                    htmlFor="signup-email"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    htmlFor="login-email"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
                   >
                     Email
                   </label>
                   <input
-                    id="signup-email"
+                    id="login-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter email"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                    placeholder="Enter your email"
                     required
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={loginMutation.isPending}
-                  className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300"
+                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 rounded-lg font-semibold transition duration-300 shadow-md disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                 >
-                  Login
+                  {loginMutation.isPending ? "Logging in..." : "Login"}
                 </button>
               </form>
             )}
 
             {activeTab === "signup" && (
-              <form onSubmit={handleSignup} className="space-y-4">
+              <form onSubmit={handleSignup} className="space-y-5">
                 <div>
                   <label
                     htmlFor="signup-username"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
                   >
                     Username
                   </label>
@@ -174,15 +174,15 @@ const SignupLoginPopover = () => {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Choose username"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                    placeholder="Choose your username"
                     required
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="signup-email"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
                   >
                     Email
                   </label>
@@ -191,15 +191,15 @@ const SignupLoginPopover = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter email"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                    placeholder="Enter your email"
                     required
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="signup-password"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
                   >
                     Password
                   </label>
@@ -208,26 +208,28 @@ const SignupLoginPopover = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Create password"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                    placeholder="Create a password"
                     required
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={signUpmutation.isPending}
-                  className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition duration-300"
+                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 rounded-lg font-semibold transition duration-300 shadow-md disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                 >
-                  Signup
+                  {signUpmutation.isPending
+                    ? "Creating account..."
+                    : "Create Account"}
                 </button>
               </form>
             )}
 
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition duration-300"
             >
-              X
+              ✕
             </button>
           </div>
         </div>
