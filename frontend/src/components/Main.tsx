@@ -1,90 +1,104 @@
+import { useColor } from "./hooks/button";
 import { vud } from "../assets";
 import { useState } from "react";
-import { useColor } from "./hooks/button";
-
+// ... existing code ...
 export default function Main() {
   const [selectedTopic, setSelectedTopic] = useState("Samachar");
   const { description, heading } = useColor(selectedTopic);
 
   return (
-    <section
-      className="h-auto bg-[url('https://probo.in/assets/images/home/header/header-bg.svg')] bg-center  bg-no-repeat"
-      style={{ backgroundSize: "100% 25%", backgroundPositionY: "35%" }}
-    >
-      <div className="flex flex-col lg:flex-row justify-around items-center">
-        <div className="flex flex-col space-y-6 my-auto max-w-lg text-center lg:text-left">
-          <h1 className="text-4xl md:text-6xl font-work-sans">
-            Invest in your point of view
-          </h1>
-          <h1 className="text-gray-600 text-lg md:text-xl">
-            Sports, Entertainment and Finance
-          </h1>
-          <div className="flex justify-center lg:justify-start space-x-4">
-            <button
-              id="download_btn_navbar"
-              className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded transition"
-            >
-              Download App
-            </button>
-            <button
-              id="trade_online_btn_navbar"
-              className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded transition"
-            >
-              Trade Online
-            </button>
+    <section className="min-h-screen bg-[url('https://probo.in/assets/images/home/header/header-bg.svg')] bg-center bg-no-repeat">
+      {/* Hero Section */}
+      <div className="container mx-auto px-4 py-16 lg:py-24">
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-12">
+          <div className="flex flex-col space-y-8 max-w-xl text-center lg:text-left">
+            <h1 className="text-5xl md:text-7xl font-work-sans font-bold animate-fade-in">
+              Invest in your{" "}
+              <span className="text-blue-600">point of view</span>
+            </h1>
+            <h2 className="text-gray-600 text-xl md:text-2xl">
+              Sports, Entertainment and Finance
+            </h2>
+            <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+              <button
+                id="download_btn_navbar"
+                className="bg-gray-800 hover:bg-gray-700 text-white py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+              >
+                Download App
+              </button>
+              <button
+                id="trade_online_btn_navbar"
+                className="bg-blue-600 hover:bg-blue-500 text-white py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+              >
+                Trade Online
+              </button>
+            </div>
           </div>
-        </div>
-        <div className="max-w-xs md:max-w-md lg:max-w-lg">
-          <img
-            className="rounded-lg"
-            src="https://probo.in/_next/image?url=https%3A%2F%2Fd39axbyagw7ipf.cloudfront.net%2Fimages%2Fhome%2Fheader%2Fheader.webp&w=1200&q=75"
-            alt="Header image"
-          />
+          <div className="max-w-md lg:max-w-xl transform hover:scale-105 transition-transform duration-300">
+            <img
+              className="rounded-2xl shadow-2xl"
+              src="https://probo.in/_next/image?url=https%3A%2F%2Fd39axbyagw7ipf.cloudfront.net%2Fimages%2Fhome%2Fheader%2Fheader.webp&w=1200&q=75"
+              alt="Header image"
+            />
+          </div>
         </div>
       </div>
 
-      <div className="h-[500px] bg-[rgb(38,38,38)] flex flex-col lg:flex-row justify-start mx-auto p-4 lg:p-0">
-        <div className="text-white flex flex-col justify-center flex-1 mx-4 md:mx-8 space-y-2 lg:space-y-4 text-center lg:text-left">
-          <h1 className="text-[28px] md:text-[32px] lg:text-[42px]">
-            <a
-              className="cursor-pointer hover:text-gray-300"
-              onClick={() => setSelectedTopic("Samachar")}
-            >
-              Samachar
-            </a>{" "}
-            <span className="text-gray-500">
-              <a
-                className="cursor-pointer hover:text-gray-300"
-                onClick={() => setSelectedTopic("Vichar")}
-              >
-                Vichar
-              </a>
-            </span>{" "}
-            <a
-              className="cursor-pointer hover:text-gray-300"
-              onClick={() => setSelectedTopic("Upachar")}
-            >
-              <span className="text-gray-500">Upachar</span>
-            </a>
-          </h1>
-          <h2 className="text-[20px] md:text-[24px] lg:text-[30px]">
-            {heading}
-          </h2>
-          <p className="text-[14px] md:text-[16px] lg:text-[20px]">
-            {description}
-          </p>
-        </div>
-        <div className="flex justify-center items-center flex-1 mt-6 lg:mt-0">
-          <div className="bg-white w-[180px] md:w-[200px] lg:w-[240px] h-[300px] md:h-[380px] rounded-3xl shadow-lg border-4 border-gray-700 overflow-hidden flex items-center justify-center">
-            <video
-              className="rounded-xl"
-              muted
-              loop
-              autoPlay
-              height="100%"
-              width="100%"
-              src={vud}
-            ></video>
+      {/* Features Section */}
+      <div className="bg-[rgb(38,38,38)] py-16">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row justify-between items-center gap-12">
+            <div className="text-white flex flex-col justify-center flex-1 space-y-6 text-center lg:text-left">
+              <div className="space-x-4 text-[32px] md:text-[42px] lg:text-[52px] font-bold">
+                <a
+                  className={`cursor-pointer transition-colors duration-300 ${
+                    selectedTopic === "Samachar"
+                      ? "text-white"
+                      : "text-gray-500 hover:text-gray-300"
+                  }`}
+                  onClick={() => setSelectedTopic("Samachar")}
+                >
+                  Samachar
+                </a>
+                <a
+                  className={`cursor-pointer transition-colors duration-300 ${
+                    selectedTopic === "Vichar"
+                      ? "text-white"
+                      : "text-gray-500 hover:text-gray-300"
+                  }`}
+                  onClick={() => setSelectedTopic("Vichar")}
+                >
+                  Vichar
+                </a>
+                <a
+                  className={`cursor-pointer transition-colors duration-300 ${
+                    selectedTopic === "Upachar"
+                      ? "text-white"
+                      : "text-gray-500 hover:text-gray-300"
+                  }`}
+                  onClick={() => setSelectedTopic("Upachar")}
+                >
+                  Upachar
+                </a>
+              </div>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold">
+                {heading}
+              </h2>
+              <p className="text-lg md:text-xl lg:text-2xl text-gray-300">
+                {description}
+              </p>
+            </div>
+            <div className="flex justify-center items-center flex-1">
+              <div className="bg-white w-[220px] md:w-[280px] lg:w-[320px] h-[400px] md:h-[480px] rounded-[2rem] shadow-2xl border-4 border-gray-700 overflow-hidden transform hover:scale-105 transition-transform duration-300">
+                <video
+                  className="rounded-xl h-full w-full object-cover"
+                  muted
+                  loop
+                  autoPlay
+                  src={vud}
+                ></video>
+              </div>
+            </div>
           </div>
         </div>
       </div>
