@@ -23,7 +23,6 @@ export const proboRouter = express.Router();
 proboRouter.get("/", (req: Request, res: any) => {
   return res.send("hello");
 });
-// proboRouter.post("/auth", authSignup);
 proboRouter.post("/user/create/:userId", createUser);
 proboRouter.post("/symbol/create/:stockSymbol", createSymbol);
 proboRouter.post("/onramp/inr", rampUser);

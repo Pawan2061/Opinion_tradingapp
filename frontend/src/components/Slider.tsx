@@ -4,11 +4,8 @@ import { motion } from "framer-motion";
 export default function Slider() {
   return (
     <div className="relative min-h-[600px] w-full bg-gradient-to-r from-gray-50 to-white py-12">
-      {/* Container for better responsiveness */}
       <div className="container mx-auto px-4">
-        {/* Flex container for responsive layout */}
         <div className="flex flex-col lg:flex-row items-center gap-12">
-          {/* Text Section */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -26,7 +23,6 @@ export default function Slider() {
             </p>
           </motion.div>
 
-          {/* Cards Section */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
