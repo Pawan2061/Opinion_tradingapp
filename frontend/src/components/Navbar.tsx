@@ -10,7 +10,6 @@ export default function Navbar() {
   const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Handle navbar background on scroll
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -33,7 +32,6 @@ export default function Navbar() {
     >
       <nav className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link
             to="/"
             className="flex items-center transition-transform duration-300 hover:scale-105"
@@ -45,7 +43,6 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
@@ -62,26 +59,20 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right Section */}
           <div className="flex items-center space-x-4">
-            {!userdata?.user && (
-              <span className="hidden md:block text-xs text-gray-500 font-medium px-3 py-1 bg-gray-100 rounded-full">
-                For 18+ only
-              </span>
-            )}
-
-            {userdata?.user ? (
-              <UserInfo />
+            {!userdata?.user ? (
+              <>
+                <span className="hidden md:block text-xs text-gray-500 font-medium px-3 py-1 bg-gray-100 rounded-full">
+                  For 18+ only
+                </span>
+                <div className="flex items-center space-x-3">
+                  <SignupLoginPopover />
+                </div>
+              </>
             ) : (
-              <div className="flex items-center space-x-3">
-                <button className="hidden md:block hover:text-blue-600 text-sm font-medium transition-colors duration-300">
-                  Login
-                </button>
-                <SignupLoginPopover />
-              </div>
+              <UserInfo />
             )}
 
-            {/* Mobile Menu Button */}
             <button className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors duration-300">
               <svg
                 className="w-6 h-6"
@@ -100,7 +91,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu - Hidden by default */}
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navLinks.map((link) => (

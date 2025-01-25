@@ -12,7 +12,6 @@ export default function Main() {
 
   return (
     <main className="min-h-screen bg-[url('https://probo.in/assets/images/home/header/header-bg.svg')] bg-center bg-no-repeat">
-      {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 lg:py-24">
         <div className="flex flex-col lg:flex-row justify-between items-center gap-12">
           <div className="flex flex-col space-y-8 max-w-xl text-center lg:text-left">
@@ -46,7 +45,6 @@ export default function Main() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="bg-[rgb(38,38,38)] py-16">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row justify-between items-center gap-12">

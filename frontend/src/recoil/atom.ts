@@ -60,23 +60,27 @@ const { persistAtom } = recoilPersist({
   storage: localStorage,
 });
 
-export const authState = atom<string | null>({
-  key: "authstate",
-  default: null,
+interface AuthState {
+  user: string | null;
+  token: string | null;
+  balance: number;
+}
 
+export const authState = atom<AuthState>({
+  key: "authState",
+  default: {
+    user: null,
+    token: null,
+    balance: 0,
+  },
   effects_UNSTABLE: [persistAtom],
 });
 
-export const authSelector = selector<{ user: string } | null>({
-  key: "authselector",
+export const authSelector = selector({
+  key: "authSelector",
   get: ({ get }) => {
-    const user = get(authState);
-    if (!user) {
-      return null;
-    }
-    return {
-      user,
-    };
+    const auth = get(authState);
+    return auth;
   },
 });
 

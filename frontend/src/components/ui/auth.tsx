@@ -3,8 +3,9 @@ import { useState } from "react";
 import { handleSignin, hanldeAuth } from "../../utils/calc";
 import { queryClient } from "../../main";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { authState } from "../../recoil/atom";
+import axios from "axios";
 
 const SignupLoginPopover = () => {
   const navigate = useNavigate();
@@ -12,16 +13,23 @@ const SignupLoginPopover = () => {
   const [activeTab, setActiveTab] = useState("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [auth, setAuthState] = useRecoilState(authState);
+  const [auth, setAuth] = useRecoilState(authState);
   console.log(auth);
 
   const [email, setEmail] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
+  const setAuthState = useSetRecoilState(authState);
+
   const signUpmutation = useMutation({
     mutationFn: hanldeAuth,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
 
-      setAuthState(data.user.username);
+      setAuthState({
+        user: data.user.username,
+        token: data.token,
+        balance: data.user.balance || 0,
+      });
       navigate("/events");
     },
   });
@@ -30,10 +38,44 @@ const SignupLoginPopover = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
 
-      setAuthState(data.user.username);
+      setAuthState({
+        user: data.user.username,
+        token: data.token,
+        balance: data.user.balance || 0,
+      });
       navigate("/events");
     },
   });
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const username = formData.get("username") as string;
+    const password = formData.get("password") as string;
+    const email = formData.get("email") as string;
+
+    try {
+      const endpoint = isLogin ? "/auth/login" : "/auth/signup";
+      const response = await axios.post(
+        `http://localhost:3000/api/v1${endpoint}`,
+        {
+          username,
+          password,
+          email,
+        }
+      );
+
+      if (response.data) {
+        setAuthState({
+          user: response.data.user.username,
+          token: response.data.token,
+          balance: response.data.user.balance || 0,
+        });
+      }
+    } catch (error) {
+      console.error("Authentication error:", error);
+    }
+  };
 
   const handleLogin = (e: any) => {
     e.preventDefault();
