@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   redis:
     image: redis
@@ -19,7 +19,6 @@ services:
     ports:
       - "3002:3002"
 
-
   ws-server:
     build:
       context: ./ws
@@ -29,7 +28,7 @@ services:
     restart: unless-stopped
     environment:
       - REDIS_URL=redis://redis:6379
-   
+
     ports:
       - "8080:8080"
 

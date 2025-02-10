@@ -8,7 +8,7 @@ export default function EventNavbar() {
         >
           All stories
         </a>
-        <a href="/second" className="font-work-sans text-xs">
+        {/* <a href="/second" className="font-work-sans text-xs">
           Pawan
         </a>
         <a href="#" className="font-work-sans text-xs ">
@@ -43,7 +43,7 @@ export default function EventNavbar() {
         </a>
         <a href="#" className="font-work-sans text-xs ">
           Pawan
-        </a>
+        </a> */}
       </div>
     </div>
   );

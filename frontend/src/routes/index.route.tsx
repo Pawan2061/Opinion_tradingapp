@@ -4,6 +4,7 @@ import Events from "../pages/Events";
 import Navbar from "../components/Navbar";
 import OrderBook from "../pages/Trade";
 import Wallet from "../pages/Wallet";
+import Learn from "../pages/Learn";
 
 const Approutes = () => {
   return (
@@ -14,7 +15,7 @@ const Approutes = () => {
         <Route path="/events" element={<Events />} />
         <Route path="/trade" element={<OrderBook />} />
         <Route path="/wallet" element={<Wallet />} />
-        {/* <Route path="/trade" element={<Trade />} /> */}
+        <Route path="/learn" element={<Learn />} />
       </Routes>
     </Router>
   );

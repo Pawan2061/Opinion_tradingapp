@@ -41,7 +41,7 @@ export default function Eventbody() {
       longDesc:
         "Following new product announcements and market expansion, analysts predict significant growth for Tesla stock.",
       image:
-        "https://g.foolcdn.com/editorial/images/734973/tesla-model-y-red.jpg",
+        "https://bsmedia.business-standard.com/_media/bs/img/article/2024-04/30/full/1714454526-2588.JPG?im=FeatureCrop,size=(826,465)",
       yesPrice: 3,
       noPrice: 6,
       probability: 65,
