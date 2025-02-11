@@ -4,6 +4,7 @@ import { authSelector, authState } from "../recoil/atom";
 import axios from "axios";
 import { FaWallet, FaArrowUp, FaHistory } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../utils/calc";
 
 const Wallet = () => {
   const [amount, setAmount] = useState("");
@@ -27,13 +28,10 @@ const Wallet = () => {
     setSuccess("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/onramp/inr",
-        {
-          userId: userdata?.user,
-          amount: Number(amount),
-        }
-      );
+      const response = await axios.post(API_BASE_URL + "/api/v1/onramp/inr", {
+        userId: userdata?.user,
+        amount: Number(amount),
+      });
       console.log(response.data, "response data");
 
       if (response.data) {

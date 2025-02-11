@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { TradeButton } from "./ui/TradeButton";
 import axios from "axios";
+import { API_BASE_URL } from "../utils/calc";
 
 type TradeAction = "buy" | "sell";
 type TradeOutcome = "yes" | "no";
@@ -73,8 +74,8 @@ export const Trade = () => {
 
       const endpoint =
         selectedAction === "buy"
-          ? "http://localhost:3000/api/v1/order/buy"
-          : "http://localhost:3000/api/v1/order/sell";
+          ? API_BASE_URL + "/api/v1/order/buy"
+          : API_BASE_URL + "/api/v1/order/sell";
 
       console.log(orderPayload);
 

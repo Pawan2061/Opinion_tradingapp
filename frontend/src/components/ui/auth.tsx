@@ -55,15 +55,12 @@ const SignupLoginPopover = () => {
     const email = formData.get("email") as string;
 
     try {
-      const endpoint = isLogin ? "/auth/login" : "/auth/signup";
-      const response = await axios.post(
-        `http://localhost:3000/api/v1${endpoint}`,
-        {
-          username,
-          password,
-          email,
-        }
-      );
+      const endpoint = isLogin ? "/authLogin" : "/authSignup";
+      const response = await axios.post(`http://localhost:3000/${endpoint}`, {
+        username,
+        password,
+        email,
+      });
 
       if (response.data) {
         setAuthState({

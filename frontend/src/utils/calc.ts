@@ -23,6 +23,9 @@ interface payload {
   yes: { [price: string]: OrderData };
   no: { [price: string]: OrderData };
 }
+
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export function transform(data: payload): WsData {
   const parse = JSON.parse(data as any);
   console.log("type of ", typeof parse);
@@ -59,7 +62,7 @@ export function transform(data: payload): WsData {
 
 export async function hanldeAuth(data: AuthPayload) {
   try {
-    const response = await axios.post("http://localhost:3000/authSignup", data);
+    const response = await axios.post(API_BASE_URL + "/authSignup", data);
     console.log(response, "response here");
 
     return response.data;
@@ -70,7 +73,7 @@ export async function hanldeAuth(data: AuthPayload) {
 
 export async function handleSignin(data: AuthPayload) {
   try {
-    const response = await axios.post("http://localhost:3000/authLogin", data);
+    const response = await axios.post(API_BASE_URL + "/authLogin", data);
     console.log(response, "response here");
 
     return response.data;
