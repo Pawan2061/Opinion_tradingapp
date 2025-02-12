@@ -27,25 +27,25 @@ export const Trade = () => {
       action: "buy",
       outcome: "yes",
       text: "Buy Yes",
-      priceDefault: 150,
+      priceDefault: 2,
     },
     {
       action: "buy",
       outcome: "no",
       text: "Buy No",
-      priceDefault: 150,
+      priceDefault: 3,
     },
     {
       action: "sell",
       outcome: "yes",
       text: "Sell Yes",
-      priceDefault: 150,
+      priceDefault: 4,
     },
     {
       action: "sell",
       outcome: "no",
       text: "Sell No",
-      priceDefault: 150,
+      priceDefault: 5,
     },
   ];
 
@@ -67,17 +67,17 @@ export const Trade = () => {
       price: price,
       stockType: selectedOutcome,
     };
+    console.log(API_BASE_URL, "api url is here");
 
     try {
       setLoading(true);
       setError(null);
+      console.log(API_BASE_URL, "api base url");
 
       const endpoint =
         selectedAction === "buy"
           ? API_BASE_URL + "/api/v1/order/buy"
           : API_BASE_URL + "/api/v1/order/sell";
-
-      console.log(orderPayload);
 
       const response = await axios.post(endpoint, orderPayload);
 
