@@ -3,6 +3,8 @@ import { ChevronDown } from "lucide-react";
 import { TradeButton } from "./ui/TradeButton";
 import axios from "axios";
 import { API_BASE_URL } from "../utils/calc";
+import { useRecoilValue } from "recoil";
+import { orderBookAtom } from "../recoil/atom";
 
 type TradeAction = "buy" | "sell";
 type TradeOutcome = "yes" | "no";
@@ -49,6 +51,8 @@ export const Trade = () => {
     },
   ];
 
+  const orderBook = useRecoilValue(orderBookAtom);
+
   const handleTradeSelection = (
     action: TradeAction,
     outcome: TradeOutcome,
@@ -60,12 +64,14 @@ export const Trade = () => {
   };
 
   const handlePlaceOrder = async () => {
+    const currentOrder = getCurrentOrder();
     const orderPayload = {
       userId: "user1",
       stockSymbol: "BTC_USDT_10_Oct_2024_9_30",
       quantity: quantity,
-      price: price,
+      price: currentOrder ? currentOrder.price : price,
       stockType: selectedOutcome,
+      action: selectedAction,
     };
     console.log(API_BASE_URL, "api url is here");
 
@@ -89,6 +95,19 @@ export const Trade = () => {
       setLoading(false);
     }
   };
+
+  const getCurrentOrder = () => {
+    const currentOrder = orderBook.find(
+      (order) => order.name === "BTC_USDT_10_Oct_2024_9_30"
+    );
+    if (currentOrder) {
+      const orders = currentOrder.orders[selectedOutcome];
+      return orders.length > 0 ? orders[0] : null;
+    }
+    return null;
+  };
+
+  const currentOrder = getCurrentOrder();
 
   return (
     <div className="w-full max-w-md mx-auto p-4 bg-white rounded-lg shadow-md">
@@ -146,11 +165,20 @@ export const Trade = () => {
       <div className="flex justify-between items-center mb-4">
         <div>
           <div className="text-sm text-gray-600">You</div>
-          <div className="font-bold">₹ 0</div>
+          <div className="font-bold">
+            ₹ {currentOrder ? quantity * currentOrder.price : 0}
+          </div>
         </div>
         <div className="text-right">
           <div className="text-sm text-gray-600">You get</div>
-          <div className="font-bold">₹ 20</div>
+          <div className="font-bold">
+            ₹{" "}
+            {currentOrder
+              ? selectedAction === "buy"
+                ? quantity * currentOrder.price - 10
+                : quantity * currentOrder.price + 10
+              : 0}
+          </div>
         </div>
       </div>
 
