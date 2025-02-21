@@ -73,12 +73,10 @@ export const Trade = () => {
       stockType: selectedOutcome,
       action: selectedAction,
     };
-    console.log(API_BASE_URL, "api url is here");
 
     try {
       setLoading(true);
       setError(null);
-      console.log(API_BASE_URL, "api base url");
 
       const endpoint =
         selectedAction === "buy"
